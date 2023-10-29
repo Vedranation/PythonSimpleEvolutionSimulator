@@ -3,7 +3,7 @@ import random
 
 world_size = 5 #how big (box) do you want world to be
 
-
+#change
 #Generate the world X in Y, filled with None to show empty cells, starts from XY = 0
 World_list_x_y = [[None for _ in range(world_size)] for _ in range(world_size)]
 
