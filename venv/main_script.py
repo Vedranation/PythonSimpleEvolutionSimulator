@@ -1,13 +1,11 @@
 
 import random
 
-world_size = 20 #how big (box) do you want world to be
+world_size = 5 #how big (box) do you want world to be
+
 
 #Generate the world X in Y, filled with None to show empty cells, starts from XY = 0
-
 World_list_x_y = [[None for _ in range(world_size)] for _ in range(world_size)]
-
-print(World_list_x_y[0][0]) #Check coordinates X=13 Y=7
 
 class Agent:
     def __init__(self, who):
@@ -22,8 +20,8 @@ class Agent:
         else:
             raise Exception("Not supported agent type")
 
+        self.FindFreeSpot() #find a free spot to spawn
 
-        self.FindFreeSpot()
 
 
     def FindFreeSpot(self):
@@ -37,7 +35,23 @@ class Agent:
         World_list_x_y[self.x][self.y] = self.who
         return self.x, self.y
 
+num_dandelion = 10 #how many of each agents do you want
+num_cow = 5
+Cows_list = []
+Dandelion_list = []
 
-Plant = Agent("Plant")
-Rhino = Agent("Herbivore")
+if pow(world_size, 2) < num_cow + num_dandelion: #Check if world is big enough
+    raise Exception("World can't be smaller than amount of objects to spawn")
 
+#spawn agents
+for i in range(num_dandelion):
+    Plant = Agent("Plant")
+    Dandelion_list.append(Plant)
+for i in range(num_cow):
+    Cow = Agent("Herbivore")
+    Cows_list.append(Cow)
+
+for i in Cows_list:
+    print(f"Cows are at: X: {i.x} Y: {i.y}")
+for i in Dandelion_list:
+    print(f"Dandelions are at: X: {i.x} Y: {i.y}")
