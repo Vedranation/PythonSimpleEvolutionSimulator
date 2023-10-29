@@ -45,8 +45,8 @@ if pow(world_size, 2) < num_cow + num_dandelion: #Check if world is big enough
 
 #spawn agents
 for i in range(num_dandelion):
-    Plant = Agent("Plant")
-    Dandelion_list.append(Plant)
+    Dandelion = Agent("Plant")
+    Dandelion_list.append(Dandelion)
 for i in range(num_cow):
     Cow = Agent("Herbivore")
     Cows_list.append(Cow)
@@ -55,3 +55,4 @@ for i in Cows_list:
     print(f"Cows are at: X: {i.x} Y: {i.y}")
 for i in Dandelion_list:
     print(f"Dandelions are at: X: {i.x} Y: {i.y}")
+
