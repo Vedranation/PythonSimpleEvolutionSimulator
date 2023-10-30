@@ -85,14 +85,28 @@ class Agent:
                     if World_agent_list_x_y[direction[0]][direction[1]].type == "Plant": #if we just ate a plant:
                         World_agent_list_x_y[direction[0]][direction[1]].FindFreeSpot() #respawn plant
                     else:
-                        Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # for the agent being eaten
+                        Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
+                    #update new position
                     World_agent_list_x_y[self.x][self.y] = None
                     World_agent_list_x_y[direction[0]][direction[1]] = self
                     self.x = direction[0]
                     self.y = direction[1]
+                    return #end the search
+        self.RandomMove(directions_x_y)
+    def RandomMove(self, directions_x_y):
+        if self.speed == 1: #simplest case, just move and end turn
+            for direction in directions_x_y:
+                if direction[0] >= world_size or direction[1] >= world_size or direction[0] < 0 or direction[1] < 0:  # prevents moving beyond edge of world
+                    continue
+                random.choice(directions_x_y)
+                print(f"{self.name} moved from X: {self.x} Y: {self.y} to X: {direction[0]} Y: {direction[1]}")
+                World_agent_list_x_y[self.x][self.y] = None
+                World_agent_list_x_y[direction[0]][direction[1]] = self
+                self.x = direction[0]
+                self.y = direction[1]
+                return
 
-                    break #end the search
 
 
 Cows_list = [] #initialise lists to store agents
