@@ -8,21 +8,23 @@ world_size = 20 #how big (box) do you want world to be
 World_list_x_y = [[None for _ in range(world_size)] for _ in range(world_size)]
 
 class Agent:
-    def __init__(self, type, perception, speed):
+    def __init__(self, name, type, perception, speed):
 
         #Register what type of agent is bring created
         if type == "Plant":
             self.type = "Plant"
         elif type == "Herbivore":
             self.type = "Herbivore"
+            self.food = "Plant"
         elif type == "Carnivore":
             self.type = "Carnivore"
+            self.food = "Herbivore"
         else:
             raise Exception("Not supported agent type")
 
         self.perception = perception
         self.speed = speed
-
+        self.name = name
         self.FindFreeSpot() #find a free spot to spawn
 
     def FindFreeSpot(self):
@@ -48,32 +50,50 @@ class Agent:
             for direction in directions_x_y:
                 if direction[0] >= world_size or direction[1] >= world_size or direction[0] < 0 or direction[1] < 0: #prevents checking beyond edge of world
                     continue
-                print(f"Cow X: {self.x} Y: {self.y}  |  check X: {direction[0]} Y:{direction[1]}  |  found: {World_list_x_y[direction[0]][direction[1]]}")
+                print(f"{self.name} X: {self.x} Y: {self.y}  |  check X: {direction[0]} Y:{direction[1]}  |  found: {World_list_x_y[direction[0]][direction[1]]}") #console log
+
+                #if we found food:
+                if World_list_x_y[direction[0]][direction[1]] == self.food:
+                    #World_list_x_y[direction[0]][direction[1]] =
+                    print("Found food!")
+                    break #end the search
 
 
-
-num_dandelion = 10 #how many of each agents do you want
-num_cow = 5
+Simulation_Length = 2 #how many turns in simulation
+Num_dandelion = 10 #how many of each agents do you want
+Num_cow = 5
+Num_tiger = 5
 Cows_list = []
 Dandelion_list = []
+Tigers_list = []
 
-if pow(world_size, 2) < num_cow + num_dandelion: #Check if world is big enough
+
+if pow(world_size, 2) < Num_cow + Num_dandelion: #Check if world is big enough
     raise Exception("World can't be smaller than amount of objects to spawn")
 
 #spawn agents
-for i in range(num_dandelion):
-    Dandelion = Agent("Plant", 0, 0) #input type, perception, speed
+for i in range(Num_dandelion):
+    Dandelion = Agent("Dandelion", "Plant", 0, 0) #input name, type, perception, speed
     Dandelion_list.append(Dandelion)
-for i in range(num_cow):
-    Cow = Agent("Herbivore", 1, 1)
+for i in range(Num_cow):
+    Cow = Agent("Cow", "Herbivore", 1, 1)
     Cows_list.append(Cow)
+for i in range(Num_tiger):
+    Tiger = Agent("Tiger", "Carnivore", 1, 1)
+    Tigers_list.append(Tiger)
 
 for i in Cows_list:
     print(f"Cows are at: X: {i.x} Y: {i.y}")
 for i in Dandelion_list:
     print(f"Dandelions are at: X: {i.x} Y: {i.y}")
+for i in Tigers_list:
+    print(f"Tigers are at: X: {i.x} Y: {i.y}")
 
-#simulate 1 turn
-
-for cows in Cows_list:
-    cows.SearchForFood()
+#simulate Simulation_Length turns
+for i in range(Simulation_Length):
+    print(f"\nTurn {i+1}\n")
+    for cows in Cows_list:
+        cows.SearchForFood()
+    print("\n")
+    for tigers in Tigers_list:
+        tigers.SearchForFood()
