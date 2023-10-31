@@ -111,10 +111,11 @@ class Agent:
     def RandomMove(self, directions_x_y):
         if self.speed == 1: #simplest case, just move and end turn
             for direction in directions_x_y:
-                if direction[0] >= world_size or direction[1] >= world_size or direction[0] < 0 or direction[1] < 0:  # prevents moving beyond edge of world
-                    continue
+                if direction[0] >= world_size or direction[1] >= world_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
+                    continue # prevents moving beyond edge of world or into another Agent and fucking things up
                 random.choice(directions_x_y)
                 print(f"{self.name} moved from [{self.x},{self.y}] to [{direction[0]},{direction[1]}], Hunger: {self.hunger}")
+
                 World_agent_list_x_y[self.x][self.y] = None
                 World_agent_list_x_y[direction[0]][direction[1]] = self
                 self.x = direction[0]
