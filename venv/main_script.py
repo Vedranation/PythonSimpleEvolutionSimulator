@@ -4,7 +4,7 @@ import math
 import re
 
 World_size = 20     #how big (box) do you want world to be
-Simulation_Length = 15      #how many turns in simulation
+Simulation_Length = 30     #how many turns in simulation
 
 #how many of each agents do you want, don't touch Original_num thats for post simulation debug
 Num_dandelion = 80; Original_num_dandelion = Num_dandelion
@@ -15,7 +15,7 @@ Num_tiger = 30; Original_num_Tiger = Num_tiger
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
 Base_reproduce_chance = 0.2     #maximum reproduce chance (at max hunger)
-
+DeathAge = 60       #at how old do animals 100% die (sigmoid)
 #---------------------------------------------------------------------------
 
 
@@ -141,12 +141,13 @@ class Agent:
         #If food was eaten, how much nourishment does it give
         if ate == True:
             if size == "Small":
-                self.hunger = self.hunger + 4
+                self.hunger = self.hunger + 6
             elif size == "Medium":
-                self.hunger = self.hunger + 8
+                self.hunger = self.hunger + 9
             else:
-                self.hunger = self.hunger + 16 #big animals nourish for longer
-            return #grace period, if food was found, don't use reserves or check for starvation
+                self.hunger = self.hunger + 12 #big animals nourish for longer
+            return
+            #grace period, if food was found, don't use reserves or check for starvation
         #depending on Agent size, food depletes at different rate
         if self.size == "Small":
             self.hunger = self.hunger - 1 #lose 1 point worth of hunger
@@ -165,14 +166,23 @@ class Agent:
         hunger_factor = hunger / Max_hunger_to_reproduce  # Normalizes hunger between 0 and 1
         return round(1 / (1 + math.exp(-sigmoid_slope * (hunger_factor - 0.5))), 2) #more well fed, more chance to breed
 
+
+    def DeathOfOldAge(self):
+        sigmoid_slope = 15.0
+        death_factor = self.age / DeathAge  # Normalizes chance to die between 0 and 1
+
+        if round(1 / (1 + math.exp(-sigmoid_slope * (death_factor - 0.5))), 2) >= round(random.random(), 2): # older you are, more likely to perish
+            self.RemoveAgent(self) #die of old age
+
     def Reproduce(self): #Is called directly, Handles reproducing and aging
-        if pow(World_size, 2) < SumAllAgents:
-            print("World too small to breed!")
-            self.age = self.age + 1
-            return
+
         if self.age > Reproduce_age:
             if Base_reproduce_chance * Agent.HungerReproduceSigmoid(self.hunger) <= round(random.random(), 2):
-                if "Tiger" in self.name:
+                if pow(World_size, 2) < SumAllAgents:
+                    print("World too small to breed!")
+                    self.age = self.age + 1
+                    return
+                elif "Tiger" in self.name:
 
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
@@ -184,6 +194,7 @@ class Agent:
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed)
                 print(f"{newborn.name} was born with perception {newborn.perception}, speed {newborn.speed}")
         self.age = self.age + 1
+        self.DeathOfOldAge() #check if time to die
 
 
 
@@ -223,6 +234,9 @@ for i in range(Num_tiger):
 # for i in Tigers_list:
 #     print(f"Tigers are at: X: {i.x} Y: {i.y}")
 print(f"World started with {Num_dandelion} Dandelions, {Num_cow} Cows, and {Num_tiger} Tigers")
+
+
+
 #simulate Simulation_Length turns (main loop)
 for i in range(Simulation_Length):
     print(f"\n\n----------Turn {i+1}----------")
@@ -241,7 +255,10 @@ for i in range(Simulation_Length):
     Num_dandelion = len(Dandelion_list)
     Num_tiger = len(Tigers_list)
     SumAllAgents = Num_cow + Num_dandelion + Num_tiger
+
+
+
 #report results
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {Original_num_dandelion} Dandelions, {Original_num_Cow} Cows, and {Original_num_Tiger} Tigers, Total: {(Original_num_Tiger + Original_num_dandelion + Original_num_Cow)}")
-print(f"World ended with {Num_dandelion} Dandelions, {Num_cow} Cows, and {Num_tiger} Tigers, Total: {SumAllAgents}")
+print(f"World ended at turn {Simulation_Length} with {Num_dandelion} Dandelions, {Num_cow} Cows, and {Num_tiger} Tigers, Total: {SumAllAgents}")
