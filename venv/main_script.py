@@ -17,6 +17,7 @@ Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to bree
 Base_reproduce_chance = 0.2     #maximum reproduce chance (at max hunger)
 DeathAge = 60       #at how old do animals 100% die (sigmoid)
 World_size_spawn_tolerance = 1.01   #tolerance to world size to prevent overpopulation (wacky solution and pretty shit but should work)
+Personal_animal_limit = pow(World_size, 2) * 0.75    #how much % of the world can a single population have before its forbidden from spawning
 #---------------------------------------------------------------------------
 
 Skip = False
@@ -148,16 +149,16 @@ class Agent:
             elif size == "Medium":
                 self.hunger = self.hunger + 9
             else:
-                self.hunger = self.hunger + 12 #big animals nourish for longer
-            return
-            #grace period, if food was found, don't use reserves or check for starvation
+                self.hunger = self.hunger + 16 #big animals nourish for longer
+            #return #grace period, if food was found, don't use reserves or check for starvation
+
         #depending on Agent size, food depletes at different rate
         if self.size == "Small":
             self.hunger = self.hunger - 1 #lose 1 point worth of hunger
         elif self.size == "Medium":
             self.hunger = self.hunger - 2
         else:
-            self.hunger = self.hunger - 4 #bigger animals need more food
+            self.hunger = self.hunger - 3 #bigger animals need more food
         #starve
         if self.hunger <= 0:
             self.RemoveAgent(self) #starve
@@ -191,12 +192,20 @@ class Agent:
                     return
 
                 elif "Tiger" in self.name:
-
+                    if len(Tigers_list) > Personal_animal_limit:
+                        print("Tigers have reached population limit")
+                        self.age = self.age + 1
+                        self.DeathOfOldAge()
+                        return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed)
                 elif "Cow" in self.name:
-
+                    if len(Cows_list) > Personal_animal_limit:
+                        print("Cows have reached population limit")
+                        self.age = self.age + 1
+                        self.DeathOfOldAge()
+                        return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed)
