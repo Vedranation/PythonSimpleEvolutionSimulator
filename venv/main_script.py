@@ -3,13 +3,13 @@ import random
 import math
 import re
 
-World_size = 30     #how big (box) do you want world to be
+World_size = 20     #how big (box) do you want world to be
 Simulation_Length = 60     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [80];
 Num_cow = [30];
-Num_tiger = [30];
+Num_tiger = [20];
 
 
 Reproduce_age = 5   #minimum age before can breed
@@ -29,7 +29,7 @@ if pow(World_size, 2) < SumAllAgents[-1]:
 #Generate the world X in Y, filled with None to show empty cells, starts from XY = 0, ends at at World_size - 1
 World_agent_list_x_y = [[None for _ in range(World_size)] for _ in range(World_size)] #stores all agent instances
 class Agent:
-    def __init__(self, name, type, perception, speed, size):
+    def __init__(self, name, type, perception, speed, size, hunger):
 
         #Register what type of agent is bring created
         if type == "Plant":
@@ -49,14 +49,15 @@ class Agent:
         self.size = size
         self.age = 0;
 
-        if self.size == "Small": #big animals need more food, spawns bigger animals with bigger reservoir
-            self.hunger = 10
-        elif self.size == "Medium":
-            self.hunger = 15
-        elif self.size == "Large":
-            self.hunger = 20
-        else:
-            raise Exception("Not supposed agent size")
+        if self.type != "Plant":
+            if self.size == "Small": #big animals need more food, spawns bigger animals with bigger reservoir
+                self.hunger = hunger + 2
+            elif self.size == "Medium":
+                self.hunger = hunger + 4
+            elif self.size == "Large":
+                self.hunger = hunger + 6
+            else:
+                raise Exception("Not supposed agent size")
 
         self.FindFreeSpot()  # find a free spot to spawn
 
@@ -158,7 +159,7 @@ class Agent:
         elif self.size == "Medium":
             self.hunger = self.hunger - 2
         else:
-            self.hunger = self.hunger - 3 #bigger animals need more food
+            self.hunger = self.hunger - 4 #bigger animals need more food
         #starve
         if self.hunger <= 0:
             self.RemoveAgent(self) #starve
@@ -193,22 +194,22 @@ class Agent:
 
                 elif "Tiger" in self.name:
                     if len(Tigers_list) > Personal_animal_limit:
-                        print("Tigers have reached population limit")
+                        #print("Tigers have reached population limit")
                         self.age = self.age + 1
                         self.DeathOfOldAge()
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed)
+                    newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Cow" in self.name:
                     if len(Cows_list) > Personal_animal_limit:
-                        print("Cows have reached population limit")
+                        #print("Cows have reached population limit")
                         self.age = self.age + 1
                         self.DeathOfOldAge()
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
-                    newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed)
+                    newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 print(f"{newborn.name} was born with perception {newborn.perception}, speed {newborn.speed}")
         self.age = self.age + 1
         self.DeathOfOldAge() #check if time to die
@@ -221,16 +222,16 @@ Dandelion_list = []
 Tigers_list = []
 
 #Function to spawn agents
-def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small"): # input default name, type, perception, speed, size, unless overwritten by parent
-    Dandelion = Agent(name, type, perception, speed, size)
+def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
+    Dandelion = Agent(name, type, perception, speed, size, hunger)
     Dandelion_list.append(Dandelion)
     return Dandelion
-def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large"):
-    Cow = Agent(name, type, perception, speed, size)
+def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=20):
+    Cow = Agent(name, type, perception, speed, size, hunger)
     Cows_list.append(Cow)
     return Cow
-def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large"):
-    Tiger = Agent(name, type, perception, speed, size)
+def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=20):
+    Tiger = Agent(name, type, perception, speed, size, hunger)
     Tigers_list.append(Tiger)
     return Tiger
 
