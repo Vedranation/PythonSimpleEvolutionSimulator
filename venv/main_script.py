@@ -8,17 +8,18 @@ Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
-Num_cow = [30];
-Num_tiger = [20];
+Num_cow = [40];
+Num_tiger = [40];
 
-
+Max_flowers = 200       #how many flowers can be
+GrowthPerTurn = 10      #how many flowers spawn per turn
 maximum_hunger = 40     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
 Base_reproduce_chance = 0.2     #maximum reproduce chance (at max hunger)
 DeathAge = 30       #at how old do animals 100% die (sigmoid)
-World_size_spawn_tolerance = 1.01   #tolerance to world size to prevent overpopulation
-Personal_animal_limit = pow(World_size, 2) * 0.65    #how much % of the world can a single population have before its forbidden from spawning
+World_size_spawn_tolerance = 1.01      #tolerance to world size to prevent overpopulation
+Personal_animal_limit = pow(World_size, 2) * 0.75       #how much % of the world can a single population have before its forbidden from spawning
 #---------------------------------------------------------------------------
 
 Skip = False
@@ -81,7 +82,8 @@ class Agent:
             Cows_list.remove(agent)
         elif "Tiger" in agent.name:
             Tigers_list.remove(agent)
-        # No need to remove plants from a list because they get respawned
+        elif "Dandelion" in agent.name:
+            Dandelion_list.remove(agent)
         global Skip
         Skip = True
 
@@ -109,15 +111,11 @@ class Agent:
                 #if we found food, eat it and go there:
 
                 if World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
-                    #print(f"{self.name} found food! Food is: {World_agent_list_x_y[direction[0]][direction[1]].name}, Hunger: {self.hunger}") #Find specific instance to eat
+                    print(f"{self.name} found food! Food is: {World_agent_list_x_y[direction[0]][direction[1]].name}, Hunger: {self.hunger}") #Find specific instance to eat
 
-                    if World_agent_list_x_y[direction[0]][direction[1]].type == "Plant": #if we just ate a plant:
-                        self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size)  # track hunger levels, pass food that was eaten
-                        World_agent_list_x_y[direction[0]][direction[1]].FindFreeSpot() #respawn plant
 
-                    else:
-                        self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size)  # track hunger levels, pass food that was eaten
-                        Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
+                    self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size)  # track hunger levels, pass food that was eaten
+                    Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
                     #update new position
                     World_agent_list_x_y[self.x][self.y] = None
@@ -151,8 +149,8 @@ class Agent:
             elif size == "Medium":
                 self.hunger = self.hunger + 9
             else:
-                self.hunger = self.hunger + 16 #big animals nourish for longer
-            #return #grace period, if food was found, don't use reserves or check for starvation
+                self.hunger = self.hunger + 20 #big animals nourish for longer
+            return #grace period, if food was found, don't use reserves or check for starvation
 
         #depending on Agent size, food depletes at different rate
         if self.size == "Small":
@@ -176,7 +174,7 @@ class Agent:
 
 
     def DeathOfOldAge(self):
-        sigmoid_slope = 15.0
+        sigmoid_slope = 20.0
         death_factor = self.age / DeathAge  # Normalizes chance to die between 0 and 1
 
         if round(1 / (1 + math.exp(-sigmoid_slope * (death_factor - 0.5))), 2) >= round(random.random(), 2): # older you are, more likely to perish
@@ -260,6 +258,11 @@ print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, and
 
 #simulate Simulation_Length turns (main loop)
 for i in range(Simulation_Length):
+
+    if Num_dandelion[-1]+GrowthPerTurn <= Max_flowers: #respawn flowers
+        for j in range(10):
+            SpawnDandelion()
+
     print(f"\n\n----------Turn {i+1}----------")
     print(f"There are: {len(Dandelion_list)} Dandelions, {len(Cows_list)} Cows, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
     for cows in Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
