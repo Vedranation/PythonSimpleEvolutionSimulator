@@ -3,21 +3,22 @@ import random
 import math
 import re
 
-World_size = 20     #how big (box) do you want world to be
-Simulation_Length = 60     #how many turns in simulation
+World_size = 30     #how big (box) do you want world to be
+Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
-Num_dandelion = [80];
+Num_dandelion = [130];
 Num_cow = [30];
 Num_tiger = [20];
 
 
+maximum_hunger = 40     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
 Base_reproduce_chance = 0.2     #maximum reproduce chance (at max hunger)
-DeathAge = 60       #at how old do animals 100% die (sigmoid)
-World_size_spawn_tolerance = 1.01   #tolerance to world size to prevent overpopulation (wacky solution and pretty shit but should work)
-Personal_animal_limit = pow(World_size, 2) * 0.75    #how much % of the world can a single population have before its forbidden from spawning
+DeathAge = 30       #at how old do animals 100% die (sigmoid)
+World_size_spawn_tolerance = 1.01   #tolerance to world size to prevent overpopulation
+Personal_animal_limit = pow(World_size, 2) * 0.65    #how much % of the world can a single population have before its forbidden from spawning
 #---------------------------------------------------------------------------
 
 Skip = False
@@ -50,12 +51,12 @@ class Agent:
         self.age = 0;
 
         if self.type != "Plant":
-            if self.size == "Small": #big animals need more food, spawns bigger animals with bigger reservoir
-                self.hunger = hunger + 2
+            if self.size == "Small": #gives babies 1 turn worth of food
+                self.hunger = hunger + 1
             elif self.size == "Medium":
-                self.hunger = hunger + 4
+                self.hunger = hunger + 2
             elif self.size == "Large":
-                self.hunger = hunger + 6
+                self.hunger = hunger + 4
             else:
                 raise Exception("Not supposed agent size")
 
@@ -108,7 +109,7 @@ class Agent:
                 #if we found food, eat it and go there:
 
                 if World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
-                    print(f"{self.name} found food! Food is: {World_agent_list_x_y[direction[0]][direction[1]].name}, Hunger: {self.hunger}") #Find specific instance to eat
+                    #print(f"{self.name} found food! Food is: {World_agent_list_x_y[direction[0]][direction[1]].name}, Hunger: {self.hunger}") #Find specific instance to eat
 
                     if World_agent_list_x_y[direction[0]][direction[1]].type == "Plant": #if we just ate a plant:
                         self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size)  # track hunger levels, pass food that was eaten
@@ -132,7 +133,7 @@ class Agent:
                 if direction[0] >= World_size or direction[1] >= World_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
                 random.choice(directions_x_y)
-                print(f"{self.name} moved from [{self.x},{self.y}] to [{direction[0]},{direction[1]}], Hunger: {self.hunger}")
+                #print(f"{self.name} moved from [{self.x},{self.y}] to [{direction[0]},{direction[1]}], Hunger: {self.hunger}")
 
                 World_agent_list_x_y[self.x][self.y] = None
                 World_agent_list_x_y[direction[0]][direction[1]] = self
@@ -164,6 +165,8 @@ class Agent:
         if self.hunger <= 0:
             self.RemoveAgent(self) #starve
             return
+        if self.hunger > maximum_hunger:
+            self.hunger = maximum_hunger
 
     @staticmethod
     def HungerReproduceSigmoid(hunger):
@@ -194,7 +197,7 @@ class Agent:
 
                 elif "Tiger" in self.name:
                     if len(Tigers_list) > Personal_animal_limit:
-                        #print("Tigers have reached population limit")
+                        print("Tigers have reached population limit")
                         self.age = self.age + 1
                         self.DeathOfOldAge()
                         return
@@ -203,14 +206,14 @@ class Agent:
                     newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Cow" in self.name:
                     if len(Cows_list) > Personal_animal_limit:
-                        #print("Cows have reached population limit")
+                        print("Cows have reached population limit")
                         self.age = self.age + 1
                         self.DeathOfOldAge()
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
-                print(f"{newborn.name} was born with perception {newborn.perception}, speed {newborn.speed}")
+                print(f"{newborn.name} was born with perception {newborn.perception}, speed {newborn.speed}, hunger {newborn.hunger}")
         self.age = self.age + 1
         self.DeathOfOldAge() #check if time to die
 
