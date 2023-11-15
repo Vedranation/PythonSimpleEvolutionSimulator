@@ -2,9 +2,10 @@
 import random
 import math
 import re
+import ConsoleLog
 
 World_size = 30     #how big (box) do you want world to be
-Simulation_Length = 200     #how many turns in simulation
+Simulation_Length = 100     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
@@ -12,14 +13,24 @@ Num_cow = [40];
 Num_tiger = [40];
 
 Max_flowers = 200       #how many flowers can be
-GrowthPerTurn = 10      #how many flowers spawn per turn
-maximum_hunger = 40     #maximum hunger a creature can have in its belly
+GrowthPerTurn = 15      #how many flowers spawn per turn
+Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
-Base_reproduce_chance = 0.2     #maximum reproduce chance (at max hunger)
+Base_reproduce_chance = 0.5     #maximum reproduce chance (at max hunger)
 DeathAge = 30       #at how old do animals 100% die (sigmoid)
 World_size_spawn_tolerance = 1.01      #tolerance to world size to prevent overpopulation
 Personal_animal_limit = pow(World_size, 2) * 0.8       #how much % of the world can a single population have before its forbidden from spawning
+
+Console_log_start_position = False
+Console_log_check_for_food = False
+Console_log_found_food = True
+Console_log_was_eaten = False
+Console_log_death_starvation = True
+Console_log_death_oldage = False
+Console_log_born = True
+Console_log_random_move = False
+Console_log_reproduce_chance = True
 #---------------------------------------------------------------------------
 
 Skip = False
@@ -49,17 +60,17 @@ class Agent:
         self.speed = speed
         self.name = name
         self.size = size
-        self.age = 0;
+        self.age = 1;
 
         if self.type != "Plant":
             if self.size == "Small": #gives babies 1 turn worth of food
-                self.hunger = hunger + 1
+                self.hunger = hunger - 1
             elif self.size == "Medium":
-                self.hunger = hunger + 2
+                self.hunger = hunger - 2
             elif self.size == "Large":
-                self.hunger = hunger + 4
+                self.hunger = hunger - 4
             else:
-                raise Exception("Not supposed agent size")
+                raise Exception("Not supported agent size")
 
         self.FindFreeSpot()  # find a free spot to spawn
 
@@ -102,19 +113,16 @@ class Agent:
                     continue
 
                 if World_agent_list_x_y[direction[0]][direction[1]] == None:
-
-                    #print(f"{self.name} X: {self.x} Y: {self.y}  |  check X: {direction[0]} Y:{direction[1]}  |  found: None") #console log
+                    ConsoleLog.CheckForFood(self, direction[0], direction[1], True, World_agent_list_x_y, Console_log_check_for_food)
                     continue
-                #else:
-                    #print(f"{self.name} [{self.x},{self.y}]  |  check: [{direction[0]},{direction[1]}]  |  found: {World_agent_list_x_y[direction[0]][direction[1]].name}")
+                else:
+                    ConsoleLog.CheckForFood(self, direction[0], direction[1], False, World_agent_list_x_y, Console_log_check_for_food)
 
                 #if we found food, eat it and go there:
-
                 if World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
-                    print(f"{self.name} found food! Food is: {World_agent_list_x_y[direction[0]][direction[1]].name}, Hunger: {self.hunger}") #Find specific instance to eat
 
 
-                    self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size)  # track hunger levels, pass food that was eaten
+                    self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
                     Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
                     #update new position
@@ -131,7 +139,7 @@ class Agent:
                 if direction[0] >= World_size or direction[1] >= World_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
                 random.choice(directions_x_y)
-                #print(f"{self.name} moved from [{self.x},{self.y}] to [{direction[0]},{direction[1]}], Hunger: {self.hunger}")
+                ConsoleLog.RandomMove(self, direction[0], direction[1], Console_log_random_move)
 
                 World_agent_list_x_y[self.x][self.y] = None
                 World_agent_list_x_y[direction[0]][direction[1]] = self
@@ -140,16 +148,28 @@ class Agent:
                 self.Hunger(False) #track hunger levels, didnt eat
                 return
 
-    def Hunger(self, ate=False, size="Small"):
+    def Hunger(self, ate=False, size="Small", direction=[69, 69]):
         #Function to track Agents hunger level
         #If food was eaten, how much nourishment does it give
         if ate == True:
             if size == "Small":
-                self.hunger = self.hunger + 6
+                worth = 6
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
+                self.hunger = self.hunger + worth
+
             elif size == "Medium":
-                self.hunger = self.hunger + 9
+                worth = 9
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
+                self.hunger = self.hunger + worth
             else:
-                self.hunger = self.hunger + 20 #big animals nourish for longer
+                worth = 26
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
+                self.hunger = self.hunger + worth #big animals nourish for longer
+            if self.hunger > Maximum_hunger:
+                self.hunger = Maximum_hunger
             return #grace period, if food was found, don't use reserves or check for starvation
 
         #depending on Agent size, food depletes at different rate
@@ -159,12 +179,7 @@ class Agent:
             self.hunger = self.hunger - 2
         else:
             self.hunger = self.hunger - 4 #bigger animals need more food
-        #starve
-        if self.hunger <= 0:
-            self.RemoveAgent(self) #starve
-            return
-        if self.hunger > maximum_hunger:
-            self.hunger = maximum_hunger
+
 
     @staticmethod
     def HungerReproduceSigmoid(hunger):
@@ -172,32 +187,43 @@ class Agent:
         hunger_factor = hunger / Max_hunger_to_reproduce  # Normalizes hunger between 0 and 1
         return round(1 / (1 + math.exp(-sigmoid_slope * (hunger_factor - 0.5))), 2) #more well fed, more chance to breed
 
+    def StarvationAndAge(self):
+        self.age = self.age + 1
+        #starve
+        if self.hunger <= 0:
+            ConsoleLog.DeathStarvation(self, Console_log_death_starvation)
+            self.RemoveAgent(self) #starve
+            return
+        else:
+            sigmoid_slope = 20.0
+            death_factor = self.age / DeathAge  # Normalizes chance to die between 0 and 1
 
-    def DeathOfOldAge(self):
-        sigmoid_slope = 20.0
-        death_factor = self.age / DeathAge  # Normalizes chance to die between 0 and 1
-
-        if round(1 / (1 + math.exp(-sigmoid_slope * (death_factor - 0.5))), 2) >= round(random.random(), 2): # older you are, more likely to perish
-            self.RemoveAgent(self) #die of old age
+            if round(1 / (1 + math.exp(-sigmoid_slope * (death_factor - 0.5))), 2) >= round(random.random(), 2):  # older you are, more likely to perish
+                ConsoleLog.DeathOldAge(self, Console_log_death_oldage)
+                self.RemoveAgent(self)  # die of old age
+            return
 
     def Reproduce(self): #Is called directly, Handles reproducing and aging
 
         if self.age > Reproduce_age:
-            if Base_reproduce_chance * Agent.HungerReproduceSigmoid(self.hunger) <= round(random.random(), 2):
+
+            sigm = Agent.HungerReproduceSigmoid(self.hunger)
+            rnd = round(random.random(), 2)
+            mult = round(Base_reproduce_chance * sigm, 2)
+
+            ConsoleLog.ReproduceChance(self, Base_reproduce_chance, sigm, mult, rnd, Console_log_reproduce_chance)
+            if rnd <= mult:
 
                 UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) #need to update this when adding more animals
 
                 if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
+
                     print("World too small to breed!")
-                    self.age = self.age + 1
-                    self.DeathOfOldAge()
                     return
 
                 elif "Tiger" in self.name:
                     if len(Tigers_list) > Personal_animal_limit:
                         print("Tigers have reached population limit")
-                        self.age = self.age + 1
-                        self.DeathOfOldAge()
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
@@ -205,15 +231,11 @@ class Agent:
                 elif "Cow" in self.name:
                     if len(Cows_list) > Personal_animal_limit:
                         print("Cows have reached population limit")
-                        self.age = self.age + 1
-                        self.DeathOfOldAge()
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
-                print(f"{newborn.name} was born with perception {newborn.perception}, speed {newborn.speed}, hunger {newborn.hunger}")
-        self.age = self.age + 1
-        self.DeathOfOldAge() #check if time to die
+                ConsoleLog.Born(newborn, Console_log_born)
 
         def Mutate():
             return
@@ -230,11 +252,11 @@ def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size
     Dandelion = Agent(name, type, perception, speed, size, hunger)
     Dandelion_list.append(Dandelion)
     return Dandelion
-def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=20):
+def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25):
     Cow = Agent(name, type, perception, speed, size, hunger)
     Cows_list.append(Cow)
-    return Cowy
-def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=20):
+    return Cow
+def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25):
     Tiger = Agent(name, type, perception, speed, size, hunger)
     Tigers_list.append(Tiger)
     return Tiger
@@ -247,6 +269,7 @@ def RespawnVegetation():
         for j in range(round(GrowthPerTurn/2)):
             SpawnDandelion()
 
+
 #spawn amount of agents we want
 for i in range(Num_dandelion[0]):
     SpawnDandelion()
@@ -256,14 +279,9 @@ for i in range(Num_cow[0]):
 for i in range(Num_tiger[0]):
     SpawnTiger()
 
-#console log
-# for i in Cows_list:
-#     print(f"Cows are at: X: {i.x} Y: {i.y}")
-# for i in Dandelion_list:
-#     print(f"Dandelions are at: X: {i.x} Y: {i.y}")
-# for i in Tigers_list:
-#     print(f"Tigers are at: X: {i.x} Y: {i.y}")
+
 print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, and {Num_tiger[0]} Tigers")
+ConsoleLog.StartPosition(Cows_list, Dandelion_list, Tigers_list, Console_log_start_position)
 
 
 
@@ -277,19 +295,16 @@ for i in range(Simulation_Length):
     for cows in Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
-        Skip = False
         cows.SearchForFood()
-        if Skip == True: #prevents double deletion from starvation and then old age
-            continue
         cows.Reproduce()
+        cows.StarvationAndAge()
+
     print("")
     for tigers in Tigers_list[:]:
 
-        Skip = False
         tigers.SearchForFood()
-        if Skip == True:
-            continue
         tigers.Reproduce()
+        tigers.StarvationAndAge()
 
     Num_cow.append(len(Cows_list))
     Num_dandelion.append(len(Dandelion_list))
