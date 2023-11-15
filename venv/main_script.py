@@ -19,7 +19,7 @@ Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to bree
 Base_reproduce_chance = 0.2     #maximum reproduce chance (at max hunger)
 DeathAge = 30       #at how old do animals 100% die (sigmoid)
 World_size_spawn_tolerance = 1.01      #tolerance to world size to prevent overpopulation
-Personal_animal_limit = pow(World_size, 2) * 0.75       #how much % of the world can a single population have before its forbidden from spawning
+Personal_animal_limit = pow(World_size, 2) * 0.8       #how much % of the world can a single population have before its forbidden from spawning
 #---------------------------------------------------------------------------
 
 Skip = False
@@ -215,6 +215,9 @@ class Agent:
         self.age = self.age + 1
         self.DeathOfOldAge() #check if time to die
 
+        def Mutate():
+            return
+
 
 
 
@@ -230,11 +233,19 @@ def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size
 def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=20):
     Cow = Agent(name, type, perception, speed, size, hunger)
     Cows_list.append(Cow)
-    return Cow
+    return Cowy
 def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=20):
     Tiger = Agent(name, type, perception, speed, size, hunger)
     Tigers_list.append(Tiger)
     return Tiger
+def RespawnVegetation():
+    # respawn plants every turn
+    if Num_dandelion[-1]+GrowthPerTurn <= Max_flowers:
+        for j in range(GrowthPerTurn):
+            SpawnDandelion()
+    elif (Num_dandelion[-1]+GrowthPerTurn/2) <= Max_flowers: #spawns half
+        for j in range(round(GrowthPerTurn/2)):
+            SpawnDandelion()
 
 #spawn amount of agents we want
 for i in range(Num_dandelion[0]):
@@ -259,9 +270,7 @@ print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, and
 #simulate Simulation_Length turns (main loop)
 for i in range(Simulation_Length):
 
-    if Num_dandelion[-1]+GrowthPerTurn <= Max_flowers: #respawn flowers
-        for j in range(10):
-            SpawnDandelion()
+    RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
     print(f"There are: {len(Dandelion_list)} Dandelions, {len(Cows_list)} Cows, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
