@@ -4,15 +4,15 @@ import math
 import re
 import ConsoleLog
 
-World_size = 30     #how big (box) do you want world to be
+World_size = 35     #how big (box) do you want world to be
 Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
 Num_cow = [60];
-Num_rabbit = [20];
-Num_tiger = [20];
-Num_wolf = [20];
+Num_rabbit = [30];
+Num_tiger = [30];
+Num_wolf = [30];
 
 Max_flowers = 200       #how many flowers can be
 GrowthPerTurn = 40      #how many flowers spawn per turn
@@ -31,14 +31,14 @@ Animal_breed_cooldown = 2
 Console_log_start_position = False
 Console_log_check_for_food = False
 Console_log_found_food = False
-Console_log_was_eaten = True
+Console_log_was_eaten = False
 Console_log_death_starvation = False
 Console_log_death_oldage = False
-Console_log_death_battle = True
-Console_log_born = True
+Console_log_death_battle = False
+Console_log_born = False
 Console_log_random_move = False
 Console_log_reproduce_chance = False
-Console_log_fight_big = True
+Console_log_fight_big = False
 #---------------------------------------------------------------------------
 
 DiedInBattle = False
@@ -73,11 +73,11 @@ class Agent:
 
         if self.type != "Plant":
             if self.size == "Small": #gives babies 1 turn worth of food
-                self.hunger = hunger + 1
+                self.hunger = hunger + 0
             elif self.size == "Medium":
-                self.hunger = hunger + 2
+                self.hunger = hunger + 0
             elif self.size == "Large":
-                self.hunger = hunger + 4
+                self.hunger = hunger + 0
             else:
                 raise Exception("Not supported agent size")
 
@@ -342,6 +342,18 @@ Dandelion_list = []
 Tigers_list = []
 Wolf_list = []
 
+Cows_hunger = [] #stores average hunger values every turn
+Rabbits_hunger = []
+Tigers_hunger = []
+Wolf_hunger = []
+def CalculateAverageHunger(animal_list):
+    average = 0
+    for i in animal_list:
+        average = average + i.hunger
+    if len(animal_list) == 0:
+        return 0
+    average = average / len(animal_list)
+    return round(average, 1)
 #Function to spawn agents
 def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
     Dandelion = Agent(name, type, perception, speed, size, hunger)
@@ -365,12 +377,19 @@ def SpawnWolf(name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medi
     return Wolf
 def RespawnVegetation():
     # respawn plants every turn
+    UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list)  # need to update this when adding more animals
+
+    if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
+        print("World too small to grow!")
+        return
     if Num_dandelion[-1]+GrowthPerTurn <= Max_flowers:
         for j in range(GrowthPerTurn):
             SpawnDandelion()
     elif (Num_dandelion[-1]+GrowthPerTurn/2) <= Max_flowers: #spawns half
         for j in range(round(GrowthPerTurn/2)):
             SpawnDandelion()
+    else:
+        return
 
 
 #spawn amount of agents we want
@@ -435,19 +454,22 @@ for i in range(Simulation_Length):
     Num_rabbit.append(len(Rabbits_list))
     SumAllAgents.append(Num_dandelion[-1] + Num_cow[-1] + Num_tiger[-1] + Num_wolf[-1] + Num_rabbit[-1])
 
-def Visualise():
+    Cows_hunger.append(CalculateAverageHunger(Cows_list))
+    Tigers_hunger.append(CalculateAverageHunger(Tigers_list))
+    Rabbits_hunger.append(CalculateAverageHunger(Rabbits_list))
+    Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
+
+def VisualisePopulation():
     import plotly.graph_objects as go
 
-      # Replace with your desired value for X
     turns_list = [i for i in range(1, Simulation_Length + 1)]
-
     # Create traces
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows'))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers'))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions'))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves'))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits'))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows', line=dict(color='black')))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='green')))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits', line=dict(color='orange')))
 
     # Add titles and labels
     fig.update_layout(title='Animal Population Over Time',
@@ -457,8 +479,32 @@ def Visualise():
     # Show the plot
     fig.show()
 
+
+def VisualiseHunger():
+    import plotly.graph_objects as go
+
+    # Turns list for X-axis
+    turns_list = [i for i in range(1, Simulation_Length + 1)]
+
+    # Create the plot for average hunger
+    fig_hunger = go.Figure()
+    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
+    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='orange')))
+    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Tigers_hunger, mode='lines', name='Tigers', line=dict(color='red')))
+    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Wolf_hunger, mode='lines', name='Wolves', line=dict(color='purple')))
+
+    # Add titles and labels
+    fig_hunger.update_layout(title='Average Animal Hunger Over Time',
+                             xaxis_title='Turn',
+                             yaxis_title='Average Hunger')
+
+    # Show the plot
+    fig_hunger.show()
+
+
 #report results
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
 print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}")
-Visualise()
+VisualisePopulation()
+VisualiseHunger()
