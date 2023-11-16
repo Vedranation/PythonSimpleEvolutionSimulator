@@ -5,15 +5,17 @@ import re
 import ConsoleLog
 
 World_size = 30     #how big (box) do you want world to be
-Simulation_Length = 100     #how many turns in simulation
+Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
-Num_cow = [40];
-Num_tiger = [40];
+Num_cow = [60];
+Num_rabbit = [60];
+Num_tiger = [10];
+Num_wolf = [10];
 
 Max_flowers = 200       #how many flowers can be
-GrowthPerTurn = 15      #how many flowers spawn per turn
+GrowthPerTurn = 25      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
@@ -24,18 +26,18 @@ Personal_animal_limit = pow(World_size, 2) * 0.8       #how much % of the world 
 
 Console_log_start_position = False
 Console_log_check_for_food = False
-Console_log_found_food = True
-Console_log_was_eaten = False
-Console_log_death_starvation = True
+Console_log_found_food = False
+Console_log_was_eaten = True
+Console_log_death_starvation = False
 Console_log_death_oldage = False
-Console_log_born = True
+Console_log_born = False
 Console_log_random_move = False
-Console_log_reproduce_chance = True
+Console_log_reproduce_chance = False
 #---------------------------------------------------------------------------
 
 Skip = False
 #Check if world is big enough for all agents
-SumAllAgents = [Num_cow[-1]+Num_dandelion[-1]+Num_tiger[-1]]
+SumAllAgents = [Num_cow[-1]+Num_dandelion[-1]+Num_tiger[-1]+Num_wolf[-1]+Num_rabbit[-1]]
 if pow(World_size, 2) < SumAllAgents[-1]:
     raise Exception("World can't be smaller than amount of objects to spawn")
 
@@ -91,10 +93,14 @@ class Agent:
         # Remove from respective list
         if "Cow" in agent.name:
             Cows_list.remove(agent)
+        elif "Rabbit" in agent.name:
+            Rabbits_list.remove(agent)
         elif "Tiger" in agent.name:
             Tigers_list.remove(agent)
         elif "Dandelion" in agent.name:
             Dandelion_list.remove(agent)
+        elif "Wolf" in agent.name:
+            Wolf_list.remove(agent)
         global Skip
         Skip = True
 
@@ -214,7 +220,7 @@ class Agent:
             ConsoleLog.ReproduceChance(self, Base_reproduce_chance, sigm, mult, rnd, Console_log_reproduce_chance)
             if rnd <= mult:
 
-                UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) #need to update this when adding more animals
+                UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) #need to update this when adding more animals
 
                 if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
 
@@ -235,6 +241,20 @@ class Agent:
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                elif "Rabbit" in self.name:
+                    if len(Rabbits_list) > Personal_animal_limit:
+                        print("Rabbits have reached population limit")
+                        return
+                    babyname = int(re.search(r"(\d+)$", self.name).group(1))
+                    babyname = "Rabbit_" + str(babyname+1)
+                    newborn = SpawnRabbit(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                elif "Wolf" in self.name:
+                    if len(Wolf_list) > Personal_animal_limit:
+                        print("Wolves have reached population limit")
+                        return
+                    babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
+                    babyname = "Wolf_" + str(babyname+1) #make name with new generation number
+                    newborn = SpawnWolf(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 ConsoleLog.Born(newborn, Console_log_born)
 
         def Mutate():
@@ -244,8 +264,10 @@ class Agent:
 
 
 Cows_list = [] #initialise lists to store agents
+Rabbits_list = []
 Dandelion_list = []
 Tigers_list = []
+Wolf_list = []
 
 #Function to spawn agents
 def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
@@ -256,10 +278,18 @@ def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large"
     Cow = Agent(name, type, perception, speed, size, hunger)
     Cows_list.append(Cow)
     return Cow
+def SpawnRabbit(name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25):
+    Rabbit = Agent(name, type, perception, speed, size, hunger)
+    Rabbits_list.append(Rabbit)
+    return Rabbit
 def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25):
     Tiger = Agent(name, type, perception, speed, size, hunger)
     Tigers_list.append(Tiger)
     return Tiger
+def SpawnWolf(name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25):
+    Wolf = Agent(name, type, perception, speed, size, hunger)
+    Wolf_list.append(Wolf)
+    return Wolf
 def RespawnVegetation():
     # respawn plants every turn
     if Num_dandelion[-1]+GrowthPerTurn <= Max_flowers:
@@ -276,12 +306,16 @@ for i in range(Num_dandelion[0]):
 
 for i in range(Num_cow[0]):
     SpawnCow()
+for i in range(Num_rabbit[0]):
+    SpawnRabbit()
 for i in range(Num_tiger[0]):
     SpawnTiger()
+for i in range(Num_wolf[0]):
+    SpawnWolf()
 
 
-print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, and {Num_tiger[0]} Tigers")
-ConsoleLog.StartPosition(Cows_list, Dandelion_list, Tigers_list, Console_log_start_position)
+print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves and {Num_tiger[0]} Tigers")
+ConsoleLog.StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list, Console_log_start_position)
 
 
 
@@ -291,7 +325,7 @@ for i in range(Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Cows_list)} Cows, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
+    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Cows_list)} Cows, {len(Rabbits_list)} Rabbits, {len(Wolf_list)} Wolves, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
     for cows in Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
@@ -300,16 +334,26 @@ for i in range(Simulation_Length):
         cows.StarvationAndAge()
 
     print("")
+    for rabbits in Rabbits_list[:]:
+        rabbits.SearchForFood()
+        rabbits.Reproduce()
+        rabbits.StarvationAndAge()
     for tigers in Tigers_list[:]:
-
         tigers.SearchForFood()
         tigers.Reproduce()
         tigers.StarvationAndAge()
+    print("")
+    for wolves in Wolf_list[:]:
+        wolves.SearchForFood()
+        wolves.Reproduce()
+        wolves.StarvationAndAge()
 
     Num_cow.append(len(Cows_list))
     Num_dandelion.append(len(Dandelion_list))
     Num_tiger.append(len(Tigers_list))
-    SumAllAgents.append(Num_dandelion[-1] + Num_cow[-1] + Num_tiger[-1])
+    Num_wolf.append(len(Wolf_list))
+    Num_rabbit.append(len(Rabbits_list))
+    SumAllAgents.append(Num_dandelion[-1] + Num_cow[-1] + Num_tiger[-1] + Num_wolf[-1] + Num_rabbit[-1])
 
 def Visualise():
     import plotly.graph_objects as go
@@ -322,6 +366,8 @@ def Visualise():
     fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows'))
     fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers'))
     fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions'))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves'))
+    fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits'))
 
     # Add titles and labels
     fig.update_layout(title='Animal Population Over Time',
@@ -333,6 +379,6 @@ def Visualise():
 
 #report results
 print("\n\n----------SIMULATION END----------")
-print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
-print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_cow[-1]} Cows, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}")
+print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
+print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}")
 Visualise()

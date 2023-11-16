@@ -1,15 +1,19 @@
 
 #Todo function to easily toggle logging to console
 
-def StartPosition(Cows_list, Dandelion_list, Tigers_list, logbool):
-    '''Logs agents starting positions, input Cows_list, Dandelion_list, Tigers_list'''
+def StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list, logbool):
+    '''Logs agents starting positions, input Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list'''
     if logbool == True:
         for i in Cows_list:
-            print(f"Cows are at: X: {i.x} Y: {i.y}")
+            print(f"Cows are at: [{i.x}, {i.y}]")
+        for i in Rabbits_list:
+            print(f"Rabbits are at [{i.x}{i.y}]")
         for i in Dandelion_list:
-            print(f"Dandelions are at: X: {i.x} Y: {i.y}")
+            print(f"Dandelions are at: [{i.x}, {i.y}]")
         for i in Tigers_list:
-            print(f"Tigers are at: X: {i.x} Y: {i.y}")
+            print(f"Tigers are at: [{i.x}, {i.y}]")
+        for i in Wolf_list:
+            print(f"Wolves are at: [{i.x}, {i.y}]")
     return
 
 def CheckForFood(agent, directionX, directionY, isNone, World_agent_list_x_y, logbool):
