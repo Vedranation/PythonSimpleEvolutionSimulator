@@ -62,3 +62,17 @@ def ReproduceChance(agent, Base_reproduce_chance, sigm, mult, rnd, logbool):
         print(
             f"Base: {Base_reproduce_chance}, Sigm: {sigm}, Mult: {mult}, Rnd: {rnd}, Rnd small? {rnd <= round(Base_reproduce_chance * sigm, 2)}")
     return
+
+def DiedInBattle(agent, prey, logbool):
+    if logbool == True:
+        print(f"{agent.name} ({agent.hunger}) died in battle fighting {prey}")
+    return
+
+def FightBig(agent, prey_agent, win_chance, prey_power, logbool):
+    if logbool == True:
+        win_chance = round(win_chance, 2)
+        if prey_agent.size == "Large" and agent.size == "Small":
+            print(f"DAMM! {agent.name} ({agent.size}) just killed HUGE game! {prey_agent.name} ({prey_agent.size}) Prey Power: {prey_power*100}%, Total win chance was: {win_chance*100}%")
+        else:
+            print(f"{agent.name} ({agent.size}) just killed a bigger prey! {prey_agent.name} ({prey_agent.size}) Prey Power: {prey_power*100}%, Total win chance was: {win_chance*100}%")
+    return

@@ -10,19 +10,23 @@ Simulation_Length = 200     #how many turns in simulation
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
 Num_cow = [60];
-Num_rabbit = [60];
-Num_tiger = [10];
-Num_wolf = [10];
+Num_rabbit = [20];
+Num_tiger = [20];
+Num_wolf = [20];
 
 Max_flowers = 200       #how many flowers can be
-GrowthPerTurn = 25      #how many flowers spawn per turn
+GrowthPerTurn = 40      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
-Base_reproduce_chance = 0.5     #maximum reproduce chance (at max hunger)
+Base_reproduce_chance = 0.8     #maximum reproduce chance (at max hunger)
 DeathAge = 30       #at how old do animals 100% die (sigmoid)
-World_size_spawn_tolerance = 1.01      #tolerance to world size to prevent overpopulation
-Personal_animal_limit = pow(World_size, 2) * 0.8       #how much % of the world can a single population have before its forbidden from spawning
+World_size_spawn_tolerance = 1.03      #tolerance to world size to prevent overpopulation
+Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
+Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
+Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
+Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
+Animal_breed_cooldown = 2
 
 Console_log_start_position = False
 Console_log_check_for_food = False
@@ -30,12 +34,14 @@ Console_log_found_food = False
 Console_log_was_eaten = True
 Console_log_death_starvation = False
 Console_log_death_oldage = False
-Console_log_born = False
+Console_log_death_battle = True
+Console_log_born = True
 Console_log_random_move = False
 Console_log_reproduce_chance = False
+Console_log_fight_big = True
 #---------------------------------------------------------------------------
 
-Skip = False
+DiedInBattle = False
 #Check if world is big enough for all agents
 SumAllAgents = [Num_cow[-1]+Num_dandelion[-1]+Num_tiger[-1]+Num_wolf[-1]+Num_rabbit[-1]]
 if pow(World_size, 2) < SumAllAgents[-1]:
@@ -63,14 +69,15 @@ class Agent:
         self.name = name
         self.size = size
         self.age = 1;
+        self.breedcooldown= 0
 
         if self.type != "Plant":
             if self.size == "Small": #gives babies 1 turn worth of food
-                self.hunger = hunger - 1
+                self.hunger = hunger + 1
             elif self.size == "Medium":
-                self.hunger = hunger - 2
+                self.hunger = hunger + 2
             elif self.size == "Large":
-                self.hunger = hunger - 4
+                self.hunger = hunger + 4
             else:
                 raise Exception("Not supported agent size")
 
@@ -101,8 +108,7 @@ class Agent:
             Dandelion_list.remove(agent)
         elif "Wolf" in agent.name:
             Wolf_list.remove(agent)
-        global Skip
-        Skip = True
+
 
 
     def SearchForFood(self): #Is called directly, handles Food, movement and roam
@@ -126,18 +132,26 @@ class Agent:
 
                 #if we found food, eat it and go there:
                 if World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
+                    if self.FightOrFlight(World_agent_list_x_y[direction[0]][direction[1]]) == True:   #check prey size, if prey is bigger chance to fight it is smaller
 
+                        if self.Fight(World_agent_list_x_y[direction[0]][direction[1]]) == True:    #predator won and ate the meal
 
-                    self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
-                    Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
+                            self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
+                            Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
-                    #update new position
-                    World_agent_list_x_y[self.x][self.y] = None
-                    World_agent_list_x_y[direction[0]][direction[1]] = self
-                    self.x = direction[0]
-                    self.y = direction[1]
+                            #update new position
+                            World_agent_list_x_y[self.x][self.y] = None
+                            World_agent_list_x_y[direction[0]][direction[1]] = self
+                            self.x = direction[0]
+                            self.y = direction[1]
 
-                    return #end the search
+                            return #end the search
+                        else:   #predator lost and died
+                            global DiedInBattle
+                            DiedInBattle = True #pass this to main loop
+                            return
+                    else:
+                        continue #prey not worth the risk, keep searching
         self.RandomMove(directions_x_y)
     def RandomMove(self, directions_x_y):
         if self.speed == 1: #simplest case, just move and end turn
@@ -153,18 +167,67 @@ class Agent:
                 self.y = direction[1]
                 self.Hunger(False) #track hunger levels, didnt eat
                 return
+    def FightOrFlight(self, prey_agent):
+        '''The less hunger, more desperate for a meal, at 50% hunger the modifier becomes 1, above 50% hunger it probably wont risk, below it will'''
+        if prey_agent.type == "Plant":
+            return True     #plants don't fight back
+        desperation = 0.5 / (self.hunger / Maximum_hunger)
+        preySize = prey_agent.size
+        preyType = prey_agent.type
 
-    def Hunger(self, ate=False, size="Small", direction=[69, 69]):
+        if (self.size == "Small" and preySize == "Medium") or (self.size == "Medium" and preySize == "Large") and preyType != "Plant": #1 size difference
+            if round(random.random(), 2) <= Predator_bigger_prey_fight_chance * desperation:
+                return True #predator will fight
+            else:
+                return False    #predator doesn't fight
+        elif (self.size == "Small" and preySize == "Large") and preyType != "Plant": #2 size difference
+            if round(random.random(), 2) <= (Predator_bigger_prey_fight_chance/5) * desperation:    # predator is VERY unlikely to fight
+                return True
+            else:
+                return False  # predator doesn't fight
+        else:
+            return True #large can eat anything
+    def Fight(self, prey_agent):
+        '''at 50% hunger prey has 50% Well_fed_buff worth'''
+        if prey_agent.type == "Plant":
+            return True     #plants don't fight back
+
+        prey_power = round(Well_fed_buff * (prey_agent.hunger / Maximum_hunger), 2)     #Well fed prey gets a boost to their combat power
+        if (self.size == "Small" and prey_agent.size == "Medium") or (self.size == "Medium" and prey_agent.size == "Large"): #1 size difference
+            total_win_chance = round(Predator_bigger_prey_win_chance - prey_power * Predator_bigger_prey_win_chance, 2)
+            if round(random.random(), 2) <= (total_win_chance):
+
+                ConsoleLog.FightBig(self, prey_agent, total_win_chance, prey_power, Console_log_fight_big)
+                return True #predator won the fight
+            else:
+                ConsoleLog.DiedInBattle(self, prey_agent.name, Console_log_death_battle)
+                return False    #predator lost the fight and died
+
+        elif (self.size == "Small" and prey_agent.size == "Large"):       #probably suicide for small guy but let him try
+            total_win_chance = round((Predator_bigger_prey_win_chance/5 - prey_power * (Predator_bigger_prey_win_chance/5)), 2)
+            if round(random.random(), 2) <= (total_win_chance):
+                    ConsoleLog.FightBig(self, prey_agent, total_win_chance, prey_power, Console_log_fight_big)
+
+                    return True #David beat the goliath
+            else:
+                ConsoleLog.DiedInBattle(self, prey_agent.name, Console_log_death_battle)
+                return False    #predator lost the fight and died
+        else:
+            return True #large predator automatically wins
+
+
+
+    def Hunger(self, ate=False, preySize="Small", direction=[69, 69]):
         #Function to track Agents hunger level
         #If food was eaten, how much nourishment does it give
         if ate == True:
-            if size == "Small":
+            if preySize == "Small":
                 worth = 6
                 ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
                 ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
                 self.hunger = self.hunger + worth
 
-            elif size == "Medium":
+            elif preySize == "Medium":
                 worth = 9
                 ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
                 ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
@@ -193,9 +256,14 @@ class Agent:
         hunger_factor = hunger / Max_hunger_to_reproduce  # Normalizes hunger between 0 and 1
         return round(1 / (1 + math.exp(-sigmoid_slope * (hunger_factor - 0.5))), 2) #more well fed, more chance to breed
 
-    def StarvationAndAge(self):
+    def Starvation_Age_Battle_Death(self, DiedInBattle=False):
+        '''Handles all kinds of deaths'''
         self.age = self.age + 1
-        #starve
+
+        if DiedInBattle == True:
+            self.RemoveAgent(self) #Cow killed you bro
+            return
+
         if self.hunger <= 0:
             ConsoleLog.DeathStarvation(self, Console_log_death_starvation)
             self.RemoveAgent(self) #starve
@@ -212,6 +280,11 @@ class Agent:
     def Reproduce(self): #Is called directly, Handles reproducing and aging
 
         if self.age > Reproduce_age:
+            if self.breedcooldown > 0:      #Introduces a breeding cooldown
+                self.breedcooldown = self.breedcooldown - 1
+                return
+            else:
+                self.breedcooldown = Animal_breed_cooldown
 
             sigm = Agent.HungerReproduceSigmoid(self.hunger)
             rnd = round(random.random(), 2)
@@ -331,22 +404,29 @@ for i in range(Simulation_Length):
                                 #animal be skipped from processing, causing bunch of bugs
         cows.SearchForFood()
         cows.Reproduce()
-        cows.StarvationAndAge()
+        cows.Starvation_Age_Battle_Death()
 
     print("")
     for rabbits in Rabbits_list[:]:
         rabbits.SearchForFood()
         rabbits.Reproduce()
-        rabbits.StarvationAndAge()
+        rabbits.Starvation_Age_Battle_Death()
     for tigers in Tigers_list[:]:
+        DiedInBattle = False
         tigers.SearchForFood()
-        tigers.Reproduce()
-        tigers.StarvationAndAge()
+        if DiedInBattle == False:
+            tigers.Reproduce()
+            tigers.Starvation_Age_Battle_Death()
+        else:
+            tigers.Starvation_Age_Battle_Death(DiedInBattle=True)
     print("")
     for wolves in Wolf_list[:]:
         wolves.SearchForFood()
-        wolves.Reproduce()
-        wolves.StarvationAndAge()
+        if DiedInBattle == False:
+            wolves.Reproduce()
+            wolves.Starvation_Age_Battle_Death()
+        else:
+            wolves.Starvation_Age_Battle_Death(DiedInBattle=True)
 
     Num_cow.append(len(Cows_list))
     Num_dandelion.append(len(Dandelion_list))
