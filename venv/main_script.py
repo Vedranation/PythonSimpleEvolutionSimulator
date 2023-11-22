@@ -4,7 +4,7 @@ import math
 import re
 import ConsoleLog
 
-World_size = 35     #how big (box) do you want the world to be
+World_size = 35     #how big (box) do you want the world to be1
 Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
