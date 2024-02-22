@@ -1,6 +1,6 @@
 #handles visualisation and graphing
 import plotly.graph_objects as go
-
+import pygame
 def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, logbool):
 
     if logbool == True:
@@ -45,3 +45,17 @@ def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunge
         # Show the plot
         fig_hunger.show()
     return
+
+def VisualiseSimulationInit(width=800, height=600):
+    pygame.init()
+    global Visualise_window
+    Visualise_window = pygame.display.set_mode((width, height))
+    global TigerIcon
+    TigerIcon = pygame.Rect((300, 250, 50, 50))
+
+
+def VisualiseSimulationDraw():
+    pygame.draw.rect(Visualise_window, (255, 0, 0), TigerIcon)
+    pygame.display.update()
+def VisualiseSimulationQuit():
+    pygame.quit()

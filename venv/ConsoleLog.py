@@ -76,3 +76,7 @@ def FightBig(agent, prey_agent, win_chance, prey_power, logbool):
         else:
             print(f"{agent.name} ({agent.size}) just killed a bigger prey! {prey_agent.name} ({prey_agent.size}) Prey Power: {prey_power*100}%, Total win chance was: {win_chance*100}%")
     return
+
+def WorldTooSmallTooBreed(logbool):
+    if logbool:
+        print(f"World too small to breed!")

@@ -10,11 +10,12 @@ Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
+#TODO: add Num_berrybush = [30];
 Num_cow = [30];
 Num_rabbit = [60];
 Num_tiger = [30];
 Num_wolf = [30];
-
+#fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same
 Max_flowers = 200       #how many flowers can be
 GrowthPerTurn = 40      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
@@ -29,6 +30,9 @@ Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for 
 Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
 Animal_breed_cooldown = 0
 
+Window_width = 1280
+Window_height = 720
+
 Console_log_start_position = False
 Console_log_check_for_food = False
 Console_log_found_food = False
@@ -40,10 +44,17 @@ Console_log_born = False
 Console_log_random_move = False
 Console_log_reproduce_chance = False
 Console_log_fight_big = False
+Console_log_worldtoosmalltobreed = False
 
-Visualise_Population_Toggle = True
-Visualise_Hunger_Toggle = True
+Visualise_population_toggle = False
+Visualise_hunger_toggle = False
+Visualise_Simulation_toggle = True
+
 #---------------------------------------------------------------------------
+
+if Visualise_Simulation_toggle == True:
+    VisualiseScript.VisualiseSimulationInit(width=Window_width, height=Window_height)
+
 
 DiedInBattle = False
 #Check if world is big enough for all agents
@@ -301,7 +312,7 @@ class Agent:
 
                 if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
 
-                    print("World too small to breed!")
+                    ConsoleLog.WorldTooSmallTooBreed(Console_log_worldtoosmalltobreed)
                     return
 
                 elif "Tiger" in self.name:
@@ -463,11 +474,16 @@ for i in range(Simulation_Length):
     Rabbits_hunger.append(CalculateAverageHunger(Rabbits_list))
     Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
 
+    if Visualise_Simulation_toggle:
+        VisualiseScript.VisualiseSimulationDraw() #draw the display window
 
 
 #report results
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
-print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}")
-VisualiseScript.VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Visualise_Population_Toggle)
-VisualiseScript.VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Visualise_Hunger_Toggle)
+print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(World_size, 2) / round(World_size_spawn_tolerance, None)}")
+
+VisualiseScript.VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Visualise_population_toggle)
+VisualiseScript.VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Visualise_hunger_toggle)
+
+VisualiseScript.VisualiseSimulationQuit()
