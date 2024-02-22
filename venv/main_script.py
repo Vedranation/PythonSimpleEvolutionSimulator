@@ -3,14 +3,15 @@ import random
 import math
 import re
 import ConsoleLog
+import VisualiseScript
 
 World_size = 35     #how big (box) do you want the world to be1
 Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [130];
-Num_cow = [60];
-Num_rabbit = [30];
+Num_cow = [30];
+Num_rabbit = [60];
 Num_tiger = [30];
 Num_wolf = [30];
 
@@ -26,7 +27,7 @@ Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world 
 Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
 Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
 Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
-Animal_breed_cooldown = 2
+Animal_breed_cooldown = 0
 
 Console_log_start_position = False
 Console_log_check_for_food = False
@@ -39,6 +40,9 @@ Console_log_born = False
 Console_log_random_move = False
 Console_log_reproduce_chance = False
 Console_log_fight_big = False
+
+Visualise_Population_Toggle = True
+Visualise_Hunger_Toggle = True
 #---------------------------------------------------------------------------
 
 DiedInBattle = False
@@ -459,52 +463,11 @@ for i in range(Simulation_Length):
     Rabbits_hunger.append(CalculateAverageHunger(Rabbits_list))
     Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
 
-def VisualisePopulation():
-    import plotly.graph_objects as go
-
-    turns_list = [i for i in range(1, Simulation_Length + 1)]
-    # Create traces
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows', line=dict(color='black')))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='green')))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
-    fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits', line=dict(color='orange')))
-
-    # Add titles and labels
-    fig.update_layout(title='Animal Population Over Time',
-                      xaxis_title='Turn',
-                      yaxis_title='Number of Animals')
-
-    # Show the plot
-    fig.show()
-
-
-def VisualiseHunger():
-    import plotly.graph_objects as go
-
-    # Turns list for X-axis
-    turns_list = [i for i in range(1, Simulation_Length + 1)]
-
-    # Create the plot for average hunger
-    fig_hunger = go.Figure()
-    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
-    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='orange')))
-    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Tigers_hunger, mode='lines', name='Tigers', line=dict(color='red')))
-    fig_hunger.add_trace(go.Scatter(x=turns_list, y=Wolf_hunger, mode='lines', name='Wolves', line=dict(color='purple')))
-
-    # Add titles and labels
-    fig_hunger.update_layout(title='Average Animal Hunger Over Time',
-                             xaxis_title='Turn',
-                             yaxis_title='Average Hunger')
-
-    # Show the plot
-    fig_hunger.show()
 
 
 #report results
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {Num_dandelion[0]} Dandelions, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
 print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}")
-VisualisePopulation()
-VisualiseHunger()
+VisualiseScript.VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Visualise_Population_Toggle)
+VisualiseScript.VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Visualise_Hunger_Toggle)
