@@ -1,5 +1,4 @@
-
-#Todo function to easily toggle logging to console
+#function to easily toggle logging to console
 
 def StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list, logbool):
     '''Logs agents starting positions, input Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list'''

@@ -46,12 +46,50 @@ def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunge
         fig_hunger.show()
     return
 
-def VisualiseSimulationInit(width=800, height=600):
+def VisualiseSimulationInit(worldsize, width=800, height=800):
     pygame.init()
     global Visualise_window
     Visualise_window = pygame.display.set_mode((width, height))
+    gridsize = round(min((width, height)) * 0.8) #use 80% of the smaller dimension
+    Visualise_window.fill((0, 200, 0))
+
+    # Calculate starting points to center the grid
+    start_x = (width - gridsize) // 2
+    start_y = (height - gridsize) // 2
+    grid_color = (0, 0, 0)
+
+    #draw the grid
+    distancebtwrow = gridsize // worldsize
+    cell_positions = []  # Initialize list to hold cell positions
+
+    #calculates left top of each cell
+    for i in range(worldsize):
+        row = []  # Initialize list to hold cell positions for this row
+        for j in range(worldsize):
+            # Calculate top-left corner of each cell
+            cell_x = start_x + j * distancebtwrow
+            cell_y = start_y + i * distancebtwrow
+            row.append((cell_x, cell_y))
+
+        cell_positions.append(row)
+
+    print(cell_positions)
+
+    for i in range(worldsize + 1):  # +1 to draw the boundary of the grid
+        # Vertical line (need to adjust both start and end points)
+        pygame.draw.line(Visualise_window, grid_color,
+                         (start_x + i * distancebtwrow, start_y),
+                         (start_x + i * distancebtwrow, start_y + gridsize))
+        # Horizontal line (need to adjust both start and end points)
+        pygame.draw.line(Visualise_window, grid_color,
+                         (start_x, start_y + i * distancebtwrow),
+                         (start_x + gridsize, start_y + i * distancebtwrow))
+
+
     global TigerIcon
-    TigerIcon = pygame.Rect((300, 250, 50, 50))
+    TigerIcon = pygame.Rect((start_x, start_y, 30, 30))
+
+
 
 
 def VisualiseSimulationDraw():
