@@ -1,6 +1,7 @@
 #handles visualisation and graphing
 import plotly.graph_objects as go
 import pygame
+import re
 def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, logbool):
 
     if logbool == True:
@@ -49,51 +50,100 @@ def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunge
 def VisualiseSimulationInit(worldsize, width=800, height=800):
     pygame.init()
     global Visualise_window
+    global World_size
+    global Gridsize
+    global Start_x
+    global Start_y
+    global Grid_color
+    global Fill_color
+    global Cell_positions
+    global Distancebtwrow
+    Grid_color = (0, 0, 0)
+    Fill_color = (0, 200, 0)
+
+    Cell_positions = []  # Initialize list to hold cell positions
+
+    World_size = worldsize #this is very bad practise I know but this script doesnt have access to main_script globals and its 5am and oh well
+
+
+
     Visualise_window = pygame.display.set_mode((width, height))
-    gridsize = round(min((width, height)) * 0.8) #use 80% of the smaller dimension
+    Gridsize = round(min((width, height)) * 0.8) #use 80% of the smaller dimension
     Visualise_window.fill((0, 200, 0))
 
     # Calculate starting points to center the grid
-    start_x = (width - gridsize) // 2
-    start_y = (height - gridsize) // 2
-    grid_color = (0, 0, 0)
+
+    Start_x = (width - Gridsize) // 2
+    Start_y = (height - Gridsize) // 2
+
 
     #draw the grid
-    distancebtwrow = gridsize // worldsize
-    cell_positions = []  # Initialize list to hold cell positions
+    Distancebtwrow = Gridsize // worldsize
+
+
+    DrawGrid()
 
     #calculates left top of each cell
     for i in range(worldsize):
         row = []  # Initialize list to hold cell positions for this row
         for j in range(worldsize):
             # Calculate top-left corner of each cell
-            cell_x = start_x + j * distancebtwrow
-            cell_y = start_y + i * distancebtwrow
+            cell_x = Start_x + j * Distancebtwrow
+            cell_y = Start_y + i * Distancebtwrow
             row.append((cell_x, cell_y))
 
-        cell_positions.append(row)
+        Cell_positions.append(row)
 
-    print(cell_positions)
+    print(Cell_positions)
 
-    for i in range(worldsize + 1):  # +1 to draw the boundary of the grid
+def DrawGrid():
+    global Visualise_window
+    global World_size
+    global Gridsize
+    global Start_x
+    global Start_y
+    global Grid_color
+    global Fill_color
+    global Cell_positions
+    global Distancebtwrow
+    Visualise_window.fill(Fill_color)
+    for i in range(World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
-        pygame.draw.line(Visualise_window, grid_color,
-                         (start_x + i * distancebtwrow, start_y),
-                         (start_x + i * distancebtwrow, start_y + gridsize))
+        pygame.draw.line(Visualise_window, Grid_color,
+                         (Start_x + i * Distancebtwrow, Start_y),
+                         (Start_x + i * Distancebtwrow, Start_y + Gridsize))
         # Horizontal line (need to adjust both start and end points)
-        pygame.draw.line(Visualise_window, grid_color,
-                         (start_x, start_y + i * distancebtwrow),
-                         (start_x + gridsize, start_y + i * distancebtwrow))
+        pygame.draw.line(Visualise_window, Grid_color,
+                         (Start_x, Start_y + i * Distancebtwrow),
+                         (Start_x + Gridsize, Start_y + i * Distancebtwrow))
 
 
+def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y):
+    global Visualise_window
     global TigerIcon
-    TigerIcon = pygame.Rect((start_x, start_y, 30, 30))
+    global Cell_positions
+    DrawGrid()
+
+
+    for x_row_list in world_agent_list_x_y:
+        for y_cell in x_row_list:
+            if y_cell is None: #empty cell
+                print("None")
+                continue
+
+            animalname = re.match(r"(\D+)_\d+", y_cell.name) #what animal is this
+            animalname = animalname.group(1) #scrape the generation number
+            if animalname == "Tiger":
+                # print(f"{animalname}, ({y_cell.x}, {y_cell.y}") #this is in COORDINATE SYSTEM XY
+                # print(Cell_positions[y_cell.x][y_cell.y]) #this is in PIXEL CELL LOCATION TOP LEFT CORNER OF THE CELL
+                #TODO: make tigers scale with grid size
+                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
+                pygame.draw.rect(Visualise_window, (255, 0, 0), pygame.Rect((cell_position_x, cell_position_y, 30, 30))) #window, color, what (start x, start y, sizex , sizey
 
 
 
 
-def VisualiseSimulationDraw():
-    pygame.draw.rect(Visualise_window, (255, 0, 0), TigerIcon)
+
     pygame.display.update()
 def VisualiseSimulationQuit():
     pygame.quit()

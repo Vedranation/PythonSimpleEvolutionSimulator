@@ -2,19 +2,21 @@
 import random
 import math
 import re
+import time
+
 import ConsoleLog
 import VisualiseScript
 
-World_size = 10     #how big (box) do you want the world to be1
-Simulation_Length = 200     #how many turns in simulation
+World_size = 20     #how big (box) do you want the world to be1
+Simulation_Length = 20     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [10];
 #TODO: add Num_berrybush = [30];
 Num_cow = [0];
 Num_rabbit = [10];
-Num_tiger = [0];
-Num_wolf = [10];
+Num_tiger = [10];
+Num_wolf = [0];
 #fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same
 Max_flowers = 10       #how many flowers can be
 GrowthPerTurn = 3      #how many flowers spawn per turn
@@ -35,7 +37,7 @@ Window_height = 800
 
 Console_log_start_position = False
 Console_log_check_for_food = False
-Console_log_found_food = True
+Console_log_found_food = False
 Console_log_was_eaten = False
 Console_log_death_starvation = False
 Console_log_death_oldage = False
@@ -476,7 +478,8 @@ for i in range(Simulation_Length):
     Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
 
     if Visualise_simulation_toggle:
-        VisualiseScript.VisualiseSimulationDraw() #draw the display window
+        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y) #draw the display window
+        time.sleep(0.5)
 
 
 #report results
