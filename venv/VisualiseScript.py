@@ -177,7 +177,7 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
             elif animalname == "Dandelion":
                 pygame.draw.rect(Visualise_window, Dandelion_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Cow":
-                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_x + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Berrybush":
                 pygame.draw.rect(Visualise_window, Berrybush_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
 

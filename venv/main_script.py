@@ -7,21 +7,21 @@ import time
 import ConsoleLog
 import VisualiseScript
 
-World_size = 30     #how big (box) do you want the world to be1
+World_size = 10     #how big (box) do you want the world to be1
 Simulation_Length = 20     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
-Num_dandelion = [0];
+Num_dandelion = [5];
 #TODO: add Num_berrybush = [30];
 #TODO: add Num_fox = [30];
 #fixme: Make it that rabbits can't eat apple trees or they'll be unstoppable
-Num_cow = [0];
+Num_cow = [1];
 Num_rabbit = [0];
 Num_tiger = [0];
-Num_wolf = [1];
+Num_wolf = [0];
 #fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same, seems to be bug in order or hunger starvation (animal spawn with negative hunger)
 Max_flowers = 10       #how many flowers can be
-GrowthPerTurn = 0      #how many flowers spawn per turn
+GrowthPerTurn = 3      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
@@ -54,7 +54,7 @@ Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
 
-Sim_speed = 2    #delay in seconds between each turn
+Sim_speed = 0.25    #delay in seconds between each turn
 
 #---------------------------------------------------------------------------
 
