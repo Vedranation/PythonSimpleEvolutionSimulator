@@ -2,6 +2,7 @@
 import plotly.graph_objects as go
 import pygame
 import re
+import sys
 def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, logbool):
 
     if logbool == True:
@@ -22,8 +23,6 @@ def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Nu
         # Show the plot
         fig.show()
     return
-
-
 
 def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, logbool):
 
@@ -128,6 +127,10 @@ def DrawGrid():
 
 
 def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y):
+    for event in pygame.event.get():  # kill program once X is pressed
+        if event.type == pygame.QUIT:
+            VisualiseSimulationQuit() #FIXME: Make X button not lag if used on high speeds
+
     global Visualise_window
     global TigerIcon
     global Cell_positions
@@ -167,4 +170,6 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y):
 
     pygame.display.update()
 def VisualiseSimulationQuit():
+    pygame.display.quit()
     pygame.quit()
+    sys.exit()

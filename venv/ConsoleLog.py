@@ -1,5 +1,6 @@
 #function to easily toggle logging to console
 
+
 def StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list, logbool):
     '''Logs agents starting positions, input Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list'''
     if logbool == True:
@@ -39,6 +40,8 @@ def DeathStarvation(agent, logbool):
 def Born(newborn_agent, logbool):
     if logbool == True:
         print(f"{newborn_agent.name} was born with:  perception {newborn_agent.perception}, speed {newborn_agent.speed},  hunger {newborn_agent.hunger}, at [{newborn_agent.x}, {newborn_agent.y}]")
+        if newborn_agent.hunger <= 0:
+            print("WARNING - ZERO OR NEGATIVE HUNGER BREEDING DETECTED");
     return
 
 def AgentWasEaten(agent, directionX, directionY, World_agent_list_x_y, worth, logbool):
@@ -59,7 +62,7 @@ def DeathOldAge(agent, logbool):
 def ReproduceChance(agent, Base_reproduce_chance, sigm, mult, rnd, logbool):
     if logbool == True:
         print(
-            f"Base: {Base_reproduce_chance}, Sigm: {sigm}, Mult: {mult}, Rnd: {rnd}, Rnd small? {rnd <= round(Base_reproduce_chance * sigm, 2)}")
+            f"Base: {Base_reproduce_chance},  |   Sigm: {sigm},  |   Mult: {mult},  |   Rnd: {rnd},  |   Rnd small? {rnd <= round(Base_reproduce_chance * sigm, 2)}")
     return
 
 def DiedInBattle(agent, prey, logbool):
@@ -71,6 +74,7 @@ def FightBig(agent, prey_agent, win_chance, prey_power, logbool):
     if logbool == True:
         win_chance = round(win_chance, 2)
         if prey_agent.size == "Large" and agent.size == "Small":
+
             print(f"DAMM! {agent.name} ({agent.size}) just killed HUGE game! {prey_agent.name} ({prey_agent.size}) Prey Power: {prey_power*100}%, Total win chance was: {win_chance*100}%")
         else:
             print(f"{agent.name} ({agent.size}) just killed a bigger prey! {prey_agent.name} ({prey_agent.size}) Prey Power: {prey_power*100}%, Total win chance was: {win_chance*100}%")
