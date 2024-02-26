@@ -7,18 +7,19 @@ import time
 import ConsoleLog
 import VisualiseScript
 
-World_size = 20     #how big (box) do you want the world to be1
-Simulation_Length = 20     #how many turns in simulation
+World_size = 15     #how big (box) do you want the world to be1
+Simulation_Length = 50     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 Num_dandelion = [10];
 #TODO: add Num_berrybush = [30];
-Num_cow = [0];
+#TODO: add Num_fox = [30];
+Num_cow = [10];
 Num_rabbit = [10];
-Num_tiger = [10];
+Num_tiger = [2];
 Num_wolf = [0];
 #fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same
-Max_flowers = 10       #how many flowers can be
+Max_flowers = 30       #how many flowers can be
 GrowthPerTurn = 3      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
@@ -42,15 +43,17 @@ Console_log_was_eaten = False
 Console_log_death_starvation = False
 Console_log_death_oldage = False
 Console_log_death_battle = False
-Console_log_born = False
+Console_log_born = True
 Console_log_random_move = False
 Console_log_reproduce_chance = False
 Console_log_fight_big = False
 Console_log_worldtoosmalltobreed = False
 
-Visualise_population_toggle = False
+Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
+
+Sim_speed = 0.75
 
 #---------------------------------------------------------------------------
 
@@ -85,8 +88,8 @@ class Agent:
         self.speed = speed
         self.name = name
         self.size = size
-        self.age = 1;
-        self.breedcooldown= 0
+        self.age = 1
+        self.breedcooldown = 0
 
         if self.type != "Plant":
             if self.size == "Small": #gives babies 1 turn worth of food
@@ -479,7 +482,7 @@ for i in range(Simulation_Length):
 
     if Visualise_simulation_toggle:
         VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y) #draw the display window
-        time.sleep(0.5)
+        time.sleep(Sim_speed)
 
 
 #report results
