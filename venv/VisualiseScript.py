@@ -47,12 +47,14 @@ def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunge
     return
 
 def VisualiseSimulationInit(worldsize, width=800, height=800):
+    'Initialises visualisation, and sets variables like font, color etc'
     pygame.init()
     global Visualise_window
     global World_size
     global Gridsize
     global Start_x
     global Start_y
+    global Generation_text_font
 
     global Grid_color
     global Fill_color
@@ -65,6 +67,9 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
 
     global Cell_positions
     global Distancebtwrow
+
+    Generation_text_font = pygame.font.SysFont("Arial", 30)     #font and size for agent generation number
+
     Grid_color = (0, 0, 0)
     Fill_color = (0, 200, 0)
     Tiger_color = (255, 0, 0)
@@ -85,7 +90,7 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     Start_y = (height - Gridsize) // 2
     #draw the grid
     Distancebtwrow = Gridsize // worldsize
-    DrawGrid()
+    DrawGrid(0)
 
     #calculates left top of each cell
     for i in range(worldsize):
@@ -96,75 +101,86 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
             cell_y = Start_y + i * Distancebtwrow
             row.append((cell_x, cell_y))
         Cell_positions.append(row)
-    #print(Cell_positions)
 
-def DrawGrid():
+def DrawText(text, font, color, x, y):
+    'function for drawing text in pygame'
     global Visualise_window
-    global World_size
-    global Gridsize
-    global Start_x
-    global Start_y
-    global Grid_color
-    global Fill_color
-    global Tiger_color
-    global Rabbit_color
-    global Dandelion_color
-    global Wolf_color
-    global Cow_color
-    global Berrybush_color
-    global Cell_positions
-    global Distancebtwrow
+    text = str(text)
+    text_image = font.render(text, True, color)
+    Visualise_window.blit(text_image, (x, y))
+
+
+def DrawGrid(turnN):
+    global Visualise_window
+
     Visualise_window.fill(Fill_color)
+    DrawText("Turn " + str(turnN), Generation_text_font, (0, 0, 0), 0, 0)
+
     for i in range(World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
-        pygame.draw.line(Visualise_window, Grid_color,
-                         (Start_x + i * Distancebtwrow, Start_y),
-                         (Start_x + i * Distancebtwrow, Start_y + Gridsize))
-        # Horizontal line (need to adjust both start and end points)
-        pygame.draw.line(Visualise_window, Grid_color,
-                         (Start_x, Start_y + i * Distancebtwrow),
-                         (Start_x + Gridsize, Start_y + i * Distancebtwrow))
+        if i == 0 or i == World_size:
+            pygame.draw.line(Visualise_window, Grid_color,
+                             (Start_x + i * Distancebtwrow, Start_y),
+                             (Start_x + i * Distancebtwrow, Start_y + Gridsize), width=3)
+            # Horizontal line (need to adjust both start and end points)
+            pygame.draw.line(Visualise_window, Grid_color,
+                             (Start_x, Start_y + i * Distancebtwrow),
+                             (Start_x + Gridsize, Start_y + i * Distancebtwrow), width=3)
+        else:
+            pygame.draw.line(Visualise_window, Grid_color,
+                             (Start_x + i * Distancebtwrow, Start_y),
+                             (Start_x + i * Distancebtwrow, Start_y + Gridsize))
+            # Horizontal line (need to adjust both start and end points)
+            pygame.draw.line(Visualise_window, Grid_color,
+                             (Start_x, Start_y + i * Distancebtwrow),
+                             (Start_x + Gridsize, Start_y + i * Distancebtwrow))
 
 
-def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y):
+def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
     for event in pygame.event.get():  # kill program once X is pressed
         if event.type == pygame.QUIT:
             VisualiseSimulationQuit() #FIXME: Make X button not lag if used on high speeds
 
     global Visualise_window
-    global TigerIcon
     global Cell_positions
-    DrawGrid()
+    DrawGrid(turnN)
     pygame.event.pump()
 
     for x_row_list in world_agent_list_x_y:
         for y_cell in x_row_list:
             if y_cell is None: #empty cell
-                #print("None")
                 continue
 
             animalname = re.match(r"(\D+)_\d+", y_cell.name) #what animal is this
             animalname = animalname.group(1) #scrape the generation number
+            cell_position_x, cell_position_y = Cell_positions[y_cell.y][y_cell.x]   #fixes orientation of coordinate system from top left to bottom left
+
+
+            cell_position_y = abs(height - cell_position_y)
+            print(cell_position_y)
+
+
             if animalname == "Tiger":
                 # print(f"{animalname}, ({y_cell.x}, {y_cell.y}") #this is in COORDINATE SYSTEM XY
                 # print(Cell_positions[y_cell.x][y_cell.y]) #this is in PIXEL CELL LOCATION TOP LEFT CORNER OF THE CELL
-                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
                 pygame.draw.rect(Visualise_window, Tiger_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
             elif animalname == "Rabbit":
-                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
                 pygame.draw.rect(Visualise_window, Rabbit_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Wolf":
-                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
                 pygame.draw.rect(Visualise_window, Wolf_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Dandelion":
-                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
                 pygame.draw.rect(Visualise_window, Dandelion_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Cow":
-                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
-                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_x + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Berrybush":
-                cell_position_x, cell_position_y = Cell_positions[y_cell.x][y_cell.y]
                 pygame.draw.rect(Visualise_window, Berrybush_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+
+            if y_cell.type != "Plant": #display animal generation number
+
+                match = re.search(r"\d+$", y_cell.name)
+                generation_number = int(match.group())  # Convert the matched string to an integer
+
+                DrawText(generation_number, Generation_text_font, (0, 0, 0), cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06)
 
 
 

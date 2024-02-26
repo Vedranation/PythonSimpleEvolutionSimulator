@@ -7,7 +7,7 @@ def StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_lis
         for i in Cows_list:
             print(f"Cows are at: [{i.x}, {i.y}]")
         for i in Rabbits_list:
-            print(f"Rabbits are at [{i.x}{i.y}]")
+            print(f"Rabbits are at: [{i.x}, {i.y}]")
         for i in Dandelion_list:
             print(f"Dandelions are at: [{i.x}, {i.y}]")
         for i in Tigers_list:

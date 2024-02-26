@@ -7,21 +7,21 @@ import time
 import ConsoleLog
 import VisualiseScript
 
-World_size = 30     #how big (box) do you want the world to be1
-Simulation_Length = 200     #how many turns in simulation
+World_size = 10     #how big (box) do you want the world to be1
+Simulation_Length = 20     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
-Num_dandelion = [50];
+Num_dandelion = [0];
 #TODO: add Num_berrybush = [30];
 #TODO: add Num_fox = [30];
 #fixme: Make it that rabbits can't eat apple trees or they'll be unstoppable
-Num_cow = [50];
+Num_cow = [0];
 Num_rabbit = [0];
-Num_tiger = [50];
-Num_wolf = [50];
+Num_tiger = [0];
+Num_wolf = [1];
 #fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same, seems to be bug in order or hunger starvation (animal spawn with negative hunger)
-Max_flowers = 30       #how many flowers can be
-GrowthPerTurn = 10      #how many flowers spawn per turn
+Max_flowers = 10       #how many flowers can be
+GrowthPerTurn = 0      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
@@ -32,21 +32,21 @@ Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world 
 Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
 Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
 Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
-Animal_breed_cooldown = 1
+Animal_breed_cooldown = 2
 
 Window_width = 800
 Window_height = 800
 
-Console_log_start_position = False
+Console_log_start_position = True
 Console_log_check_for_food = False
 Console_log_found_food = False
 Console_log_was_eaten = False
 Console_log_death_starvation = False
-Console_log_death_oldage = False
+Console_log_death_oldage = True
 Console_log_death_battle = False
 Console_log_born = True
-Console_log_random_move = False
-Console_log_reproduce_chance = True
+Console_log_random_move = True
+Console_log_reproduce_chance = False
 Console_log_fight_big = False
 Console_log_worldtoosmalltobreed = False
 
@@ -54,7 +54,7 @@ Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
 
-Sim_speed = 0.25
+Sim_speed = 2    #delay in seconds between each turn
 
 #---------------------------------------------------------------------------
 
@@ -455,6 +455,7 @@ for i in range(Simulation_Length):
         rabbits.SearchForFood()
         rabbits.Reproduce()
         rabbits.Starvation_Age_Battle_Death()
+    print("")
     for tigers in Tigers_list[:]:
         DiedInBattle = False
         tigers.SearchForFood()
@@ -485,7 +486,7 @@ for i in range(Simulation_Length):
     Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
 
     if Visualise_simulation_toggle:
-        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y) #draw the display window
+        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, Window_height) #draw the display window
         time.sleep(Sim_speed)
 
 
