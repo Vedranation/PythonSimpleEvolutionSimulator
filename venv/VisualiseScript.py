@@ -55,6 +55,9 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     global Start_x
     global Start_y
     global Generation_text_font
+    global Axis_text_font
+    global GUI_text_font
+    global Animal_drawing_offset
 
     global Grid_color
     global Fill_color
@@ -68,8 +71,6 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     global Cell_positions
     global Distancebtwrow
 
-    Generation_text_font = pygame.font.SysFont("Arial", 30)     #font and size for agent generation number
-
     Grid_color = (0, 0, 0)
     Fill_color = (0, 200, 0)
     Tiger_color = (255, 0, 0)
@@ -79,18 +80,24 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     Cow_color = (0, 0, 0)
     Berrybush_color = (181, 45, 0)
 
-    Cell_positions = []  # Initialize list to hold cell positions
-    World_size = worldsize #this is very bad practise I know but this script doesnt have access to main_script globals and its 5am and oh well
-
     Visualise_window = pygame.display.set_mode((width, height))
     Gridsize = round(min((width, height)) * 0.8) #use 80% of the smaller dimension
-    Visualise_window.fill((0, 200, 0))
+    Cell_positions = []  # Initialize list to hold cell positions
+    World_size = worldsize #this is very bad practise I know but this script doesnt have access to main_script globals and its 5am and oh well
     # Calculate starting points to center the grid
     Start_x = (width - Gridsize) // 2
     Start_y = (height - Gridsize) // 2
     #draw the grid
     Distancebtwrow = Gridsize // worldsize
-    DrawGrid(0)
+
+    'more variables'
+    Visualise_window.fill((0, 200, 0))  # background color
+    Animal_drawing_offset = 0.06
+    Generation_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 3)  # font and size for agent generation number
+    Axis_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 2)  # font and size for grid axis
+    GUI_text_font = pygame.font.SysFont("Arial", int(Gridsize // 15))
+
+    DrawGrid(0, height)
 
     #calculates left top of each cell
     for i in range(worldsize):
@@ -110,11 +117,11 @@ def DrawText(text, font, color, x, y):
     Visualise_window.blit(text_image, (x, y))
 
 
-def DrawGrid(turnN):
+def DrawGrid(turnN, height):
     global Visualise_window
 
     Visualise_window.fill(Fill_color)
-    DrawText("Turn " + str(turnN), Generation_text_font, (0, 0, 0), 0, 0)
+    DrawText("Turn " + str(turnN), GUI_text_font, (0, 0, 0), 5, 5) #FIXME: Change this to its own font
 
     for i in range(World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
@@ -134,6 +141,9 @@ def DrawGrid(turnN):
             pygame.draw.line(Visualise_window, Grid_color,
                              (Start_x, Start_y + i * Distancebtwrow),
                              (Start_x + Gridsize, Start_y + i * Distancebtwrow))
+        if i != World_size: #Draw axis numbers
+            DrawText(str(i), Axis_text_font, (0, 0, 0), (Start_x + i * Distancebtwrow + Distancebtwrow*0.5), (height - Start_y)) #FIXME: Change this to its own font (X AXIS)
+            DrawText(str(World_size - i -1), Axis_text_font, (0, 0, 0), (Start_x - Distancebtwrow/2), (Start_y + i * Distancebtwrow + Distancebtwrow*0.25)) #(Y AXIS)
 
 
 def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
@@ -143,7 +153,7 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
 
     global Visualise_window
     global Cell_positions
-    DrawGrid(turnN)
+    DrawGrid(turnN, height)
     pygame.event.pump()
 
     for x_row_list in world_agent_list_x_y:
@@ -154,26 +164,22 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
             animalname = re.match(r"(\D+)_\d+", y_cell.name) #what animal is this
             animalname = animalname.group(1) #scrape the generation number
             cell_position_x, cell_position_y = Cell_positions[y_cell.y][y_cell.x]   #fixes orientation of coordinate system from top left to bottom left
-
-
-            cell_position_y = abs(height - cell_position_y)
-            print(cell_position_y)
+            cell_position_y = abs(height - cell_position_y - Distancebtwrow)
 
 
             if animalname == "Tiger":
-                # print(f"{animalname}, ({y_cell.x}, {y_cell.y}") #this is in COORDINATE SYSTEM XY
-                # print(Cell_positions[y_cell.x][y_cell.y]) #this is in PIXEL CELL LOCATION TOP LEFT CORNER OF THE CELL
-                pygame.draw.rect(Visualise_window, Tiger_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
+                #fixme: On not square resolutions things offset incorrectly
+                pygame.draw.rect(Visualise_window, Tiger_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
             elif animalname == "Rabbit":
-                pygame.draw.rect(Visualise_window, Rabbit_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Rabbit_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Wolf":
-                pygame.draw.rect(Visualise_window, Wolf_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Wolf_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Dandelion":
-                pygame.draw.rect(Visualise_window, Dandelion_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Dandelion_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Cow":
-                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_x + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_x + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Berrybush":
-                pygame.draw.rect(Visualise_window, Berrybush_color, pygame.Rect((cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(Visualise_window, Berrybush_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
 
             if y_cell.type != "Plant": #display animal generation number
 

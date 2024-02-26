@@ -7,7 +7,7 @@ import time
 import ConsoleLog
 import VisualiseScript
 
-World_size = 10     #how big (box) do you want the world to be1
+World_size = 30     #how big (box) do you want the world to be1
 Simulation_Length = 20     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
@@ -34,8 +34,8 @@ Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for 
 Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
 Animal_breed_cooldown = 2
 
-Window_width = 800
-Window_height = 800
+Window_width = 900
+Window_height = 900
 
 Console_log_start_position = True
 Console_log_check_for_food = False
