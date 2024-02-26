@@ -132,7 +132,7 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y):
     global TigerIcon
     global Cell_positions
     DrawGrid()
-
+    pygame.event.pump()
 
     for x_row_list in world_agent_list_x_y:
         for y_cell in x_row_list:

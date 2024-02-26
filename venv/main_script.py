@@ -7,31 +7,32 @@ import time
 import ConsoleLog
 import VisualiseScript
 
-World_size = 15     #how big (box) do you want the world to be1
-Simulation_Length = 50     #how many turns in simulation
+World_size = 20     #how big (box) do you want the world to be1
+Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
-Num_dandelion = [10];
+Num_dandelion = [50];
 #TODO: add Num_berrybush = [30];
 #TODO: add Num_fox = [30];
-Num_cow = [10];
+#fixme: Make it that rabbits can't eat apple trees or they'll be unstoppable
+Num_cow = [20];
 Num_rabbit = [10];
-Num_tiger = [2];
-Num_wolf = [0];
-#fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same
+Num_tiger = [10];
+Num_wolf = [5];
+#fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same, seems to be bug in order or hunger starvation (animal spawn with negative hunger)
 Max_flowers = 30       #how many flowers can be
 GrowthPerTurn = 3      #how many flowers spawn per turn
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
-Base_reproduce_chance = 0.8     #maximum reproduce chance (at max hunger)
+Base_reproduce_chance = 0.75     #maximum reproduce chance (at max hunger)
 DeathAge = 30       #at how old do animals 100% die (sigmoid)
 World_size_spawn_tolerance = 1.03      #tolerance to world size to prevent overpopulation
 Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
 Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
 Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
 Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
-Animal_breed_cooldown = 0
+Animal_breed_cooldown = 1
 
 Window_width = 800
 Window_height = 800
@@ -45,7 +46,7 @@ Console_log_death_oldage = False
 Console_log_death_battle = False
 Console_log_born = True
 Console_log_random_move = False
-Console_log_reproduce_chance = False
+Console_log_reproduce_chance = True
 Console_log_fight_big = False
 Console_log_worldtoosmalltobreed = False
 
@@ -53,7 +54,7 @@ Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
 
-Sim_speed = 0.75
+Sim_speed = 0
 
 #---------------------------------------------------------------------------
 
