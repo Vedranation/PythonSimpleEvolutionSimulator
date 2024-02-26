@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import pygame
 import re
 import sys
-def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, logbool):
+def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, logbool):
 
     if logbool == True:
         turns_list = [i for i in range(1, Simulation_Length + 1)]
@@ -11,9 +11,10 @@ def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Nu
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows', line=dict(color='black')))
         fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='green')))
+        fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='yellow')))
         fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
         fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits', line=dict(color='orange')))
+        fig.add_trace(go.Scatter(x=turns_list, y=Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)')))
 
         # Add titles and labels
         fig.update_layout(title='Animal Population Over Time',
@@ -67,6 +68,7 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     global Wolf_color
     global Cow_color
     global Berrybush_color
+    global Appletree_color
 
     global Cell_positions
     global Distancebtwrow
@@ -79,6 +81,7 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     Wolf_color = (137, 12, 166)
     Cow_color = (0, 0, 0)
     Berrybush_color = (181, 45, 0)
+    Appletree_color = (242, 87, 44)
 
     Visualise_window = pygame.display.set_mode((width, height))
     Gridsize = round(min((width, height)) * 0.8) #use 80% of the smaller dimension
@@ -180,6 +183,8 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
                 pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Berrybush":
                 pygame.draw.rect(Visualise_window, Berrybush_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+            elif animalname == "Appletree":
+                pygame.draw.rect(Visualise_window, Appletree_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
 
             if y_cell.type != "Plant": #display animal generation number
 

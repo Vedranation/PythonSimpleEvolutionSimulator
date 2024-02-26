@@ -1,7 +1,7 @@
 #function to easily toggle logging to console
 
 
-def StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list, logbool):
+def StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, logbool):
     '''Logs agents starting positions, input Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list'''
     if logbool == True:
         for i in Cows_list:
@@ -10,6 +10,8 @@ def StartPosition(Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_lis
             print(f"Rabbits are at: [{i.x}, {i.y}]")
         for i in Dandelion_list:
             print(f"Dandelions are at: [{i.x}, {i.y}]")
+        for i in Appletree_list:
+            print(f"Apple trees are at: [{i.x}, {i.y}]")
         for i in Tigers_list:
             print(f"Tigers are at: [{i.x}, {i.y}]")
         for i in Wolf_list:
