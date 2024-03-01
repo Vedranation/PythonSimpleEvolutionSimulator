@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import math
 
 # Constants
-Max_hunger_to_reproduce = 60  # Y almost 100%
-sigmoid_slope = 15.0  # the bigger the steeper
+Max_hunger_to_reproduce = 50  # Y almost 100%
+sigmoid_slope = 20  # the bigger the steeper
 
 # Function to calculate reproduction chance
 def HungerReproduceSigmoid(hunger):
@@ -20,10 +20,5 @@ plt.xlabel('Hunger')
 plt.ylabel('Reproduction Chance')
 plt.grid(True)
 plt.show()
-
-
-
-#used in main
-Max_hunger_to_reproduce = 40
 
 print(HungerReproduceSigmoid(10))

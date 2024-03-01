@@ -6,9 +6,9 @@ import time
 
 import ConsoleLog
 import VisualiseScript
+import GlobalsStateManager
 
-World_size = 20     #how big (box) do you want the world to be1
-Simulation_Length = 1000     #how many turns in simulation
+GSM = GlobalsStateManager.GlobalsManager #Encapsulate all globals
 
 #how many of each agents do you want to start with, stores their numbers each turn
 
@@ -18,25 +18,20 @@ Simulation_Length = 1000     #how many turns in simulation
 #TODO: add stone or impassable terrain
 #TODO: make animals babies spawn near parents
 #TODO: make predators able to see fleeing prey
-Num_dandelion = [30];
-Num_cow = [0];
-Num_rabbit = [5];
-Num_tiger = [0];
-Num_wolf = [0];
-Num_appletree = [30];
-Num_fox = [0];
+#TODO: refactor globals
+#TODO: move Agent to its own script
 
-Max_flowers = 60       #how many flowers can be
-Dandelion_growth_per_turn = 20      #how many Dandelions spawn per turn
+Max_flowers = 200       #how many flowers can be
+Dandelion_growth_per_turn = 30     #how many Dandelions spawn per turn
 Berrybush_growth_per_turn = 7
-Appletree_growth_per_turn = 0
+Appletree_growth_per_turn = 3
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
-Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
+Max_hunger_to_reproduce = 50    #at which hunger value is highest chance to breed
 Base_reproduce_chance = 0.75     #maximum reproduce chance (at max hunger)
-DeathAge = 30       #at how old do animals 100% die (sigmoid)
+DeathAge = 50       #at how old do animals 100% die (sigmoid)
 World_size_spawn_tolerance = 1.05      #tolerance to world size to prevent overpopulation
-Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
+Personal_animal_limit = pow(GSM.World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
 Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
 Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
 Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
@@ -47,7 +42,7 @@ Window_height = 900
 
 Console_log_start_position = False
 Console_log_check_for_food = False
-Console_log_found_food = True
+Console_log_found_food = False
 Console_log_was_eaten = False
 Console_log_death_starvation = False
 Console_log_death_oldage = False
@@ -57,29 +52,29 @@ Console_log_random_move = False
 Console_log_reproduce_chance = False
 Console_log_fight_big = True
 Console_log_worldtoosmalltobreed = False
-Console_log_personalpopulationlimit = True
+Console_log_personalpopulationlimit = False
 Console_log_worldtoosmalltogrow = False
 
 Visualise_population_toggle = True
-Visualise_hunger_toggle = False
+Visualise_hunger_toggle = True
 Visualise_simulation_toggle = True
 
-Sim_delay = 1    #delay in seconds between each turn
+Sim_delay = 0.25    #delay in seconds between each turn
 
 #---------------------------------------------------------------------------
 
 if Visualise_simulation_toggle == True:
-    VisualiseScript.VisualiseSimulationInit(width=Window_width, height=Window_height, worldsize=World_size)
+    VisualiseScript.VisualiseSimulationInit(width=Window_width, height=Window_height, worldsize=GSM.World_size)
 
 
 DiedInBattle = False
 #Check if world is big enough for all agents
-SumAllAgents = [Num_cow[-1]+Num_dandelion[-1]+Num_tiger[-1]+Num_wolf[-1]+Num_rabbit[-1]+Num_appletree[-1]+Num_fox[-1]]
-if pow(World_size, 2) < SumAllAgents[-1]:
+SumAllAgents = [GSM.Num_cow[-1]+GSM.Num_dandelion[-1]+GSM.Num_tiger[-1]+GSM.Num_wolf[-1]+GSM.Num_rabbit[-1]+GSM.Num_appletree[-1]+GSM.Num_fox[-1]]
+if pow(GSM.World_size, 2) < SumAllAgents[-1]:
     raise Exception("World can't be smaller than amount of objects to spawn")
 
-#Generate the world X in Y, filled with None to show empty cells, starts from XY = 0, ends at at World_size - 1
-World_agent_list_x_y = [[None for _ in range(World_size)] for _ in range(World_size)] #stores all agent instances
+#Generate the world X in Y, filled with None to show empty cells, starts from XY = 0, ends at at GSM.World_size - 1
+World_agent_list_x_y = [[None for _ in range(GSM.World_size)] for _ in range(GSM.World_size)] #stores all agent instances
 class Agent:
     def __init__(self, name, type, perception, speed, size, hunger):
 
@@ -115,13 +110,13 @@ class Agent:
         self.FindFreeSpot()  # find a free spot to spawn
 
     def FindFreeSpot(self):
-        self.x = random.randint(0, World_size-1)
-        self.y = random.randint(0, World_size-1)
+        self.x = random.randint(0, GSM.World_size-1)
+        self.y = random.randint(0, GSM.World_size-1)
 
         #Loop until a free spot is found
         while World_agent_list_x_y[self.x][self.y] != None:
-            self.x = random.randint(0, World_size-1)
-            self.y = random.randint(0, World_size-1)
+            self.x = random.randint(0, GSM.World_size-1)
+            self.y = random.randint(0, GSM.World_size-1)
         World_agent_list_x_y[self.x][self.y] = self
 
     @staticmethod
@@ -156,7 +151,7 @@ class Agent:
             random.shuffle(directions_x_y) #randomise choice selection
 
             for direction in directions_x_y:
-                if direction[0] >= World_size or direction[1] >= World_size or direction[0] < 0 or direction[1] < 0: #prevents checking beyond edge of world
+                if direction[0] >= GSM.World_size or direction[1] >= GSM.World_size or direction[0] < 0 or direction[1] < 0: #prevents checking beyond edge of world
                     continue
 
                 if World_agent_list_x_y[direction[0]][direction[1]] == None:
@@ -207,7 +202,7 @@ class Agent:
     def RandomMove(self, directions_x_y):
         if self.speed == 1: #simplest case, just move and end turn
             for direction in directions_x_y:
-                if direction[0] >= World_size or direction[1] >= World_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
+                if direction[0] >= GSM.World_size or direction[1] >= GSM.World_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
                 random.choice(directions_x_y)
                 ConsoleLog.RandomMove(self, direction[0], direction[1], Console_log_random_move)
@@ -361,7 +356,7 @@ class Agent:
 
                 UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list) #need to update this when adding more animals
 
-                if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
+                if pow(GSM.World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
 
                     ConsoleLog.WorldTooSmallTooBreed(Console_log_worldtoosmalltobreed)
                     return
@@ -403,9 +398,8 @@ class Agent:
                     newborn = SpawnFox(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 ConsoleLog.Born(newborn, Console_log_born)
 
-        def Mutate():
+
             #todo: gene evo mutate func
-            return
 
 
 
@@ -463,8 +457,8 @@ def SpawnFox(name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small"
 def RespawnVegetation():
     # respawn plants every turn
     UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list)# need to update this when adding more animals
-    max_tiles = pow(World_size, 2)
-    current_flower_amount = Num_dandelion[-1] + Num_appletree[-1]# + Num_berrybush[-1]
+    max_tiles = pow(GSM.World_size, 2)
+    current_flower_amount = GSM.Num_dandelion[-1] + GSM.Num_appletree[-1]# + Num_berrybush[-1]
     total_growth_per_turn = Dandelion_growth_per_turn + Appletree_growth_per_turn + Berrybush_growth_per_turn
 
     if max_tiles <= (round((UpdatedAnimalSum + total_growth_per_turn) * World_size_spawn_tolerance)):
@@ -485,28 +479,28 @@ def RespawnVegetation():
 
 
 #spawn amount of agents we want
-for i in range(Num_dandelion[0]):
+for i in range(GSM.Num_dandelion[0]):
     SpawnDandelion()
-for i in range(Num_appletree[0]):
+for i in range(GSM.Num_appletree[0]):
     SpawnAppletree()
-for i in range(Num_cow[0]):
+for i in range(GSM.Num_cow[0]):
     SpawnCow()
-for i in range(Num_rabbit[0]):
+for i in range(GSM.Num_rabbit[0]):
     SpawnRabbit()
-for i in range(Num_tiger[0]):
+for i in range(GSM.Num_tiger[0]):
     SpawnTiger()
-for i in range(Num_wolf[0]):
+for i in range(GSM.Num_wolf[0]):
     SpawnWolf()
-for i in range(Num_fox[0]):
+for i in range(GSM.Num_fox[0]):
     SpawnFox()
 
-print(f"World started with {Num_dandelion[0]} Dandelions, {Num_appletree[0]} Apple trees, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_fox[0]} Foxes, {Num_wolf[0]} Wolves and {Num_tiger[0]} Tigers")
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
 ConsoleLog.StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, Console_log_start_position)
 
 
 
-#simulate Simulation_Length turns (main loop)
-for i in range(Simulation_Length):
+#simulate GSM.Simulation_Length turns (main loop)
+for i in range(GSM.Simulation_Length):
 
     RespawnVegetation()
 
@@ -551,14 +545,14 @@ for i in range(Simulation_Length):
         else:
             wolves.Starvation_Age_Battle_Death(DiedInBattle=True)
 
-    Num_cow.append(len(Cows_list))
-    Num_dandelion.append(len(Dandelion_list))
-    Num_appletree.append(len(Appletree_list))
-    Num_tiger.append(len(Tigers_list))
-    Num_wolf.append(len(Wolf_list))
-    Num_fox.append(len(Fox_list))
-    Num_rabbit.append(len(Rabbits_list))
-    SumAllAgents.append(Num_dandelion[-1] + Num_cow[-1] + Num_tiger[-1] + Num_wolf[-1] + Num_rabbit[-1] + Num_appletree[-1] + Num_fox[-1])
+    GSM.Num_cow.append(len(Cows_list))
+    GSM.Num_dandelion.append(len(Dandelion_list))
+    GSM.Num_appletree.append(len(Appletree_list))
+    GSM.Num_tiger.append(len(Tigers_list))
+    GSM.Num_wolf.append(len(Wolf_list))
+    GSM.Num_fox.append(len(Fox_list))
+    GSM.Num_rabbit.append(len(Rabbits_list))
+    SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1])
 
     Cows_hunger.append(CalculateAverageHunger(Cows_list))
     Tigers_hunger.append(CalculateAverageHunger(Tigers_list))
@@ -574,10 +568,10 @@ for i in range(Simulation_Length):
 
 #report results
 print("\n\n----------SIMULATION END----------")
-print(f"World started with {Num_dandelion[0]} Dandelions, {Num_appletree[0]} Apple trees, {Num_cow[0]} Cows, {Num_fox[0]} Foxes, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
-print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_appletree[-1]} Apple trees, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_fox[0]} Foxes, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(World_size, 2) // World_size_spawn_tolerance}")
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
+print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(GSM.World_size, 2) // World_size_spawn_tolerance}")
 
-VisualiseScript.VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, Num_fox, Visualise_population_toggle)
-VisualiseScript.VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Num_fox, Visualise_hunger_toggle)
+VisualiseScript.VisualisePopulation(GSM.Simulation_Length, GSM.Num_cow, GSM.Num_tiger, GSM.Num_dandelion, GSM.Num_wolf, GSM.Num_rabbit, GSM.Num_appletree, GSM.Num_fox, Visualise_population_toggle)
+VisualiseScript.VisualiseHunger(GSM.Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, GSM.Num_fox, Visualise_hunger_toggle)
 
 VisualiseScript.VisualiseSimulationQuit()
