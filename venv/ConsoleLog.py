@@ -72,6 +72,16 @@ def DiedInBattle(agent, prey, logbool):
         print(f"{agent.name} ({agent.hunger}) died in battle fighting {prey}")
     return
 
+def PersonalPopulationLimit(animal, logbool):
+    if logbool:
+        print(f"{animal} has reached population limit")
+    return
+
+def WorldTooSmallTooGrow(logbool):
+    if logbool:
+        print("World too small to grow!")
+    return
+
 def FightBig(agent, prey_agent, win_chance, prey_power, logbool):
     if logbool == True:
         win_chance = round(win_chance, 2)

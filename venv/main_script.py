@@ -16,7 +16,6 @@ Simulation_Length = 200     #how many turns in simulation
 #TODO: add Num_fox = [30];
 #TODO: add Num_goat = [30];
 #TODO: add stone or impassable terrain
-#fixme: Make it that rabbits can't eat apple trees or they'll be unstoppable
 #TODO: make animals babies spawn near parents
 #TODO: make predators able to see fleeing prey
 Num_dandelion = [10];
@@ -25,7 +24,7 @@ Num_rabbit = [10];
 Num_tiger = [10];
 Num_wolf = [10];
 Num_appletree = [10];
-#fixme: Random bug that makes animals (tigers and wolves) not insta starve and instead linger for hundreds of turns, avg hunger staying almost same, seems to be bug in order or hunger starvation (animal spawn with negative hunger)
+
 Max_flowers = 40       #how many flowers can be
 Dandelion_growth_per_turn = 8      #how many Dandelions spawn per turn
 Berrybush_growth_per_turn = 4
@@ -48,7 +47,7 @@ Window_height = 900
 Console_log_start_position = True
 Console_log_check_for_food = False
 Console_log_found_food = False
-Console_log_was_eaten = True
+Console_log_was_eaten = False
 Console_log_death_starvation = False
 Console_log_death_oldage = False
 Console_log_death_battle = False
@@ -57,12 +56,14 @@ Console_log_random_move = False
 Console_log_reproduce_chance = False
 Console_log_fight_big = False
 Console_log_worldtoosmalltobreed = False
+Console_log_personalpopulationlimit = True
+Console_log_worldtoosmalltogrow = False
 
 Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
 
-Sim_speed = 0.25    #delay in seconds between each turn
+Sim_speed = 0    #delay in seconds between each turn
 
 #---------------------------------------------------------------------------
 
@@ -101,7 +102,7 @@ class Agent:
         self.breedcooldown = 0
 
         if self.type != "Plant":
-            if self.size == "Small": #gives babies 1 turn worth of food
+            if self.size == "Small": #gives babies 1 turn worth of food - can cause numeric instability
                 self.hunger = hunger + 0
             elif self.size == "Medium":
                 self.hunger = hunger + 0
@@ -364,28 +365,28 @@ class Agent:
 
                 elif "Tiger" in self.name:
                     if len(Tigers_list) > Personal_animal_limit:
-                        print("Tigers have reached population limit")
+                        ConsoleLog.PersonalPopulationLimit("Tiger", Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Cow" in self.name:
                     if len(Cows_list) > Personal_animal_limit:
-                        print("Cows have reached population limit")
+                        ConsoleLog.PersonalPopulationLimit("Cow", Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Rabbit" in self.name:
                     if len(Rabbits_list) > Personal_animal_limit:
-                        print("Rabbits have reached population limit")
+                        ConsoleLog.PersonalPopulationLimit("Rabbit", Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Rabbit_" + str(babyname+1)
                     newborn = SpawnRabbit(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Wolf" in self.name:
                     if len(Wolf_list) > Personal_animal_limit:
-                        print("Wolves have reached population limit")
+                        ConsoleLog.PersonalPopulationLimit("Wolf", Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Wolf_" + str(babyname+1) #make name with new generation number
@@ -448,7 +449,7 @@ def RespawnVegetation():
     UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) # need to update this when adding more animals
 
     if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
-        print("World too small to grow!") #TODO: make this a console log disablable
+        ConsoleLog.WorldTooSmallTooGrow(Console_log_worldtoosmalltogrow)
         return
     if Num_dandelion[-1] + Num_appletree[-1] + Dandelion_growth_per_turn + Appletree_growth_per_turn + Berrybush_growth_per_turn <= Max_flowers:
         for j in range(Dandelion_growth_per_turn):
@@ -490,7 +491,7 @@ for i in range(Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Appletree_list)}Apple trees, {len(Cows_list)} Cows, {len(Rabbits_list)} Rabbits, {len(Wolf_list)} Wolves, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
+    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Appletree_list)} Apple trees, {len(Cows_list)} Cows, {len(Rabbits_list)} Rabbits, {len(Wolf_list)} Wolves, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
     for cows in Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
