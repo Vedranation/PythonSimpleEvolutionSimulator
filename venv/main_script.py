@@ -7,28 +7,29 @@ import time
 import ConsoleLog
 import VisualiseScript
 
-World_size = 15     #how big (box) do you want the world to be1
+World_size = 20     #how big (box) do you want the world to be1
 Simulation_Length = 200     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 
 #TODO: add Num_berrybush = [30];
-#TODO: add Num_fox = [30];
+
 #TODO: add Num_goat = [30];
 #TODO: add stone or impassable terrain
 #TODO: make animals babies spawn near parents
 #TODO: make predators able to see fleeing prey
-Num_dandelion = [10];
-Num_cow = [10];
-Num_rabbit = [10];
-Num_tiger = [10];
-Num_wolf = [10];
-Num_appletree = [10];
+Num_dandelion = [30];
+Num_cow = [30];
+Num_rabbit = [30];
+Num_tiger = [30];
+Num_wolf = [30];
+Num_appletree = [30];
+Num_fox = [30];
 
-Max_flowers = 40       #how many flowers can be
-Dandelion_growth_per_turn = 8      #how many Dandelions spawn per turn
-Berrybush_growth_per_turn = 4
-Appletree_growth_per_turn = 3
+Max_flowers = 50       #how many flowers can be
+Dandelion_growth_per_turn = 10      #how many Dandelions spawn per turn
+Berrybush_growth_per_turn = 7
+Appletree_growth_per_turn = 5
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
@@ -63,7 +64,7 @@ Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
 
-Sim_speed = 0    #delay in seconds between each turn
+Sim_speed = 0.25    #delay in seconds between each turn
 
 #---------------------------------------------------------------------------
 
@@ -73,7 +74,7 @@ if Visualise_simulation_toggle == True:
 
 DiedInBattle = False
 #Check if world is big enough for all agents
-SumAllAgents = [Num_cow[-1]+Num_dandelion[-1]+Num_tiger[-1]+Num_wolf[-1]+Num_rabbit[-1]+Num_appletree[-1]]
+SumAllAgents = [Num_cow[-1]+Num_dandelion[-1]+Num_tiger[-1]+Num_wolf[-1]+Num_rabbit[-1]+Num_appletree[-1]+Num_fox[-1]]
 if pow(World_size, 2) < SumAllAgents[-1]:
     raise Exception("World can't be smaller than amount of objects to spawn")
 
@@ -140,6 +141,8 @@ class Agent:
             Wolf_list.remove(agent)
         elif "Appletree" in agent.name:
             Appletree_list.remove(agent)
+        elif "Fox" in agent.name:
+            Fox_list.remove(agent)
 
 
 
@@ -356,7 +359,7 @@ class Agent:
             ConsoleLog.ReproduceChance(self, Base_reproduce_chance, sigm, mult, rnd, Console_log_reproduce_chance)
             if rnd <= mult:
 
-                UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) #need to update this when adding more animals
+                UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list) #need to update this when adding more animals
 
                 if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
 
@@ -391,6 +394,13 @@ class Agent:
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Wolf_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnWolf(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                elif "Fox" in self.name:
+                    if len(Fox_list) > Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Fox", Console_log_personalpopulationlimit)
+                        return
+                    babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
+                    babyname = "Fox_" + str(babyname+1) #make name with new generation number
+                    newborn = SpawnFox(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 ConsoleLog.Born(newborn, Console_log_born)
 
         def Mutate():
@@ -406,11 +416,13 @@ Dandelion_list = []
 Appletree_list = []
 Tigers_list = []
 Wolf_list = []
+Fox_list = []
 
 Cows_hunger = [] #stores average hunger values every turn
 Rabbits_hunger = []
 Tigers_hunger = []
 Wolf_hunger = []
+Fox_hunger = []
 def CalculateAverageHunger(animal_list):
     average = 0
     for i in animal_list:
@@ -444,19 +456,26 @@ def SpawnWolf(name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medi
     Wolf = Agent(name, type, perception, speed, size, hunger)
     Wolf_list.append(Wolf)
     return Wolf
+def SpawnFox(name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25):
+    Fox = Agent(name, type, perception, speed, size, hunger)
+    Fox_list.append(Fox)
+    return Fox
 def RespawnVegetation():
     # respawn plants every turn
-    UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) # need to update this when adding more animals
+    UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list)# need to update this when adding more animals
+    max_tiles = pow(World_size, 2)
+    current_flower_amount = Num_dandelion[-1] + Num_appletree[-1]# + Num_berrybush[-1]
+    total_growth_per_turn = Dandelion_growth_per_turn + Appletree_growth_per_turn + Berrybush_growth_per_turn
 
-    if pow(World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
+    if max_tiles <= (round((UpdatedAnimalSum + total_growth_per_turn) * World_size_spawn_tolerance)):
         ConsoleLog.WorldTooSmallTooGrow(Console_log_worldtoosmalltogrow)
         return
-    if Num_dandelion[-1] + Num_appletree[-1] + Dandelion_growth_per_turn + Appletree_growth_per_turn + Berrybush_growth_per_turn <= Max_flowers:
+    if current_flower_amount + total_growth_per_turn <= Max_flowers:
         for j in range(Dandelion_growth_per_turn):
             SpawnDandelion()
         for j in range(Appletree_growth_per_turn):
             SpawnAppletree()
-    elif (Num_dandelion[-1] + Num_appletree[-1] + Dandelion_growth_per_turn/2 + Appletree_growth_per_turn/2 + Berrybush_growth_per_turn/2) <= Max_flowers: #spawns half
+    elif (current_flower_amount + total_growth_per_turn/2) <= Max_flowers: #spawns half
         for j in range(Dandelion_growth_per_turn//2):
             SpawnDandelion()
         for j in range(Appletree_growth_per_turn//2):
@@ -478,10 +497,11 @@ for i in range(Num_tiger[0]):
     SpawnTiger()
 for i in range(Num_wolf[0]):
     SpawnWolf()
+for i in range(Num_fox[0]):
+    SpawnFox()
 
-
-print(f"World started with {Num_dandelion[0]} Dandelions, {Num_appletree[0]} Apple trees, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves and {Num_tiger[0]} Tigers")
-ConsoleLog.StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Console_log_start_position)
+print(f"World started with {Num_dandelion[0]} Dandelions, {Num_appletree[0]} Apple trees, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_fox[0]} Foxes, {Num_wolf[0]} Wolves and {Num_tiger[0]} Tigers")
+ConsoleLog.StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, Console_log_start_position)
 
 
 
@@ -491,7 +511,7 @@ for i in range(Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Appletree_list)} Apple trees, {len(Cows_list)} Cows, {len(Rabbits_list)} Rabbits, {len(Wolf_list)} Wolves, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
+    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Appletree_list)} Apple trees, {len(Cows_list)} Cows, {len(Rabbits_list)} Rabbits, {len(Fox_list)} Foxes, {len(Wolf_list)} Wolves, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
     for cows in Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
@@ -504,6 +524,15 @@ for i in range(Simulation_Length):
         rabbits.SearchForFood()
         rabbits.Reproduce()
         rabbits.Starvation_Age_Battle_Death()
+    print("")
+    for foxes in Fox_list[:]:
+        DiedInBattle = False
+        foxes.SearchForFood()
+        if DiedInBattle == False:
+            foxes.Reproduce()
+            foxes.Starvation_Age_Battle_Death()
+        else:
+            foxes.Starvation_Age_Battle_Death(DiedInBattle=True)
     print("")
     for tigers in Tigers_list[:]:
         DiedInBattle = False
@@ -527,13 +556,15 @@ for i in range(Simulation_Length):
     Num_appletree.append(len(Appletree_list))
     Num_tiger.append(len(Tigers_list))
     Num_wolf.append(len(Wolf_list))
+    Num_fox.append(len(Fox_list))
     Num_rabbit.append(len(Rabbits_list))
-    SumAllAgents.append(Num_dandelion[-1] + Num_cow[-1] + Num_tiger[-1] + Num_wolf[-1] + Num_rabbit[-1] + Num_appletree[-1])
+    SumAllAgents.append(Num_dandelion[-1] + Num_cow[-1] + Num_tiger[-1] + Num_wolf[-1] + Num_rabbit[-1] + Num_appletree[-1] + Num_fox[-1])
 
     Cows_hunger.append(CalculateAverageHunger(Cows_list))
     Tigers_hunger.append(CalculateAverageHunger(Tigers_list))
     Rabbits_hunger.append(CalculateAverageHunger(Rabbits_list))
     Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
+    Fox_hunger.append(CalculateAverageHunger(Fox_list))
 
     if Visualise_simulation_toggle:
         VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, Window_height) #draw the display window
@@ -542,10 +573,10 @@ for i in range(Simulation_Length):
 
 #report results
 print("\n\n----------SIMULATION END----------")
-print(f"World started with {Num_dandelion[0]} Dandelions, {Num_appletree[0]} Apple trees, {Num_cow[0]} Cows, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
-print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_appletree[-1]} Apple trees, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(World_size, 2) // World_size_spawn_tolerance}")
+print(f"World started with {Num_dandelion[0]} Dandelions, {Num_appletree[0]} Apple trees, {Num_cow[0]} Cows, {Num_fox[0]} Foxes, {Num_rabbit[0]} Rabbits, {Num_wolf[0]} Wolves, and {Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
+print(f"World ended at turn {Simulation_Length} with {Num_dandelion[-1]} Dandelions, {Num_appletree[-1]} Apple trees, {Num_cow[-1]} Cows, {Num_rabbit[-1]} Rabbits, {Num_fox[0]} Foxes, {Num_wolf[-1]} Wolves, and {Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(World_size, 2) // World_size_spawn_tolerance}")
 
-VisualiseScript.VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, Visualise_population_toggle)
-VisualiseScript.VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Visualise_hunger_toggle)
+VisualiseScript.VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, Num_fox, Visualise_population_toggle)
+VisualiseScript.VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Num_fox, Visualise_hunger_toggle)
 
 VisualiseScript.VisualiseSimulationQuit()

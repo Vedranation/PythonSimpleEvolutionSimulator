@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import pygame
 import re
 import sys
-def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, logbool):
+def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, Num_fox, logbool):
 
     if logbool == True:
         turns_list = [i for i in range(1, Simulation_Length + 1)]
@@ -11,10 +11,12 @@ def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Nu
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows', line=dict(color='black')))
         fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='yellow')))
+        fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='yellow', dash='dash')))
         fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits', line=dict(color='orange')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)')))
+        fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits', line=dict(color='white')))
+        fig.add_trace(go.Scatter(x=turns_list, y=Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)', dash='dash')))
+        fig.add_trace(go.Scatter(x=turns_list, y=Num_fox, mode='lines', name='Foxes', line=dict(color='orange')))
+
 
         # Add titles and labels
         fig.update_layout(title='Animal Population Over Time',
@@ -25,7 +27,7 @@ def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Nu
         fig.show()
     return
 
-def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, logbool):
+def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Fox_hunger, logbool):
 
     if logbool == True:
         # Turns list for X-axis
@@ -34,9 +36,10 @@ def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunge
         # Create the plot for average hunger
         fig_hunger = go.Figure()
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
-        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='orange')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='white')))
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=Tigers_hunger, mode='lines', name='Tigers', line=dict(color='red')))
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=Wolf_hunger, mode='lines', name='Wolves', line=dict(color='purple')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Fox_hunger, mode='lines', name='Foxes', line=dict(color='orange')))
 
         # Add titles and labels
         fig_hunger.update_layout(title='Average Animal Hunger Over Time',
@@ -67,6 +70,7 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     global Dandelion_color
     global Wolf_color
     global Cow_color
+    global Fox_color
     global Berrybush_color
     global Appletree_color
 
@@ -76,7 +80,8 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     Grid_color = (0, 0, 0)
     Fill_color = (0, 200, 0)
     Tiger_color = (255, 0, 0)
-    Rabbit_color = (224, 156, 18)
+    Fox_color = (224, 156, 18)
+    Rabbit_color = (255, 255, 255)
     Dandelion_color = (235, 235, 26)
     Wolf_color = (137, 12, 166)
     Cow_color = (0, 0, 0)
@@ -177,6 +182,8 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
                 pygame.draw.rect(Visualise_window, Rabbit_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Wolf":
                 pygame.draw.rect(Visualise_window, Wolf_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+            elif animalname == "Fox":
+                pygame.draw.rect(Visualise_window, Fox_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Dandelion":
                 pygame.draw.rect(Visualise_window, Dandelion_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
             elif animalname == "Cow":
