@@ -105,7 +105,7 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     Axis_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 2)  # font and size for grid axis
     GUI_text_font = pygame.font.SysFont("Arial", int(Gridsize // 15))
 
-    DrawGrid(0, height)
+    DrawGrid(width, height, 0, 0)
 
     #calculates left top of each cell
     for i in range(worldsize):
@@ -125,11 +125,12 @@ def DrawText(text, font, color, x, y):
     Visualise_window.blit(text_image, (x, y))
 
 
-def DrawGrid(turnN, height):
+def DrawGrid(width, height, turnN, currentTurnDelay):
     global Visualise_window
 
     Visualise_window.fill(Fill_color)
-    DrawText("Turn " + str(turnN), GUI_text_font, (0, 0, 0), 5, 5) #FIXME: Change this to its own font
+    DrawText("Turn " + str(turnN), GUI_text_font, (0, 0, 0), 5, 5)
+    DrawText("Speed: " + str(currentTurnDelay), GUI_text_font, (0, 0, 0), width - 230, 5)
 
     for i in range(World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
@@ -153,16 +154,44 @@ def DrawGrid(turnN, height):
             DrawText(str(i), Axis_text_font, (0, 0, 0), (Start_x + i * Distancebtwrow + Distancebtwrow*0.5), (height - Start_y)) #FIXME: Change this to its own font (X AXIS)
             DrawText(str(World_size - i -1), Axis_text_font, (0, 0, 0), (Start_x - Distancebtwrow/2), (Start_y + i * Distancebtwrow + Distancebtwrow*0.25)) #(Y AXIS)
 
-
-def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
-    for event in pygame.event.get():  # kill program once X is pressed
-        if event.type == pygame.QUIT:
+def EventHandler(currentTurnDelay):
+    'this is called separately from VisualiseSimulationDraw so that variable can be returned to main loop'
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: # kill program once X is pressed
             VisualiseSimulationQuit() #FIXME: Make X button not lag if used on high speeds
+
+        elif event.type == pygame.KEYDOWN: # For switching sim speed
+            if event.key == pygame.K_LEFT:
+                if currentTurnDelay > 1:
+                    return currentTurnDelay - 0.5
+                elif currentTurnDelay == 0.25:
+                    return 0.12
+                elif currentTurnDelay < 0.25 and currentTurnDelay != 0.03:
+                    return currentTurnDelay / 2
+                elif currentTurnDelay == 0.03:
+                    return 0
+                else:
+                    return currentTurnDelay - 0.25
+            elif event.key == pygame.K_RIGHT:
+                if currentTurnDelay >= 1:
+                    return currentTurnDelay + 0.5
+                elif currentTurnDelay == 0.12:
+                    return 0.25
+                elif currentTurnDelay == 0:
+                    currentTurnDelay = 0.03
+                elif currentTurnDelay < 0.12:
+                    return currentTurnDelay * 2
+                else:
+                    return currentTurnDelay + 0.25
+    return currentTurnDelay #if no events are detected
+def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, width, height, currentTurnDelay):
+    'this is called every main loop iteration'
 
     global Visualise_window
     global Cell_positions
-    DrawGrid(turnN, height)
-    pygame.event.pump()
+
+    DrawGrid(width, height, turnN, currentTurnDelay)
+
 
     for x_row_list in world_agent_list_x_y:
         for y_cell in x_row_list:
@@ -176,7 +205,7 @@ def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, height):
 
 
             if animalname == "Tiger":
-                #fixme: On not square resolutions things offset incorrectly
+                #fixme: On not square resolutions things offset incorrectly - also on world size 25 for some reason?
                 pygame.draw.rect(Visualise_window, Tiger_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
             elif animalname == "Rabbit":
                 pygame.draw.rect(Visualise_window, Rabbit_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))

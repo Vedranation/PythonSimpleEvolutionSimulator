@@ -8,7 +8,7 @@ import ConsoleLog
 import VisualiseScript
 
 World_size = 20     #how big (box) do you want the world to be1
-Simulation_Length = 200     #how many turns in simulation
+Simulation_Length = 1000     #how many turns in simulation
 
 #how many of each agents do you want to start with, stores their numbers each turn
 
@@ -19,17 +19,17 @@ Simulation_Length = 200     #how many turns in simulation
 #TODO: make animals babies spawn near parents
 #TODO: make predators able to see fleeing prey
 Num_dandelion = [30];
-Num_cow = [30];
-Num_rabbit = [30];
-Num_tiger = [30];
-Num_wolf = [30];
+Num_cow = [0];
+Num_rabbit = [5];
+Num_tiger = [0];
+Num_wolf = [0];
 Num_appletree = [30];
-Num_fox = [30];
+Num_fox = [0];
 
-Max_flowers = 50       #how many flowers can be
-Dandelion_growth_per_turn = 10      #how many Dandelions spawn per turn
+Max_flowers = 60       #how many flowers can be
+Dandelion_growth_per_turn = 20      #how many Dandelions spawn per turn
 Berrybush_growth_per_turn = 7
-Appletree_growth_per_turn = 5
+Appletree_growth_per_turn = 0
 Maximum_hunger = 50     #maximum hunger a creature can have in its belly
 Reproduce_age = 5   #minimum age before can breed
 Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
@@ -45,9 +45,9 @@ Animal_breed_cooldown = 2
 Window_width = 900
 Window_height = 900
 
-Console_log_start_position = True
+Console_log_start_position = False
 Console_log_check_for_food = False
-Console_log_found_food = False
+Console_log_found_food = True
 Console_log_was_eaten = False
 Console_log_death_starvation = False
 Console_log_death_oldage = False
@@ -55,7 +55,7 @@ Console_log_death_battle = False
 Console_log_born = False
 Console_log_random_move = False
 Console_log_reproduce_chance = False
-Console_log_fight_big = False
+Console_log_fight_big = True
 Console_log_worldtoosmalltobreed = False
 Console_log_personalpopulationlimit = True
 Console_log_worldtoosmalltogrow = False
@@ -64,7 +64,7 @@ Visualise_population_toggle = True
 Visualise_hunger_toggle = False
 Visualise_simulation_toggle = True
 
-Sim_speed = 0.25    #delay in seconds between each turn
+Sim_delay = 1    #delay in seconds between each turn
 
 #---------------------------------------------------------------------------
 
@@ -285,7 +285,7 @@ class Agent:
         #If food was eaten, how much nourishment does it give
         if ate == True:
             if preySize == "Small":
-                worth = 6
+                worth = 5
                 ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
                 ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
                 self.hunger = self.hunger + worth
@@ -567,8 +567,9 @@ for i in range(Simulation_Length):
     Fox_hunger.append(CalculateAverageHunger(Fox_list))
 
     if Visualise_simulation_toggle:
-        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, Window_height) #draw the display window
-        time.sleep(Sim_speed)
+        Sim_delay = VisualiseScript.EventHandler(Sim_delay)
+        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, Window_width, Window_height, Sim_delay) #draw the display window
+        time.sleep(Sim_delay)
 
 
 #report results
