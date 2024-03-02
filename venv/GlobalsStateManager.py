@@ -1,7 +1,7 @@
 
 class GlobalsManager:
     World_size = 30     #how big (box) do you want the world to be1
-    Simulation_Length = 600     #how many turns in simulation
+    Simulation_Length = 50     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
 
@@ -55,6 +55,27 @@ class GlobalsManager:
 
     Visualise_population_toggle = True
     Visualise_hunger_toggle = True
-    Visualise_simulation_toggle = True
+    Visualise_simulation_toggle = False
 
     Sim_delay = 0.25    #delay in seconds between each turn
+
+
+
+
+
+    'Variables for the program to define'
+    Cows_list = []  # initialise lists to store agents
+    Rabbits_list = []  # TODO: put these guys into GSM as well
+    Dandelion_list = []
+    Appletree_list = []
+    Tigers_list = []
+    Wolf_list = []
+    Fox_list = []
+
+    Cows_hunger = []  # stores average hunger values every turn
+    Rabbits_hunger = []
+    Tigers_hunger = []
+    Wolf_hunger = []
+    Fox_hunger = []
+
+    Gridsize = 0

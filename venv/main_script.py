@@ -24,7 +24,7 @@ GSM = GlobalsStateManager.GlobalsManager #Encapsulate all globals
 #---------------------------------------------------------------------------
 
 if GSM.Visualise_simulation_toggle == True:
-    VisualiseScript.VisualiseSimulationInit(width=GSM.Window_width, height=GSM.Window_height, worldsize=GSM.World_size)
+    VisualiseScript.VisualiseSimulationInit(GSM)
 
 
 DiedInBattle = False
@@ -85,19 +85,19 @@ class Agent:
 
         # Remove from respective list
         if "Cow" in agent.name:
-            Cows_list.remove(agent)
+            GSM.Cows_list.remove(agent)
         elif "Rabbit" in agent.name:
-            Rabbits_list.remove(agent)
+            GSM.Rabbits_list.remove(agent)
         elif "Tiger" in agent.name:
-            Tigers_list.remove(agent)
+            GSM.Tigers_list.remove(agent)
         elif "Dandelion" in agent.name:
-            Dandelion_list.remove(agent)
+            GSM.Dandelion_list.remove(agent)
         elif "Wolf" in agent.name:
-            Wolf_list.remove(agent)
+            GSM.Wolf_list.remove(agent)
         elif "Appletree" in agent.name:
-            Appletree_list.remove(agent)
+            GSM.Appletree_list.remove(agent)
         elif "Fox" in agent.name:
-            Fox_list.remove(agent)
+            GSM.Fox_list.remove(agent)
 
 
 
@@ -314,7 +314,7 @@ class Agent:
             ConsoleLog.ReproduceChance(self, GSM.Base_reproduce_chance, sigm, mult, rnd, GSM.Console_log_reproduce_chance)
             if rnd <= mult:
 
-                UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list) #need to update this when adding more animals
+                UpdatedAnimalSum = len(GSM.Tigers_list) + len(GSM.Dandelion_list) + len(GSM.Cows_list) + len(GSM.Wolf_list) + len(GSM.Rabbits_list) + len(GSM.Appletree_list) + len(GSM.Fox_list) #need to update this when adding more animals
 
                 if pow(GSM.World_size, 2) < (round(UpdatedAnimalSum * GSM.World_size_spawn_tolerance, 1)):
 
@@ -322,35 +322,35 @@ class Agent:
                     return
 
                 elif "Tiger" in self.name:
-                    if len(Tigers_list) > GSM.Personal_animal_limit:
+                    if len(GSM.Tigers_list) > GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Tiger", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Cow" in self.name:
-                    if len(Cows_list) > GSM.Personal_animal_limit:
+                    if len(GSM.Cows_list) > GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Cow", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Rabbit" in self.name:
-                    if len(Rabbits_list) > GSM.Personal_animal_limit:
+                    if len(GSM.Rabbits_list) > GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Rabbit", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Rabbit_" + str(babyname+1)
                     newborn = SpawnRabbit(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Wolf" in self.name:
-                    if len(Wolf_list) > GSM.Personal_animal_limit:
+                    if len(GSM.Wolf_list) > GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Wolf", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Wolf_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnWolf(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Fox" in self.name:
-                    if len(Fox_list) > GSM.Personal_animal_limit:
+                    if len(GSM.Fox_list) > GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Fox", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
@@ -362,21 +362,6 @@ class Agent:
             #todo: gene evo mutate func
 
 
-
-
-Cows_list = [] #initialise lists to store agents
-Rabbits_list = []
-Dandelion_list = []
-Appletree_list = []
-Tigers_list = []
-Wolf_list = []
-Fox_list = []
-
-Cows_hunger = [] #stores average hunger values every turn
-Rabbits_hunger = []
-Tigers_hunger = []
-Wolf_hunger = []
-Fox_hunger = []
 def CalculateAverageHunger(animal_list):
     average = 0
     for i in animal_list:
@@ -388,35 +373,35 @@ def CalculateAverageHunger(animal_list):
 #Function to spawn agents
 def SpawnDandelion(name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
     Dandelion = Agent(name, type, perception, speed, size, hunger)
-    Dandelion_list.append(Dandelion)
+    GSM.Dandelion_list.append(Dandelion)
     return Dandelion
 def SpawnAppletree(name="Appletree_1", type="Plant", perception=0, speed=0, size="Large", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
     Appletree = Agent(name, type, perception, speed, size, hunger)
-    Appletree_list.append(Appletree)
+    GSM.Appletree_list.append(Appletree)
     return Appletree
 def SpawnCow(name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25):
     Cow = Agent(name, type, perception, speed, size, hunger)
-    Cows_list.append(Cow)
+    GSM.Cows_list.append(Cow)
     return Cow
 def SpawnRabbit(name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25):
     Rabbit = Agent(name, type, perception, speed, size, hunger)
-    Rabbits_list.append(Rabbit)
+    GSM.Rabbits_list.append(Rabbit)
     return Rabbit
 def SpawnTiger(name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25):
     Tiger = Agent(name, type, perception, speed, size, hunger)
-    Tigers_list.append(Tiger)
+    GSM.Tigers_list.append(Tiger)
     return Tiger
 def SpawnWolf(name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25):
     Wolf = Agent(name, type, perception, speed, size, hunger)
-    Wolf_list.append(Wolf)
+    GSM.Wolf_list.append(Wolf)
     return Wolf
 def SpawnFox(name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25):
     Fox = Agent(name, type, perception, speed, size, hunger)
-    Fox_list.append(Fox)
+    GSM.Fox_list.append(Fox)
     return Fox
 def RespawnVegetation():
     # respawn plants every turn
-    UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list)# need to update this when adding more animals
+    UpdatedAnimalSum = len(GSM.Tigers_list) + len(GSM.Dandelion_list) + len(GSM.Cows_list) + len(GSM.Wolf_list) + len(GSM.Rabbits_list) + len(GSM.Appletree_list) + len(GSM.Fox_list)# need to update this when adding more animals
     max_tiles = pow(GSM.World_size, 2)
     current_flower_amount = GSM.Num_dandelion[-1] + GSM.Num_appletree[-1]# + Num_berrybush[-1]
     total_growth_per_turn = GSM.Dandelion_growth_per_turn + GSM.Appletree_growth_per_turn + GSM.Berrybush_growth_per_turn
@@ -455,7 +440,7 @@ for i in range(GSM.Num_fox[0]):
     SpawnFox()
 
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
-ConsoleLog.StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, GSM.Console_log_start_position)
+ConsoleLog.StartPosition(GSM.Cows_list, GSM.Dandelion_list, GSM.Appletree_list, GSM.Tigers_list, GSM.Wolf_list, GSM.Rabbits_list, GSM.Fox_list, GSM.Console_log_start_position)
 
 
 
@@ -465,8 +450,8 @@ for i in range(GSM.Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(Dandelion_list)} Dandelions, {len(Appletree_list)} Apple trees, {len(Cows_list)} Cows, {len(Rabbits_list)} Rabbits, {len(Fox_list)} Foxes, {len(Wolf_list)} Wolves, and {len(Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
-    for cows in Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
+    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Appletree_list)} Apple trees, {len(GSM.Cows_list)} Cows, {len(GSM.Rabbits_list)} Rabbits, {len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
+    for cows in GSM.Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
         cows.SearchForFood()
@@ -474,12 +459,12 @@ for i in range(GSM.Simulation_Length):
         cows.Starvation_Age_Battle_Death()
 
     print("")
-    for rabbits in Rabbits_list[:]:
+    for rabbits in GSM.Rabbits_list[:]:
         rabbits.SearchForFood()
         rabbits.Reproduce()
         rabbits.Starvation_Age_Battle_Death()
     print("")
-    for foxes in Fox_list[:]:
+    for foxes in GSM.Fox_list[:]:
         DiedInBattle = False
         foxes.SearchForFood()
         if DiedInBattle == False:
@@ -488,7 +473,7 @@ for i in range(GSM.Simulation_Length):
         else:
             foxes.Starvation_Age_Battle_Death(DiedInBattle=True)
     print("")
-    for tigers in Tigers_list[:]:
+    for tigers in GSM.Tigers_list[:]:
         DiedInBattle = False
         tigers.SearchForFood()
         if DiedInBattle == False:
@@ -497,7 +482,7 @@ for i in range(GSM.Simulation_Length):
         else:
             tigers.Starvation_Age_Battle_Death(DiedInBattle=True)
     print("")
-    for wolves in Wolf_list[:]:
+    for wolves in GSM.Wolf_list[:]:
         wolves.SearchForFood()
         if DiedInBattle == False:
             wolves.Reproduce()
@@ -505,20 +490,20 @@ for i in range(GSM.Simulation_Length):
         else:
             wolves.Starvation_Age_Battle_Death(DiedInBattle=True)
 
-    GSM.Num_cow.append(len(Cows_list))
-    GSM.Num_dandelion.append(len(Dandelion_list))
-    GSM.Num_appletree.append(len(Appletree_list))
-    GSM.Num_tiger.append(len(Tigers_list))
-    GSM.Num_wolf.append(len(Wolf_list))
-    GSM.Num_fox.append(len(Fox_list))
-    GSM.Num_rabbit.append(len(Rabbits_list))
+    GSM.Num_cow.append(len(GSM.Cows_list))
+    GSM.Num_dandelion.append(len(GSM.Dandelion_list))
+    GSM.Num_appletree.append(len(GSM.Appletree_list))
+    GSM.Num_tiger.append(len(GSM.Tigers_list))
+    GSM.Num_wolf.append(len(GSM.Wolf_list))
+    GSM.Num_fox.append(len(GSM.Fox_list))
+    GSM.Num_rabbit.append(len(GSM.Rabbits_list))
     SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1])
 
-    Cows_hunger.append(CalculateAverageHunger(Cows_list))
-    Tigers_hunger.append(CalculateAverageHunger(Tigers_list))
-    Rabbits_hunger.append(CalculateAverageHunger(Rabbits_list))
-    Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
-    Fox_hunger.append(CalculateAverageHunger(Fox_list))
+    GSM.Cows_hunger.append(CalculateAverageHunger(GSM.Cows_list))
+    GSM.Tigers_hunger.append(CalculateAverageHunger(GSM.Tigers_list))
+    GSM.Rabbits_hunger.append(CalculateAverageHunger(GSM.Rabbits_list))
+    GSM.Wolf_hunger.append(CalculateAverageHunger(GSM.Wolf_list))
+    GSM.Fox_hunger.append(CalculateAverageHunger(GSM.Fox_list))
 
     if GSM.Visualise_simulation_toggle:
         GSM.Sim_delay = VisualiseScript.EventHandler(GSM.Sim_delay)
@@ -531,7 +516,7 @@ print("\n\n----------SIMULATION END----------")
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
 print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(GSM.World_size, 2) // GSM.World_size_spawn_tolerance}")
 
-VisualiseScript.VisualisePopulation(GSM.Simulation_Length, GSM.Num_cow, GSM.Num_tiger, GSM.Num_dandelion, GSM.Num_wolf, GSM.Num_rabbit, GSM.Num_appletree, GSM.Num_fox, GSM.Visualise_population_toggle)
-VisualiseScript.VisualiseHunger(GSM.Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, GSM.Num_fox, GSM.Visualise_hunger_toggle)
+VisualiseScript.VisualisePopulation(GSM)
+VisualiseScript.VisualiseHunger(GSM)
 
 VisualiseScript.VisualiseSimulationQuit()

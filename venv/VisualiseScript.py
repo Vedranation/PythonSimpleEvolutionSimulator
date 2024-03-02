@@ -3,19 +3,19 @@ import plotly.graph_objects as go
 import pygame
 import re
 import sys
-def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Num_wolf, Num_rabbit, Num_appletree, Num_fox, logbool):
+def VisualisePopulation(GSM):
 
-    if logbool == True:
-        turns_list = [i for i in range(1, Simulation_Length + 1)]
+    if GSM.Visualise_population_toggle == True:
+        turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
         # Create traces
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_cow, mode='lines', name='Cows', line=dict(color='black')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_dandelion, mode='lines', name='Dandelions', line=dict(color='yellow', dash='dash')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_rabbit, mode='lines', name='Rabbits', line=dict(color='white')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)', dash='dash')))
-        fig.add_trace(go.Scatter(x=turns_list, y=Num_fox, mode='lines', name='Foxes', line=dict(color='orange')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_cow, mode='lines', name='Cows', line=dict(color='black')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_dandelion, mode='lines', name='Dandelions', line=dict(color='yellow', dash='dash')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_rabbit, mode='lines', name='Rabbits', line=dict(color='white')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)', dash='dash')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_fox, mode='lines', name='Foxes', line=dict(color='orange')))
 
 
         # Add titles and labels
@@ -27,19 +27,19 @@ def VisualisePopulation(Simulation_Length, Num_cow, Num_tiger, Num_dandelion, Nu
         fig.show()
     return
 
-def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, Fox_hunger, logbool):
+def VisualiseHunger(GSM):
 
-    if logbool == True:
+    if GSM.Visualise_hunger_toggle == True:
         # Turns list for X-axis
-        turns_list = [i for i in range(1, Simulation_Length + 1)]
+        turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
 
         # Create the plot for average hunger
         fig_hunger = go.Figure()
-        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
-        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='white')))
-        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Tigers_hunger, mode='lines', name='Tigers', line=dict(color='red')))
-        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Wolf_hunger, mode='lines', name='Wolves', line=dict(color='purple')))
-        fig_hunger.add_trace(go.Scatter(x=turns_list, y=Fox_hunger, mode='lines', name='Foxes', line=dict(color='orange')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='white')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Tigers_hunger, mode='lines', name='Tigers', line=dict(color='red')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Wolf_hunger, mode='lines', name='Wolves', line=dict(color='purple')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Fox_hunger, mode='lines', name='Foxes', line=dict(color='orange')))
 
         # Add titles and labels
         fig_hunger.update_layout(title='Average Animal Hunger Over Time',
@@ -50,12 +50,10 @@ def VisualiseHunger(Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunge
         fig_hunger.show()
     return
 
-def VisualiseSimulationInit(worldsize, width=800, height=800):
+def VisualiseSimulationInit(GSM):
     'Initialises visualisation, and sets variables like font, color etc'
     pygame.init()
-    global Visualise_window
-    global World_size
-    global Gridsize
+    global Visualise_window #TODO: Finish refactoring these guys...
     global Start_x
     global Start_y
     global Generation_text_font
@@ -88,24 +86,24 @@ def VisualiseSimulationInit(worldsize, width=800, height=800):
     Berrybush_color = (181, 45, 0)
     Appletree_color = (242, 87, 44)
 
-    Visualise_window = pygame.display.set_mode((width, height))
-    Gridsize = round(min((width, height)) * 0.8) #use 80% of the smaller dimension
+    Visualise_window = pygame.display.set_mode((GSM.width, GSM.height))
+    GSM.Gridsize = round(min((GSM.width, GSM.height)) * 0.8) #use 80% of the smaller dimension
     Cell_positions = []  # Initialize list to hold cell positions
     World_size = worldsize #this is very bad practise I know but this script doesnt have access to main_script globals and its 5am and oh well
     # Calculate starting points to center the grid
-    Start_x = (width - Gridsize) // 2
-    Start_y = (height - Gridsize) // 2
+    Start_x = (GSM.width - GSM.Gridsize) // 2
+    Start_y = (GSM.height - GSM.Gridsize) // 2
     #draw the grid
-    Distancebtwrow = Gridsize // worldsize
+    Distancebtwrow = GSM.Gridsize // worldsize
 
     'more variables'
     Visualise_window.fill((0, 200, 0))  # background color
     Animal_drawing_offset = 0.06
     Generation_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 3)  # font and size for agent generation number
     Axis_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 2)  # font and size for grid axis
-    GUI_text_font = pygame.font.SysFont("Arial", int(Gridsize // 15))
+    GUI_text_font = pygame.font.SysFont("Arial", int(GSM.Gridsize // 15))
 
-    DrawGrid(width, height, 0, 0)
+    DrawGrid(GSM.width, GSM.height, 0, 0)
 
     #calculates left top of each cell
     for i in range(worldsize):
