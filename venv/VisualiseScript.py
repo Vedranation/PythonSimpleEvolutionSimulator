@@ -53,106 +53,72 @@ def VisualiseHunger(GSM):
 def VisualiseSimulationInit(GSM):
     'Initialises visualisation, and sets variables like font, color etc'
     pygame.init()
-    global Visualise_window #TODO: Finish refactoring these guys...
-    global Start_x
-    global Start_y
-    global Generation_text_font
-    global Axis_text_font
-    global GUI_text_font
-    global Animal_drawing_offset
+    # TODO: Finish refactoring these guys...
 
-    global Grid_color
-    global Fill_color
-    global Tiger_color
-    global Rabbit_color
-    global Dandelion_color
-    global Wolf_color
-    global Cow_color
-    global Fox_color
-    global Berrybush_color
-    global Appletree_color
+    GSM.Visualise_window = pygame.display.set_mode((GSM.Window_width, GSM.Window_height))
+    GSM.Gridsize = round(min((GSM.Window_width, GSM.Window_height)) * 0.8) #use 80% of the smaller dimension
+    GSM.Cell_positions = []  # Initialize list to hold cell positions
 
-    global Cell_positions
-    global Distancebtwrow
-
-    Grid_color = (0, 0, 0)
-    Fill_color = (0, 200, 0)
-    Tiger_color = (255, 0, 0)
-    Fox_color = (224, 156, 18)
-    Rabbit_color = (255, 255, 255)
-    Dandelion_color = (235, 235, 26)
-    Wolf_color = (137, 12, 166)
-    Cow_color = (0, 0, 0)
-    Berrybush_color = (181, 45, 0)
-    Appletree_color = (242, 87, 44)
-
-    Visualise_window = pygame.display.set_mode((GSM.width, GSM.height))
-    GSM.Gridsize = round(min((GSM.width, GSM.height)) * 0.8) #use 80% of the smaller dimension
-    Cell_positions = []  # Initialize list to hold cell positions
-    World_size = worldsize #this is very bad practise I know but this script doesnt have access to main_script globals and its 5am and oh well
     # Calculate starting points to center the grid
-    Start_x = (GSM.width - GSM.Gridsize) // 2
-    Start_y = (GSM.height - GSM.Gridsize) // 2
+    GSM.Start_x = (GSM.Window_width - GSM.Gridsize) // 2
+    GSM.Start_y = (GSM.Window_height - GSM.Gridsize) // 2
     #draw the grid
-    Distancebtwrow = GSM.Gridsize // worldsize
+    GSM.Distancebtwrow = GSM.Gridsize // GSM.World_size
 
     'more variables'
-    Visualise_window.fill((0, 200, 0))  # background color
-    Animal_drawing_offset = 0.06
-    Generation_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 3)  # font and size for agent generation number
-    Axis_text_font = pygame.font.SysFont("Arial", Distancebtwrow // 2)  # font and size for grid axis
-    GUI_text_font = pygame.font.SysFont("Arial", int(GSM.Gridsize // 15))
+    GSM.Visualise_window.fill(GSM.Fill_color)  # background color
 
-    DrawGrid(GSM.width, GSM.height, 0, 0)
+    GSM.Generation_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 3)  # font and size for agent generation number
+    GSM.Axis_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 2)  # font and size for grid axis
+    GSM.GUI_text_font = pygame.font.SysFont("Arial", int(GSM.Gridsize // 15))
+
+    DrawGrid(GSM, 0)
 
     #calculates left top of each cell
-    for i in range(worldsize):
+    for i in range(GSM.World_size):
         row = []  # Initialize list to hold cell positions for this row
-        for j in range(worldsize):
+        for j in range(GSM.World_size):
             # Calculate top-left corner of each cell
-            cell_x = Start_x + j * Distancebtwrow
-            cell_y = Start_y + i * Distancebtwrow
+            cell_x = GSM.Start_x + j * GSM.Distancebtwrow
+            cell_y = GSM.Start_y + i * GSM.Distancebtwrow
             row.append((cell_x, cell_y))
-        Cell_positions.append(row)
+        GSM.Cell_positions.append(row)
 
-def DrawText(text, font, color, x, y):
+def DrawText(GSM, text, font, color, x, y):
     'function for drawing text in pygame'
-    global Visualise_window
     text = str(text)
     text_image = font.render(text, True, color)
-    Visualise_window.blit(text_image, (x, y))
+    GSM.Visualise_window.blit(text_image, (x, y))
 
 
-def DrawGrid(width, height, turnN, currentTurnDelay):
-    global Visualise_window
+def DrawGrid(GSM, turnN):
 
-    Visualise_window.fill(Fill_color)
-    DrawText("Turn " + str(turnN), GUI_text_font, (0, 0, 0), 5, 5)
-    DrawText("Speed: " + str(currentTurnDelay), GUI_text_font, (0, 0, 0), width - 230, 5)
-
-    for i in range(World_size + 1):  # +1 to draw the boundary of the grid
+    GSM.Visualise_window.fill(GSM.Fill_color)
+    DrawText(GSM, "Turn " + str(turnN), GSM.GUI_text_font, (0, 0, 0), 5, 5)
+    DrawText(GSM, "Speed: " + str(GSM.Sim_delay), GSM.GUI_text_font, (0, 0, 0), GSM.Window_width - 230, 5)
+    for i in range(GSM.World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
-        if i == 0 or i == World_size:
-            pygame.draw.line(Visualise_window, Grid_color,
-                             (Start_x + i * Distancebtwrow, Start_y),
-                             (Start_x + i * Distancebtwrow, Start_y + Gridsize), width=3)
+        if i == 0 or i == GSM.World_size:
+            pygame.draw.line(GSM.Visualise_window, GSM.Grid_color,
+                             (GSM.Start_x + i * GSM.Distancebtwrow, GSM.Start_y),
+                             (GSM.Start_x + i * GSM.Distancebtwrow, GSM.Start_y + GSM.Gridsize), width=3)
             # Horizontal line (need to adjust both start and end points)
-            pygame.draw.line(Visualise_window, Grid_color,
-                             (Start_x, Start_y + i * Distancebtwrow),
-                             (Start_x + Gridsize, Start_y + i * Distancebtwrow), width=3)
+            pygame.draw.line(GSM.Visualise_window, GSM.Grid_color,
+                             (GSM.Start_x, GSM.Start_y + i * GSM.Distancebtwrow),
+                             (GSM.Start_x + GSM.Gridsize, GSM.Start_y + i * GSM.Distancebtwrow), width=3)
         else:
-            pygame.draw.line(Visualise_window, Grid_color,
-                             (Start_x + i * Distancebtwrow, Start_y),
-                             (Start_x + i * Distancebtwrow, Start_y + Gridsize))
+            pygame.draw.line(GSM.Visualise_window, GSM.Grid_color,
+                             (GSM.Start_x + i * GSM.Distancebtwrow, GSM.Start_y),
+                             (GSM.Start_x + i * GSM.Distancebtwrow, GSM.Start_y + GSM.Gridsize))
             # Horizontal line (need to adjust both start and end points)
-            pygame.draw.line(Visualise_window, Grid_color,
-                             (Start_x, Start_y + i * Distancebtwrow),
-                             (Start_x + Gridsize, Start_y + i * Distancebtwrow))
-        if i != World_size: #Draw axis numbers
-            DrawText(str(i), Axis_text_font, (0, 0, 0), (Start_x + i * Distancebtwrow + Distancebtwrow*0.5), (height - Start_y)) #FIXME: Change this to its own font (X AXIS)
-            DrawText(str(World_size - i -1), Axis_text_font, (0, 0, 0), (Start_x - Distancebtwrow/2), (Start_y + i * Distancebtwrow + Distancebtwrow*0.25)) #(Y AXIS)
+            pygame.draw.line(GSM.Visualise_window, GSM.Grid_color,
+                             (GSM.Start_x, GSM.Start_y + i * GSM.Distancebtwrow),
+                             (GSM.Start_x + GSM.Gridsize, GSM.Start_y + i * GSM.Distancebtwrow))
+        if i != GSM.World_size: #Draw axis numbers
+            DrawText(GSM, str(i), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.5), (GSM.Window_height - GSM.Start_y)) #FIXME: Change this to its own font (X AXIS)
+            DrawText(GSM, str(GSM.World_size - i -1), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x - GSM.Distancebtwrow/2), (GSM.Start_y + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.25)) #(Y AXIS)
 
-def EventHandler(currentTurnDelay):
+def EventHandler(GSM):
     'this is called separately from VisualiseSimulationDraw so that variable can be returned to main loop'
     for event in pygame.event.get():
         if event.type == pygame.QUIT: # kill program once X is pressed
@@ -160,72 +126,67 @@ def EventHandler(currentTurnDelay):
 
         elif event.type == pygame.KEYDOWN: # For switching sim speed
             if event.key == pygame.K_LEFT:
-                if currentTurnDelay > 1:
-                    return currentTurnDelay - 0.5
-                elif currentTurnDelay == 0.25:
+                if GSM.Sim_delay > 1:
+                    return GSM.Sim_delay - 0.5
+                elif GSM.Sim_delay == 0.25:
                     return 0.12
-                elif currentTurnDelay < 0.25 and currentTurnDelay != 0.03:
-                    return currentTurnDelay / 2
-                elif currentTurnDelay == 0.03:
+                elif GSM.Sim_delay < 0.25 and GSM.Sim_delay != 0.03:
+                    return GSM.Sim_delay / 2
+                elif GSM.Sim_delay == 0.03:
                     return 0
                 else:
-                    return currentTurnDelay - 0.25
+                    return GSM.Sim_delay - 0.25
             elif event.key == pygame.K_RIGHT:
-                if currentTurnDelay >= 1:
-                    return currentTurnDelay + 0.5
-                elif currentTurnDelay == 0.12:
+                if GSM.Sim_delay >= 1:
+                    return GSM.Sim_delay + 0.5
+                elif GSM.Sim_delay == 0.12:
                     return 0.25
-                elif currentTurnDelay == 0:
-                    currentTurnDelay = 0.03
-                elif currentTurnDelay < 0.12:
-                    return currentTurnDelay * 2
+                elif GSM.Sim_delay == 0:
+                    GSM.Sim_delay = 0.03
+                elif GSM.Sim_delay < 0.12:
+                    return GSM.Sim_delay * 2
                 else:
-                    return currentTurnDelay + 0.25
-    return currentTurnDelay #if no events are detected
-def VisualiseSimulationDraw(SumAllAgents, world_agent_list_x_y, turnN, width, height, currentTurnDelay):
+                    return GSM.Sim_delay + 0.25
+    return GSM.Sim_delay #if no events are detected
+def VisualiseSimulationDraw(GSM, turnN):
     'this is called every main loop iteration'
 
-    global Visualise_window
-    global Cell_positions
+    DrawGrid(GSM, turnN)
 
-    DrawGrid(width, height, turnN, currentTurnDelay)
-
-
-    for x_row_list in world_agent_list_x_y:
+    for x_row_list in GSM.World_agent_list_x_y:
         for y_cell in x_row_list:
             if y_cell is None: #empty cell
                 continue
 
             animalname = re.match(r"(\D+)_\d+", y_cell.name) #what animal is this
             animalname = animalname.group(1) #scrape the generation number
-            cell_position_x, cell_position_y = Cell_positions[y_cell.y][y_cell.x]   #fixes orientation of coordinate system from top left to bottom left
-            cell_position_y = abs(height - cell_position_y - Distancebtwrow)
-
+            cell_position_x, cell_position_y = GSM.Cell_positions[y_cell.y][y_cell.x]   #fixes orientation of coordinate system from top left to bottom left
+            cell_position_y = abs(GSM.Window_height - cell_position_y - GSM.Distancebtwrow)
 
             if animalname == "Tiger":
                 #fixme: On not square resolutions things offset incorrectly - also on world size 25 for some reason?
-                pygame.draw.rect(Visualise_window, Tiger_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
+                pygame.draw.rect(GSM.Visualise_window, GSM.Tiger_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
             elif animalname == "Rabbit":
-                pygame.draw.rect(Visualise_window, Rabbit_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Rabbit_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
             elif animalname == "Wolf":
-                pygame.draw.rect(Visualise_window, Wolf_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Wolf_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
             elif animalname == "Fox":
-                pygame.draw.rect(Visualise_window, Fox_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Fox_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
             elif animalname == "Dandelion":
-                pygame.draw.rect(Visualise_window, Dandelion_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Dandelion_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
             elif animalname == "Cow":
-                pygame.draw.rect(Visualise_window, Cow_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Cow_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
             elif animalname == "Berrybush":
-                pygame.draw.rect(Visualise_window, Berrybush_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Berrybush_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
             elif animalname == "Appletree":
-                pygame.draw.rect(Visualise_window, Appletree_color, pygame.Rect((cell_position_x + Distancebtwrow*Animal_drawing_offset, cell_position_y + Distancebtwrow*Animal_drawing_offset, Distancebtwrow*0.9, Distancebtwrow*0.9)))
+                pygame.draw.rect(GSM.Visualise_window, GSM.Appletree_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
 
             if y_cell.type != "Plant": #display animal generation number
 
                 match = re.search(r"\d+$", y_cell.name)
                 generation_number = int(match.group())  # Convert the matched string to an integer
 
-                DrawText(generation_number, Generation_text_font, (0, 0, 0), cell_position_x + Distancebtwrow*0.06, cell_position_y + Distancebtwrow*0.06)
+                DrawText(GSM, generation_number, GSM.Generation_text_font, (0, 0, 0), cell_position_x + GSM.Distancebtwrow*0.06, cell_position_y + GSM.Distancebtwrow*0.06)
 
 
 

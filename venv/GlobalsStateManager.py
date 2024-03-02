@@ -48,24 +48,35 @@ class GlobalsManager:
     Console_log_born = False
     Console_log_random_move = False
     Console_log_reproduce_chance = False
-    Console_log_fight_big = True
+    Console_log_fight_big = False
     Console_log_worldtoosmalltobreed = False
     Console_log_personalpopulationlimit = False
     Console_log_worldtoosmalltogrow = False
 
-    Visualise_population_toggle = True
-    Visualise_hunger_toggle = True
-    Visualise_simulation_toggle = False
+    Visualise_population_toggle = False
+    Visualise_hunger_toggle = False
+    Visualise_simulation_toggle = True
 
     Sim_delay = 0.25    #delay in seconds between each turn
 
+    Grid_color = (0, 0, 0)
+    Fill_color = (0, 200, 0)
+    Tiger_color = (255, 0, 0)
+    Fox_color = (224, 156, 18)
+    Rabbit_color = (255, 255, 255)
+    Dandelion_color = (235, 235, 26)
+    Wolf_color = (137, 12, 166)
+    Cow_color = (0, 0, 0)
+    Berrybush_color = (181, 45, 0)
+    Appletree_color = (242, 87, 44)
 
 
 
+    'Variables for the program to define and operate on'
+    World_agent_list_x_y = []
 
-    'Variables for the program to define'
     Cows_list = []  # initialise lists to store agents
-    Rabbits_list = []  # TODO: put these guys into GSM as well
+    Rabbits_list = []
     Dandelion_list = []
     Appletree_list = []
     Tigers_list = []
@@ -78,4 +89,14 @@ class GlobalsManager:
     Wolf_hunger = []
     Fox_hunger = []
 
+    SumAllAgents = 0
     Gridsize = 0
+    Visualise_window = 0
+    Start_x = 0
+    Start_y = 0
+    Generation_text_font = 0
+    Axis_text_font = 0  #Fonts are defined in VisualiseSimulationInit cause it needs stuff before
+    GUI_text_font = 0
+    Cell_positions = 0
+    Distancebtwrow = 0
+    Animal_drawing_offset = 0.06

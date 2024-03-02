@@ -29,12 +29,12 @@ if GSM.Visualise_simulation_toggle == True:
 
 DiedInBattle = False
 #Check if world is big enough for all agents
-SumAllAgents = [GSM.Num_cow[-1]+GSM.Num_dandelion[-1]+GSM.Num_tiger[-1]+GSM.Num_wolf[-1]+GSM.Num_rabbit[-1]+GSM.Num_appletree[-1]+GSM.Num_fox[-1]]
-if pow(GSM.World_size, 2) < SumAllAgents[-1]:
+GSM.SumAllAgents = [GSM.Num_cow[-1]+GSM.Num_dandelion[-1]+GSM.Num_tiger[-1]+GSM.Num_wolf[-1]+GSM.Num_rabbit[-1]+GSM.Num_appletree[-1]+GSM.Num_fox[-1]]
+if pow(GSM.World_size, 2) < GSM.SumAllAgents[-1]:
     raise Exception("World can't be smaller than amount of objects to spawn")
 
 #Generate the world X in Y, filled with None to show empty cells, starts from XY = 0, ends at at GSM.World_size - 1
-World_agent_list_x_y = [[None for _ in range(GSM.World_size)] for _ in range(GSM.World_size)] #stores all agent instances
+GSM.World_agent_list_x_y = [[None for _ in range(GSM.World_size)] for _ in range(GSM.World_size)] #stores all agent instances
 class Agent:
     def __init__(self, name, type, perception, speed, size, hunger):
 
@@ -74,14 +74,14 @@ class Agent:
         self.y = random.randint(0, GSM.World_size-1)
 
         #Loop until a free spot is found
-        while World_agent_list_x_y[self.x][self.y] != None:
+        while GSM.World_agent_list_x_y[self.x][self.y] != None:
             self.x = random.randint(0, GSM.World_size-1)
             self.y = random.randint(0, GSM.World_size-1)
-        World_agent_list_x_y[self.x][self.y] = self
+        GSM.World_agent_list_x_y[self.x][self.y] = self
 
     @staticmethod
     def RemoveAgent(agent): #Removes an agent from both the type list and agent list.
-        World_agent_list_x_y[agent.x][agent.y] = None
+        GSM.World_agent_list_x_y[agent.x][agent.y] = None
 
         # Remove from respective list
         if "Cow" in agent.name:
@@ -114,40 +114,40 @@ class Agent:
                 if direction[0] >= GSM.World_size or direction[1] >= GSM.World_size or direction[0] < 0 or direction[1] < 0: #prevents checking beyond edge of world
                     continue
 
-                if World_agent_list_x_y[direction[0]][direction[1]] == None:
-                    ConsoleLog.CheckForFood(self, direction[0], direction[1], True, World_agent_list_x_y, GSM.Console_log_check_for_food)
+                if GSM.World_agent_list_x_y[direction[0]][direction[1]] == None:
+                    ConsoleLog.CheckForFood(self, direction[0], direction[1], True, GSM.World_agent_list_x_y, GSM.Console_log_check_for_food)
                     continue
                 else:
-                    ConsoleLog.CheckForFood(self, direction[0], direction[1], False, World_agent_list_x_y, GSM.Console_log_check_for_food)
+                    ConsoleLog.CheckForFood(self, direction[0], direction[1], False, GSM.World_agent_list_x_y, GSM.Console_log_check_for_food)
 
                 #if we found food, eat it and go there:
-                if World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
+                if GSM.World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
                     if self.food == "Plant": #herbivore eat
-                        if self.HerbivoreNoEatBig(World_agent_list_x_y[direction[0]][direction[1]]) == True:
-                            self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size,
+                        if self.HerbivoreNoEatBig(GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:
+                            self.Hunger(True, GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
                                         direction)  # track hunger levels, pass food that was eaten
                             Agent.RemoveAgent(
-                                World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
+                                GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
                             # update new position
-                            World_agent_list_x_y[self.x][self.y] = None
-                            World_agent_list_x_y[direction[0]][direction[1]] = self
+                            GSM.World_agent_list_x_y[self.x][self.y] = None
+                            GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
                             self.x = direction[0]
                             self.y = direction[1]
                             return  # end the search
                         else:
                             continue #small herbivores don't eat bigger size food
 
-                    if self.FightOrFlight(World_agent_list_x_y[direction[0]][direction[1]]) == True:   #carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
+                    if self.FightOrFlight(GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:   #carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
 
-                        if self.Fight(World_agent_list_x_y[direction[0]][direction[1]]) == True:    #predator won and ate the meal
+                        if self.Fight(GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:    #predator won and ate the meal
 
-                            self.Hunger(True, World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
-                            Agent.RemoveAgent(World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
+                            self.Hunger(True, GSM.World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
+                            Agent.RemoveAgent(GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
                             #update new position
-                            World_agent_list_x_y[self.x][self.y] = None
-                            World_agent_list_x_y[direction[0]][direction[1]] = self
+                            GSM.World_agent_list_x_y[self.x][self.y] = None
+                            GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
                             self.x = direction[0]
                             self.y = direction[1]
 
@@ -162,13 +162,13 @@ class Agent:
     def RandomMove(self, directions_x_y):
         if self.speed == 1: #simplest case, just move and end turn
             for direction in directions_x_y:
-                if direction[0] >= GSM.World_size or direction[1] >= GSM.World_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
+                if direction[0] >= GSM.World_size or direction[1] >= GSM.World_size or direction[0] < 0 or direction[1] < 0 or GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
                 random.choice(directions_x_y)
                 ConsoleLog.RandomMove(self, direction[0], direction[1], GSM.Console_log_random_move)
 
-                World_agent_list_x_y[self.x][self.y] = None
-                World_agent_list_x_y[direction[0]][direction[1]] = self
+                GSM.World_agent_list_x_y[self.x][self.y] = None
+                GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
                 self.x = direction[0]
                 self.y = direction[1]
                 self.Hunger(False) #track hunger levels, didnt eat
@@ -241,19 +241,19 @@ class Agent:
         if ate == True:
             if preySize == "Small":
                 worth = 5
-                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
-                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_found_food)
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], GSM.World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], GSM.World_agent_list_x_y, worth, GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth
 
             elif preySize == "Medium":
                 worth = 9
-                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
-                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_found_food)
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], GSM.World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], GSM.World_agent_list_x_y, worth, GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth
             else:
                 worth = 26
-                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
-                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_found_food)
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], GSM.World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], GSM.World_agent_list_x_y, worth, GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth #big animals nourish for longer
             if self.hunger > GSM.Maximum_hunger:
                 self.hunger = GSM.Maximum_hunger
@@ -450,7 +450,7 @@ for i in range(GSM.Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Appletree_list)} Apple trees, {len(GSM.Cows_list)} Cows, {len(GSM.Rabbits_list)} Rabbits, {len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {SumAllAgents[-1]}\n\n")
+    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Appletree_list)} Apple trees, {len(GSM.Cows_list)} Cows, {len(GSM.Rabbits_list)} Rabbits, {len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {GSM.SumAllAgents[-1]}\n\n")
     for cows in GSM.Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
@@ -497,7 +497,7 @@ for i in range(GSM.Simulation_Length):
     GSM.Num_wolf.append(len(GSM.Wolf_list))
     GSM.Num_fox.append(len(GSM.Fox_list))
     GSM.Num_rabbit.append(len(GSM.Rabbits_list))
-    SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1])
+    GSM.SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1])
 
     GSM.Cows_hunger.append(CalculateAverageHunger(GSM.Cows_list))
     GSM.Tigers_hunger.append(CalculateAverageHunger(GSM.Tigers_list))
@@ -506,15 +506,15 @@ for i in range(GSM.Simulation_Length):
     GSM.Fox_hunger.append(CalculateAverageHunger(GSM.Fox_list))
 
     if GSM.Visualise_simulation_toggle:
-        GSM.Sim_delay = VisualiseScript.EventHandler(GSM.Sim_delay)
-        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, GSM.Window_width, GSM.Window_height, GSM.Sim_delay) #draw the display window
+        GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
+        VisualiseScript.VisualiseSimulationDraw(GSM, i) #draw the display window
         time.sleep(GSM.Sim_delay)
 
 
 #report results
 print("\n\n----------SIMULATION END----------")
-print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
-print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(GSM.World_size, 2) // GSM.World_size_spawn_tolerance}")
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
+print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
 
 VisualiseScript.VisualisePopulation(GSM)
 VisualiseScript.VisualiseHunger(GSM)
