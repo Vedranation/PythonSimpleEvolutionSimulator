@@ -21,50 +21,10 @@ GSM = GlobalsStateManager.GlobalsManager #Encapsulate all globals
 #TODO: refactor globals
 #TODO: move Agent to its own script
 
-Max_flowers = 200       #how many flowers can be
-Dandelion_growth_per_turn = 30     #how many Dandelions spawn per turn
-Berrybush_growth_per_turn = 7
-Appletree_growth_per_turn = 3
-Maximum_hunger = 50     #maximum hunger a creature can have in its belly
-Reproduce_age = 5   #minimum age before can breed
-Max_hunger_to_reproduce = 50    #at which hunger value is highest chance to breed
-Base_reproduce_chance = 0.75     #maximum reproduce chance (at max hunger)
-DeathAge = 50       #at how old do animals 100% die (sigmoid)
-World_size_spawn_tolerance = 1.05      #tolerance to world size to prevent overpopulation
-Personal_animal_limit = pow(GSM.World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
-Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
-Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
-Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
-Animal_breed_cooldown = 2
-
-Window_width = 900
-Window_height = 900
-
-Console_log_start_position = False
-Console_log_check_for_food = False
-Console_log_found_food = False
-Console_log_was_eaten = False
-Console_log_death_starvation = False
-Console_log_death_oldage = False
-Console_log_death_battle = False
-Console_log_born = False
-Console_log_random_move = False
-Console_log_reproduce_chance = False
-Console_log_fight_big = True
-Console_log_worldtoosmalltobreed = False
-Console_log_personalpopulationlimit = False
-Console_log_worldtoosmalltogrow = False
-
-Visualise_population_toggle = True
-Visualise_hunger_toggle = True
-Visualise_simulation_toggle = True
-
-Sim_delay = 0.25    #delay in seconds between each turn
-
 #---------------------------------------------------------------------------
 
-if Visualise_simulation_toggle == True:
-    VisualiseScript.VisualiseSimulationInit(width=Window_width, height=Window_height, worldsize=GSM.World_size)
+if GSM.Visualise_simulation_toggle == True:
+    VisualiseScript.VisualiseSimulationInit(width=GSM.Window_width, height=GSM.Window_height, worldsize=GSM.World_size)
 
 
 DiedInBattle = False
@@ -155,10 +115,10 @@ class Agent:
                     continue
 
                 if World_agent_list_x_y[direction[0]][direction[1]] == None:
-                    ConsoleLog.CheckForFood(self, direction[0], direction[1], True, World_agent_list_x_y, Console_log_check_for_food)
+                    ConsoleLog.CheckForFood(self, direction[0], direction[1], True, World_agent_list_x_y, GSM.Console_log_check_for_food)
                     continue
                 else:
-                    ConsoleLog.CheckForFood(self, direction[0], direction[1], False, World_agent_list_x_y, Console_log_check_for_food)
+                    ConsoleLog.CheckForFood(self, direction[0], direction[1], False, World_agent_list_x_y, GSM.Console_log_check_for_food)
 
                 #if we found food, eat it and go there:
                 if World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
@@ -205,7 +165,7 @@ class Agent:
                 if direction[0] >= GSM.World_size or direction[1] >= GSM.World_size or direction[0] < 0 or direction[1] < 0 or World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
                 random.choice(directions_x_y)
-                ConsoleLog.RandomMove(self, direction[0], direction[1], Console_log_random_move)
+                ConsoleLog.RandomMove(self, direction[0], direction[1], GSM.Console_log_random_move)
 
                 World_agent_list_x_y[self.x][self.y] = None
                 World_agent_list_x_y[direction[0]][direction[1]] = self
@@ -229,46 +189,46 @@ class Agent:
                 return False
     def FightOrFlight(self, prey_agent):
         '''The less hunger, more desperate for a meal, at 50% hunger the modifier becomes 1, above 50% hunger it probably wont risk, below it will'''
-        desperation = 0.5 / (self.hunger / Maximum_hunger)
+        desperation = 0.5 / (self.hunger / GSM.Maximum_hunger)
         preySize = prey_agent.size
         preyType = prey_agent.type
 
         if (self.size == "Small" and preySize == "Medium") or (self.size == "Medium" and preySize == "Large") and preyType != "Plant": #1 size difference
-            if round(random.random(), 2) <= Predator_bigger_prey_fight_chance * desperation:
+            if round(random.random(), 2) <= GSM.Predator_bigger_prey_fight_chance * desperation:
                 return True #predator will fight
             else:
                 return False    #predator doesn't fight
         elif (self.size == "Small" and preySize == "Large") and preyType != "Plant": #2 size difference
-            if round(random.random(), 2) <= (Predator_bigger_prey_fight_chance/5) * desperation:    # predator is VERY unlikely to fight
+            if round(random.random(), 2) <= (GSM.Predator_bigger_prey_fight_chance/5) * desperation:    # predator is VERY unlikely to fight
                 return True
             else:
                 return False  # predator doesn't fight
         else:
             return True #large can eat anything
     def Fight(self, prey_agent):
-        '''at 50% hunger prey has 50% Well_fed_buff worth'''
+        '''at 50% hunger prey has 50% GSM.Well_fed_buff worth'''
         if prey_agent.type == "Plant":
             return True     #plants don't fight back
 
-        prey_power = round(Well_fed_buff * (prey_agent.hunger / Maximum_hunger), 2)     #Well fed prey gets a boost to their combat power
+        prey_power = round(GSM.Well_fed_buff * (prey_agent.hunger / GSM.Maximum_hunger), 2)     #Well fed prey gets a boost to their combat power
         if (self.size == "Small" and prey_agent.size == "Medium") or (self.size == "Medium" and prey_agent.size == "Large"): #1 size difference
-            total_win_chance = round(Predator_bigger_prey_win_chance - prey_power * Predator_bigger_prey_win_chance, 2)
+            total_win_chance = round(GSM.Predator_bigger_prey_win_chance - prey_power * GSM.Predator_bigger_prey_win_chance, 2)
             if round(random.random(), 2) <= (total_win_chance):
 
-                ConsoleLog.FightBig(self, prey_agent, total_win_chance, prey_power, Console_log_fight_big)
+                ConsoleLog.FightBig(self, prey_agent, total_win_chance, prey_power, GSM.Console_log_fight_big)
                 return True #predator won the fight
             else:
-                ConsoleLog.DiedInBattle(self, prey_agent.name, Console_log_death_battle)
+                ConsoleLog.DiedInBattle(self, prey_agent.name, GSM.Console_log_death_battle)
                 return False    #predator lost the fight and died
 
         elif (self.size == "Small" and prey_agent.size == "Large"):       #probably suicide for small guy but let him try
-            total_win_chance = round((Predator_bigger_prey_win_chance/5 - prey_power * (Predator_bigger_prey_win_chance/5)), 2)
+            total_win_chance = round((GSM.Predator_bigger_prey_win_chance/5 - prey_power * (GSM.Predator_bigger_prey_win_chance/5)), 2)
             if round(random.random(), 2) <= (total_win_chance):
-                    ConsoleLog.FightBig(self, prey_agent, total_win_chance, prey_power, Console_log_fight_big)
+                    ConsoleLog.FightBig(self, prey_agent, total_win_chance, prey_power, GSM.Console_log_fight_big)
 
                     return True #David beat the goliath
             else:
-                ConsoleLog.DiedInBattle(self, prey_agent.name, Console_log_death_battle)
+                ConsoleLog.DiedInBattle(self, prey_agent.name, GSM.Console_log_death_battle)
                 return False    #predator lost the fight and died
         else:
             return True #large predator automatically wins
@@ -281,22 +241,22 @@ class Agent:
         if ate == True:
             if preySize == "Small":
                 worth = 5
-                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
-                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth
 
             elif preySize == "Medium":
                 worth = 9
-                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
-                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth
             else:
                 worth = 26
-                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_was_eaten)
-                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, Console_log_found_food)
+                ConsoleLog.AgentWasEaten(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_was_eaten)
+                ConsoleLog.FoundFood(self, direction[0], direction[1], World_agent_list_x_y, worth, GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth #big animals nourish for longer
-            if self.hunger > Maximum_hunger:
-                self.hunger = Maximum_hunger
+            if self.hunger > GSM.Maximum_hunger:
+                self.hunger = GSM.Maximum_hunger
             return #grace period, if food was found, don't use reserves or check for starvation
 
         #depending on Agent size, food depletes at different rate
@@ -311,7 +271,7 @@ class Agent:
     @staticmethod
     def HungerReproduceSigmoid(hunger):
         sigmoid_slope = 7.0
-        hunger_factor = hunger / Max_hunger_to_reproduce  # Normalizes hunger between 0 and 1
+        hunger_factor = hunger / GSM.Max_hunger_to_reproduce  # Normalizes hunger between 0 and 1
         return round(1 / (1 + math.exp(-sigmoid_slope * (hunger_factor - 0.5))), 2) #more well fed, more chance to breed
 
     def Starvation_Age_Battle_Death(self, DiedInBattle=False):
@@ -323,80 +283,80 @@ class Agent:
             return
 
         if self.hunger <= 0:
-            ConsoleLog.DeathStarvation(self, Console_log_death_starvation)
+            ConsoleLog.DeathStarvation(self, GSM.Console_log_death_starvation)
             self.RemoveAgent(self) #starve
             return
         else:
             sigmoid_slope = 20.0
-            death_factor = self.age / DeathAge  # Normalizes chance to die between 0 and 1
+            death_factor = self.age / GSM.DeathAge  # Normalizes chance to die between 0 and 1
 
             if round(1 / (1 + math.exp(-sigmoid_slope * (death_factor - 0.5))), 2) >= round(random.random(), 2):  # older you are, more likely to perish
-                ConsoleLog.DeathOldAge(self, Console_log_death_oldage)
+                ConsoleLog.DeathOldAge(self, GSM.Console_log_death_oldage)
                 self.RemoveAgent(self)  # die of old age
             return
 
     def Reproduce(self): #Is called directly, Handles reproducing and aging
 
-        if self.age > Reproduce_age:
+        if self.age > GSM.Reproduce_age:
             if self.breedcooldown > 0:      #Introduces a breeding cooldown
                 self.breedcooldown = self.breedcooldown - 1
                 return
             else:
-                self.breedcooldown = Animal_breed_cooldown
+                self.breedcooldown = GSM.Animal_breed_cooldown
 
             if self.hunger <= 0:    #prevents bizzare cases of 0 or negative hunger reproducing
                 return
 
             sigm = Agent.HungerReproduceSigmoid(self.hunger)
             rnd = round(random.random(), 2)
-            mult = round(Base_reproduce_chance * sigm, 2)
+            mult = round(GSM.Base_reproduce_chance * sigm, 2)
 
-            ConsoleLog.ReproduceChance(self, Base_reproduce_chance, sigm, mult, rnd, Console_log_reproduce_chance)
+            ConsoleLog.ReproduceChance(self, GSM.Base_reproduce_chance, sigm, mult, rnd, GSM.Console_log_reproduce_chance)
             if rnd <= mult:
 
                 UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list) #need to update this when adding more animals
 
-                if pow(GSM.World_size, 2) < (round(UpdatedAnimalSum * World_size_spawn_tolerance, 1)):
+                if pow(GSM.World_size, 2) < (round(UpdatedAnimalSum * GSM.World_size_spawn_tolerance, 1)):
 
-                    ConsoleLog.WorldTooSmallTooBreed(Console_log_worldtoosmalltobreed)
+                    ConsoleLog.WorldTooSmallTooBreed(GSM.Console_log_worldtoosmalltobreed)
                     return
 
                 elif "Tiger" in self.name:
-                    if len(Tigers_list) > Personal_animal_limit:
-                        ConsoleLog.PersonalPopulationLimit("Tiger", Console_log_personalpopulationlimit)
+                    if len(Tigers_list) > GSM.Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Tiger", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnTiger(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Cow" in self.name:
-                    if len(Cows_list) > Personal_animal_limit:
-                        ConsoleLog.PersonalPopulationLimit("Cow", Console_log_personalpopulationlimit)
+                    if len(Cows_list) > GSM.Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Cow", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
                     newborn = SpawnCow(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Rabbit" in self.name:
-                    if len(Rabbits_list) > Personal_animal_limit:
-                        ConsoleLog.PersonalPopulationLimit("Rabbit", Console_log_personalpopulationlimit)
+                    if len(Rabbits_list) > GSM.Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Rabbit", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Rabbit_" + str(babyname+1)
                     newborn = SpawnRabbit(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Wolf" in self.name:
-                    if len(Wolf_list) > Personal_animal_limit:
-                        ConsoleLog.PersonalPopulationLimit("Wolf", Console_log_personalpopulationlimit)
+                    if len(Wolf_list) > GSM.Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Wolf", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Wolf_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnWolf(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Fox" in self.name:
-                    if len(Fox_list) > Personal_animal_limit:
-                        ConsoleLog.PersonalPopulationLimit("Fox", Console_log_personalpopulationlimit)
+                    if len(Fox_list) > GSM.Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Fox", GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Fox_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnFox(name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
-                ConsoleLog.Born(newborn, Console_log_born)
+                ConsoleLog.Born(newborn, GSM.Console_log_born)
 
 
             #todo: gene evo mutate func
@@ -459,20 +419,20 @@ def RespawnVegetation():
     UpdatedAnimalSum = len(Tigers_list) + len(Dandelion_list) + len(Cows_list) + len(Wolf_list) + len(Rabbits_list) + len(Appletree_list) + len(Fox_list)# need to update this when adding more animals
     max_tiles = pow(GSM.World_size, 2)
     current_flower_amount = GSM.Num_dandelion[-1] + GSM.Num_appletree[-1]# + Num_berrybush[-1]
-    total_growth_per_turn = Dandelion_growth_per_turn + Appletree_growth_per_turn + Berrybush_growth_per_turn
+    total_growth_per_turn = GSM.Dandelion_growth_per_turn + GSM.Appletree_growth_per_turn + GSM.Berrybush_growth_per_turn
 
-    if max_tiles <= (round((UpdatedAnimalSum + total_growth_per_turn) * World_size_spawn_tolerance)):
-        ConsoleLog.WorldTooSmallTooGrow(Console_log_worldtoosmalltogrow)
+    if max_tiles <= (round((UpdatedAnimalSum + total_growth_per_turn) * GSM.World_size_spawn_tolerance)):
+        ConsoleLog.WorldTooSmallTooGrow(GSM.Console_log_worldtoosmalltogrow)
         return
-    if current_flower_amount + total_growth_per_turn <= Max_flowers:
-        for j in range(Dandelion_growth_per_turn):
+    if current_flower_amount + total_growth_per_turn <= GSM.Max_flowers:
+        for j in range(GSM.Dandelion_growth_per_turn):
             SpawnDandelion()
-        for j in range(Appletree_growth_per_turn):
+        for j in range(GSM.Appletree_growth_per_turn):
             SpawnAppletree()
-    elif (current_flower_amount + total_growth_per_turn/2) <= Max_flowers: #spawns half
-        for j in range(Dandelion_growth_per_turn//2):
+    elif (current_flower_amount + total_growth_per_turn/2) <= GSM.Max_flowers: #spawns half
+        for j in range(GSM.Dandelion_growth_per_turn//2):
             SpawnDandelion()
-        for j in range(Appletree_growth_per_turn//2):
+        for j in range(GSM.Appletree_growth_per_turn//2):
             SpawnAppletree()
     else:
         return
@@ -495,7 +455,7 @@ for i in range(GSM.Num_fox[0]):
     SpawnFox()
 
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
-ConsoleLog.StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, Console_log_start_position)
+ConsoleLog.StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, GSM.Console_log_start_position)
 
 
 
@@ -560,18 +520,18 @@ for i in range(GSM.Simulation_Length):
     Wolf_hunger.append(CalculateAverageHunger(Wolf_list))
     Fox_hunger.append(CalculateAverageHunger(Fox_list))
 
-    if Visualise_simulation_toggle:
-        Sim_delay = VisualiseScript.EventHandler(Sim_delay)
-        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, Window_width, Window_height, Sim_delay) #draw the display window
-        time.sleep(Sim_delay)
+    if GSM.Visualise_simulation_toggle:
+        GSM.Sim_delay = VisualiseScript.EventHandler(GSM.Sim_delay)
+        VisualiseScript.VisualiseSimulationDraw(SumAllAgents, World_agent_list_x_y, i, GSM.Window_width, GSM.Window_height, GSM.Sim_delay) #draw the display window
+        time.sleep(GSM.Sim_delay)
 
 
 #report results
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(SumAllAgents[0])}")
-print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(GSM.World_size, 2) // World_size_spawn_tolerance}")
+print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {SumAllAgents[-1]}/{pow(GSM.World_size, 2) // GSM.World_size_spawn_tolerance}")
 
-VisualiseScript.VisualisePopulation(GSM.Simulation_Length, GSM.Num_cow, GSM.Num_tiger, GSM.Num_dandelion, GSM.Num_wolf, GSM.Num_rabbit, GSM.Num_appletree, GSM.Num_fox, Visualise_population_toggle)
-VisualiseScript.VisualiseHunger(GSM.Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, GSM.Num_fox, Visualise_hunger_toggle)
+VisualiseScript.VisualisePopulation(GSM.Simulation_Length, GSM.Num_cow, GSM.Num_tiger, GSM.Num_dandelion, GSM.Num_wolf, GSM.Num_rabbit, GSM.Num_appletree, GSM.Num_fox, GSM.Visualise_population_toggle)
+VisualiseScript.VisualiseHunger(GSM.Simulation_Length, Cows_hunger, Rabbits_hunger, Tigers_hunger, Wolf_hunger, GSM.Num_fox, GSM.Visualise_hunger_toggle)
 
 VisualiseScript.VisualiseSimulationQuit()
