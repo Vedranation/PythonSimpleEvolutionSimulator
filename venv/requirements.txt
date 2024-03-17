@@ -1,6 +1,3 @@
-plotly
-pygame
-random
-math
-re
-sys
+plotly==2.2.1
+pygame==5.18.0
+re==2.5.2

@@ -49,7 +49,7 @@ class Agent:
             self.y = random.randint(0, self.GSM.World_size-1)
         self.GSM.World_agent_list_x_y[self.x][self.y] = self
 
-    @staticmethod #fixme: pass GSM into this
+    @staticmethod
     def RemoveAgent(GSM, agent): #Removes an agent from both the type list and agent list.
 
         GSM.World_agent_list_x_y[agent.x][agent.y] = None
@@ -241,7 +241,7 @@ class Agent:
 
 
     @staticmethod
-    def HungerReproduceSigmoid(GSM, hunger): #fixme: pass GSM into this
+    def HungerReproduceSigmoid(GSM, hunger):
         sigmoid_slope = 7.0
         hunger_factor = hunger / GSM.Max_hunger_to_reproduce  # Normalizes hunger between 0 and 1
         return round(1 / (1 + math.exp(-sigmoid_slope * (hunger_factor - 0.5))), 2) #more well fed, more chance to breed

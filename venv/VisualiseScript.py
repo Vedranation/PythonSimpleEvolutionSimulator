@@ -1,8 +1,10 @@
 #handles visualisation and graphing
-import plotly.graph_objects as go
-import pygame
-import re
+import plotly.graph_objects as go   #2.2.1
+import pygame #5.18.0
+import re #2.5.2
 import sys
+
+
 def VisualisePopulation(GSM):
 
     if GSM.Visualise_population_toggle == True:

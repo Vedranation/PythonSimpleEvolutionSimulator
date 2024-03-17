@@ -15,8 +15,6 @@ GSM = GlobalsStateManager.GlobalsManager #Encapsulate all globals
 #TODO: add stone or impassable terrain
 #TODO: make animals babies spawn near parents
 #TODO: make predators able to see fleeing prey
-#TODO: refactor globals
-#TODO: move Agent to its own script
 
 #---------------------------------------------------------------------------
 

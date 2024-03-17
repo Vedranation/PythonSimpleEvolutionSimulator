@@ -1,7 +1,7 @@
 
 class GlobalsManager:
     World_size = 30     #how big (box) do you want the world to be1
-    Simulation_Length = 50     #how many turns in simulation
+    Simulation_Length = 600     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
 
@@ -48,13 +48,13 @@ class GlobalsManager:
     Console_log_born = False
     Console_log_random_move = False
     Console_log_reproduce_chance = False
-    Console_log_fight_big = False
+    Console_log_fight_big = True
     Console_log_worldtoosmalltobreed = False
     Console_log_personalpopulationlimit = False
     Console_log_worldtoosmalltogrow = False
 
-    Visualise_population_toggle = False
-    Visualise_hunger_toggle = False
+    Visualise_population_toggle = True
+    Visualise_hunger_toggle = True
     Visualise_simulation_toggle = True
 
     Sim_delay = 0.25    #delay in seconds between each turn
