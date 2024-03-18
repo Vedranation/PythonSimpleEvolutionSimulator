@@ -1,5 +1,7 @@
 #handles visualisation and graphing
 import plotly.graph_objects as go   #2.2.1
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame #5.18.0
 import re #2.5.2
 import sys
@@ -55,7 +57,7 @@ def VisualiseHunger(GSM):
 def VisualiseSimulationInit(GSM):
     'Initialises visualisation, and sets variables like font, color etc'
     pygame.init()
-    # TODO: Finish refactoring these guys...
+
 
     GSM.Visualise_window = pygame.display.set_mode((GSM.Window_width, GSM.Window_height))
     GSM.Gridsize = round(min((GSM.Window_width, GSM.Window_height)) * 0.8) #use 80% of the smaller dimension
@@ -69,7 +71,6 @@ def VisualiseSimulationInit(GSM):
 
     'more variables'
     GSM.Visualise_window.fill(GSM.Fill_color)  # background color
-
     GSM.Generation_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 3)  # font and size for agent generation number
     GSM.Axis_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 2)  # font and size for grid axis
     GSM.GUI_text_font = pygame.font.SysFont("Arial", int(GSM.Gridsize // 15))
@@ -117,7 +118,7 @@ def DrawGrid(GSM, turnN):
                              (GSM.Start_x, GSM.Start_y + i * GSM.Distancebtwrow),
                              (GSM.Start_x + GSM.Gridsize, GSM.Start_y + i * GSM.Distancebtwrow))
         if i != GSM.World_size: #Draw axis numbers
-            DrawText(GSM, str(i), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.5), (GSM.Window_height - GSM.Start_y)) #FIXME: Change this to its own font (X AXIS)
+            DrawText(GSM, str(i), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.5), (GSM.Window_height - GSM.Start_y))
             DrawText(GSM, str(GSM.World_size - i -1), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x - GSM.Distancebtwrow/2), (GSM.Start_y + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.25)) #(Y AXIS)
 
 def EventHandler(GSM):

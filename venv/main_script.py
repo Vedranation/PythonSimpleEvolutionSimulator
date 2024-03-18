@@ -86,7 +86,7 @@ def CalculateAverageHunger(animal_list):
 
 #simulate GSM.Simulation_Length turns (main loop)
 for i in range(GSM.Simulation_Length):
-    print(GSM.Predator_bigger_prey_win_chance)
+
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")

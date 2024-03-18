@@ -1,6 +1,6 @@
 
 class GlobalsManager:
-    World_size = 30     #how big (box) do you want the world to be1
+    World_size = 20     #how big (box) do you want the world to be1
     Simulation_Length = 600     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
@@ -13,16 +13,16 @@ class GlobalsManager:
     #TODO: make predators able to see fleeing prey
     Num_dandelion = [100];
     Num_cow = [20];
-    Num_rabbit = [100];
-    Num_tiger = [20];
-    Num_wolf = [60];
+    Num_rabbit = [60];
+    Num_tiger = [10];
+    Num_wolf = [10];
     Num_appletree = [30];
     Num_fox = [10];
 
-    Max_flowers = 200       #how many flowers can be
-    Dandelion_growth_per_turn = 30     #how many Dandelions spawn per turn
+    Max_flowers = 30       #how many flowers can be
+    Dandelion_growth_per_turn = 10     #how many Dandelions spawn per turn
     Berrybush_growth_per_turn = 7
-    Appletree_growth_per_turn = 3
+    Appletree_growth_per_turn = 4
     Maximum_hunger = 50     #maximum hunger a creature can have in its belly
     Reproduce_age = 5   #minimum age before can breed
     Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
@@ -35,8 +35,8 @@ class GlobalsManager:
     Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
     Animal_breed_cooldown = 2
 
-    Window_width = 900
-    Window_height = 900
+    Window_width = 800
+    Window_height = 800
 
     Console_log_start_position = False
     Console_log_check_for_food = False
