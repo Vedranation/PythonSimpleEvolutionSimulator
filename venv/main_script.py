@@ -9,9 +9,7 @@ GSM = GlobalsStateManager.GlobalsManager #Encapsulate all globals
 
 #how many of each agents do you want to start with, stores their numbers each turn
 
-#TODO: add Num_berrybush = [30];
-
-#TODO: add Num_goat = [30];
+#TODO: Make it possible to pass thru plants
 #TODO: add stone or impassable terrain
 #TODO: make animals babies spawn near parents
 #TODO: make predators able to see fleeing prey
@@ -26,7 +24,7 @@ DiedInBattle = False
 #Check if world is big enough for all agents
 GSM.SumAllAgents = [GSM.Num_cow[-1]+GSM.Num_dandelion[-1]+GSM.Num_tiger[-1]+
                     GSM.Num_wolf[-1]+GSM.Num_rabbit[-1]+GSM.Num_appletree[-1]+
-                    GSM.Num_berrybush[-1]+GSM.Num_fox[-1]]
+                    GSM.Num_berrybush[-1]+GSM.Num_fox[-1]+GSM.Num_goat[-1]]
 if pow(GSM.World_size, 2) < GSM.SumAllAgents[-1]:
     raise Exception("World can't be smaller than amount of objects to spawn")
 
@@ -37,7 +35,8 @@ GSM.World_agent_list_x_y = [[None for _ in range(GSM.World_size)] for _ in range
 def RespawnVegetation():
     # respawn plants every turn
     UpdatedAnimalSum = len(GSM.Tigers_list) + len(GSM.Dandelion_list) + len(GSM.Cows_list) + len(GSM.Wolf_list)\
-                       + len(GSM.Rabbits_list) + len(GSM.Appletree_list) + len(GSM.Fox_list) + len(GSM.Berrybush_list)# need to update this when adding more animals
+                       + len(GSM.Rabbits_list) + len(GSM.Appletree_list) + len(GSM.Fox_list) + \
+                       len(GSM.Berrybush_list) + len(GSM.Goats_list)# need to update this when adding more animals
     max_tiles = pow(GSM.World_size, 2)
     current_flower_amount = GSM.Num_dandelion[-1] + GSM.Num_appletree[-1] + GSM.Num_berrybush[-1]
     total_growth_per_turn = GSM.Dandelion_growth_per_turn + GSM.Appletree_growth_per_turn + GSM.Berrybush_growth_per_turn
@@ -74,6 +73,8 @@ for i in range(GSM.Num_cow[0]):
     AgentScript.SpawnCow(GSM)
 for i in range(GSM.Num_rabbit[0]):
     AgentScript.SpawnRabbit(GSM)
+for i in range(GSM.Num_goat[0]):
+    AgentScript.SpawnGoat(GSM)
 for i in range(GSM.Num_tiger[0]):
     AgentScript.SpawnTiger(GSM)
 for i in range(GSM.Num_wolf[0]):
@@ -81,10 +82,10 @@ for i in range(GSM.Num_wolf[0]):
 for i in range(GSM.Num_fox[0]):
     AgentScript.SpawnFox(GSM)
 
-print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush[0]} berry bushes, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, "
-      f"{GSM.Num_rabbit[0]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
-ConsoleLog.StartPosition(GSM.Cows_list, GSM.Dandelion_list, GSM.Appletree_list, GSM.Tigers_list, GSM.Wolf_list, GSM.Rabbits_list, GSM.Fox_list, GSM.Berrybush_list, GSM.Console_log_start_position)
-#fixme consolelog
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush[0]} berry bushes, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_rabbit[0]} Rabbits, "
+      f"{GSM.Num_goat[0]} Goats, {GSM.Num_cow} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
+ConsoleLog.StartPosition(GSM.Cows_list, GSM.Dandelion_list, GSM.Appletree_list, GSM.Tigers_list, GSM.Wolf_list, GSM.Rabbits_list, GSM.Fox_list, GSM.Berrybush_list, GSM.Goats_list, GSM.Console_log_start_position)
+
 def CalculateAverageHunger(animal_list):
     average = 0
     for i in animal_list:
@@ -100,19 +101,25 @@ for i in range(GSM.Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Berrybush_list)} Berry bushes, {len(GSM.Appletree_list)} Apple trees, {len(GSM.Cows_list)} Cows, {len(GSM.Rabbits_list)} Rabbits, {len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {GSM.SumAllAgents[-1]}\n\n")
+    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Berrybush_list)} Berry bushes, {len(GSM.Appletree_list)} Apple trees, "
+          f"{len(GSM.Rabbits_list)} Rabbits, \n{len(GSM.Goats_list)} Goats, {len(GSM.Cows_list)} Cows, "
+          f"{len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {GSM.SumAllAgents[-1]}\n\n")
     for cows in GSM.Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
         cows.SearchForFood()
         cows.Reproduce()
         cows.Starvation_Age_Battle_Death()
-
     print("")
     for rabbits in GSM.Rabbits_list[:]:
         rabbits.SearchForFood()
         rabbits.Reproduce()
         rabbits.Starvation_Age_Battle_Death()
+    print("")
+    for goats in GSM.Goats_list[:]:
+        goats.SearchForFood()
+        goats.Reproduce()
+        goats.Starvation_Age_Battle_Death()
     print("")
     for foxes in GSM.Fox_list[:]:
         DiedInBattle = False
@@ -148,7 +155,8 @@ for i in range(GSM.Simulation_Length):
     GSM.Num_wolf.append(len(GSM.Wolf_list))
     GSM.Num_fox.append(len(GSM.Fox_list))
     GSM.Num_rabbit.append(len(GSM.Rabbits_list))
-    GSM.SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1] + GSM.Num_berrybush[-1])
+    GSM.Num_goat.append(len(GSM.Goats_list))
+    GSM.SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1] + GSM.Num_berrybush[-1] + GSM.Num_goat[-1])
 
     GSM.Cows_hunger.append(CalculateAverageHunger(GSM.Cows_list))
     GSM.Tigers_hunger.append(CalculateAverageHunger(GSM.Tigers_list))
@@ -160,6 +168,7 @@ for i in range(GSM.Simulation_Length):
         while GSM.Is_paused:
             GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
             VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+            time.sleep(0.05) #to prevent it eating 25% CPU
             continue
         GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
         VisualiseScript.VisualiseSimulationDraw(GSM, i) #draw the display window

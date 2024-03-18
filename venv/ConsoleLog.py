@@ -1,25 +1,28 @@
 #function to easily toggle logging to console
+#Was coded before GSM was created so it doesnt use it. Instead relies on passing values in manually
+#Not exactly clever but I'm too lazy to refactor it for no reason
 
-
-def StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, Berrybush_list, logbool):
+def StartPosition(Cows_list, Dandelion_list, Appletree_list, Tigers_list, Wolf_list, Rabbits_list, Fox_list, Berrybush_list, Goats_list, logbool):
     '''Logs agents starting positions, input Cows_list, Dandelion_list, Tigers_list, Wolf_list, Rabbits_list'''
     if logbool == True:
-        for i in Cows_list:
-            print(f"Cows are at: [{i.x}, {i.y}]")
-        for i in Rabbits_list:
-            print(f"Rabbits are at: [{i.x}, {i.y}]")
         for i in Dandelion_list:
             print(f"Dandelions are at: [{i.x}, {i.y}]")
         for i in Berrybush_list:
             print(f"Berry bushes are at: [{i.x}, {i.y}]")
         for i in Appletree_list:
             print(f"Apple trees are at: [{i.x}, {i.y}]")
-        for i in Tigers_list:
-            print(f"Tigers are at: [{i.x}, {i.y}]")
-        for i in Wolf_list:
-            print(f"Wolves are at: [{i.x}, {i.y}]")
+        for i in Rabbits_list:
+            print(f"Rabbits are at: [{i.x}, {i.y}]")
+        for i in Goats_list:
+            print(f"Goats are at: [{i.x}, {i.y}]")
+        for i in Cows_list:
+            print(f"Cows are at: [{i.x}, {i.y}]")
         for i in Fox_list:
             print(f"Foxes are at: [{i.x}, {i.y}]")
+        for i in Wolf_list:
+            print(f"Wolves are at: [{i.x}, {i.y}]")
+        for i in Tigers_list:
+            print(f"Tigers are at: [{i.x}, {i.y}]")
     return
 
 def CheckForFood(agent, directionX, directionY, isNone, World_agent_list_x_y, logbool):

@@ -59,6 +59,8 @@ class Agent:
             GSM.Cows_list.remove(agent)
         elif "Rabbit" in agent.name:
             GSM.Rabbits_list.remove(agent)
+        elif "Goat" in agent.name:
+            GSM.Goats_list.remove(agent)
         elif "Tiger" in agent.name:
             GSM.Tigers_list.remove(agent)
         elif "Dandelion" in agent.name:
@@ -288,7 +290,8 @@ class Agent:
             if rnd <= mult:
 
                 UpdatedAnimalSum = len(self.GSM.Tigers_list) + len(self.GSM.Dandelion_list) + len(self.GSM.Cows_list) + len(self.GSM.Wolf_list)\
-                                   + len(self.GSM.Rabbits_list) + len(self.GSM.Appletree_list) + len(self.GSM.Fox_list) + len(self.GSM.Berrybush_list) #need to update this when adding more animals
+                                   + len(self.GSM.Rabbits_list) + len(self.GSM.Appletree_list) + len(self.GSM.Fox_list)\
+                                   + len(self.GSM.Berrybush_list) + len(self.GSM.Goats_list) #need to update this when adding more animals
 
                 if pow(self.GSM.World_size, 2) < (round(UpdatedAnimalSum * self.GSM.World_size_spawn_tolerance, 1)):
 
@@ -316,6 +319,13 @@ class Agent:
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Rabbit_" + str(babyname+1)
                     newborn = SpawnRabbit(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                elif "Goat" in self.name:
+                    if len(self.GSM.Goats_list) > self.GSM.Personal_animal_limit:
+                        ConsoleLog.PersonalPopulationLimit("Goat", self.GSM.Console_log_personalpopulationlimit)
+                        return
+                    babyname = int(re.search(r"(\d+)$", self.name).group(1))
+                    babyname = "Goat_" + str(babyname+1)
+                    newborn = SpawnGoat(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
                 elif "Wolf" in self.name:
                     if len(self.GSM.Wolf_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Wolf", self.GSM.Console_log_personalpopulationlimit)
@@ -339,34 +349,38 @@ class Agent:
 
 #Function to spawn agents
 def SpawnDandelion(GSM, name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    Dandelion = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Dandelion_list.append(Dandelion)
-    return Dandelion
+    dandelion = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Dandelion_list.append(dandelion)
+    return dandelion
 def SpawnAppletree(GSM, name="Appletree_1", type="Plant", perception=0, speed=0, size="Large", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    Appletree = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Appletree_list.append(Appletree)
-    return Appletree
+    appletree = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Appletree_list.append(appletree)
+    return appletree
 def SpawnBerrybush(GSM, name="Berrybush_1", type="Plant", perception=0, speed=0, size="Medium", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    Berrybush = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Berrybush_list.append(Berrybush)
-    return Berrybush
+    berrybush = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Berrybush_list.append(berrybush)
+    return berrybush
 def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25):
-    Cow = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Cows_list.append(Cow)
-    return Cow
+    cow = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Cows_list.append(cow)
+    return cow
 def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25):
-    Rabbit = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Rabbits_list.append(Rabbit)
-    return Rabbit
+    rabbit = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Rabbits_list.append(rabbit)
+    return rabbit
+def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=1, speed=1, size="Medium", hunger=25):
+    goat = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Goats_list.append(goat)
+    return goat
 def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25):
-    Tiger = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Tigers_list.append(Tiger)
-    return Tiger
+    tiger = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Tigers_list.append(tiger)
+    return tiger
 def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25):
-    Wolf = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Wolf_list.append(Wolf)
-    return Wolf
+    wolf = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Wolf_list.append(wolf)
+    return wolf
 def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25):
-    Fox = Agent(GSM, name, type, perception, speed, size, hunger)
-    GSM.Fox_list.append(Fox)
-    return Fox
+    fox = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Fox_list.append(fox)
+    return fox

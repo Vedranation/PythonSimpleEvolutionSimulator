@@ -15,13 +15,14 @@ class GlobalsManager:
     Num_berrybush = [20];
     Num_appletree = [30];
     Num_rabbit = [60];
+    Num_goat = [15];
     Num_cow = [20];
     Num_fox = [10];
     Num_wolf = [10];
     Num_tiger = [10];
 
 
-    Max_flowers = 30       #how many flowers can be
+    Max_flowers = 100       #how many flowers can be
     Dandelion_growth_per_turn = 10     #how many Dandelions spawn per turn
     Berrybush_growth_per_turn = 7
     Appletree_growth_per_turn = 4
@@ -66,6 +67,7 @@ class GlobalsManager:
     Tiger_color = (255, 0, 0)
     Fox_color = (224, 156, 18)
     Rabbit_color = (255, 255, 255)
+    Goat_color = (52, 192, 235)
     Dandelion_color = (235, 235, 26)
     Wolf_color = (137, 12, 166)
     Cow_color = (0, 0, 0)
@@ -79,6 +81,7 @@ class GlobalsManager:
 
     Cows_list = []  # initialise lists to store agents
     Rabbits_list = []
+    Goats_list = []
     Dandelion_list = []
     Berrybush_list = []
     Appletree_list = []
@@ -88,6 +91,7 @@ class GlobalsManager:
 
     Cows_hunger = []  # stores average hunger values every turn
     Rabbits_hunger = []
+    Goats_hunger = []
     Tigers_hunger = []
     Wolf_hunger = []
     Fox_hunger = []
@@ -110,6 +114,7 @@ class GlobalsManager:
     Berrybush_sprite = 0
     Appletree_sprite = 0
     Rabbit_sprite = 0
+    Goats_sprite = 0
     Cow_sprite = 0
     Dandelion_sprite = 0
     Fox_sprite = 0
