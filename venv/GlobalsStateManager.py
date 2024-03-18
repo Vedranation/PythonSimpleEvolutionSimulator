@@ -11,7 +11,7 @@ class GlobalsManager:
     #TODO: add stone or impassable terrain
     #TODO: make animals babies spawn near parents
     #TODO: make predators able to see fleeing prey
-    Num_dandelion = [100];
+    Num_dandelion = [50];
     Num_cow = [20];
     Num_rabbit = [60];
     Num_tiger = [10];
@@ -99,4 +99,14 @@ class GlobalsManager:
     GUI_text_font = 0
     Cell_positions = 0
     Distancebtwrow = 0
-    Animal_drawing_offset = 0.06
+    Animal_drawing_offset = 0.00
+
+    #placeholder variables for sprites
+    background_sprite = 0
+    Appletree_sprite = 0
+    Rabbit_sprite = 0
+    Cow_sprite = 0
+    Dandelion_sprite = 0
+    Fox_sprite = 0
+    Wolf_sprite = 0
+    Tiger_sprite = 0

@@ -151,6 +151,7 @@ for i in range(GSM.Simulation_Length):
         time.sleep(GSM.Sim_delay)
 
 
+
 #report results
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
