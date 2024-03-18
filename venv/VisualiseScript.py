@@ -21,6 +21,7 @@ def VisualisePopulation(GSM):
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)', dash='dash')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_berrybush, mode='lines', name='Berry bushes', line=dict(color='rgb(181, 45, 0)', dash='dash')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_fox, mode='lines', name='Foxes', line=dict(color='orange')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_goat, mode='lines', name='Goats', line=dict(color='rgb(52, 192, 235)')))
 
 
         # Add titles and labels
@@ -42,6 +43,7 @@ def VisualiseHunger(GSM):
         fig_hunger = go.Figure()
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Rabbits_hunger, mode='lines', name='Rabbits', line=dict(color='white')))
+        fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Goats_hunger, mode='lines', name='Goats', line=dict(color='rgb(52, 192, 235)')))
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Tigers_hunger, mode='lines', name='Tigers', line=dict(color='red')))
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Wolf_hunger, mode='lines', name='Wolves', line=dict(color='purple')))
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Fox_hunger, mode='lines', name='Foxes', line=dict(color='orange')))
@@ -73,11 +75,10 @@ def VisualiseSimulationInit(GSM):
     'Load image sprites'
     GSM.background_sprite = pygame.image.load("AnimalSimImages/grass.png").convert_alpha()
     GSM.Dandelion_sprite = pygame.image.load("AnimalSimImages/dandelion.png").convert_alpha()
-    #bush
-    GSM.Appletree_sprite = pygame.image.load("AnimalSimImages/appletree.png").convert_alpha()
     GSM.Berrybush_sprite = pygame.image.load("AnimalSimImages/berrybush.png").convert_alpha()
+    GSM.Appletree_sprite = pygame.image.load("AnimalSimImages/appletree.png").convert_alpha()
     GSM.Rabbit_sprite = pygame.image.load("AnimalSimImages/rabbit.png").convert_alpha()
-    #goat
+    GSM.Goat_sprite = pygame.image.load("AnimalSimImages/goat.png").convert_alpha()
     GSM.Cow_sprite = pygame.image.load("AnimalSimImages/cow.png").convert_alpha()
     GSM.Fox_sprite = pygame.image.load("AnimalSimImages/fox.png").convert_alpha()
     GSM.Wolf_sprite = pygame.image.load("AnimalSimImages/wolf.png").convert_alpha()
@@ -197,6 +198,10 @@ def VisualiseSimulationDraw(GSM, turnN):
                 #pygame.draw.rect(GSM.Visualise_window, GSM.Rabbit_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_rabbit = pygame.transform.scale(GSM.Rabbit_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_rabbit, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
+            elif animalname == "Goat":
+                #pygame.draw.rect(GSM.Visualise_window, GSM.Goat_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                scaled_goat = pygame.transform.scale(GSM.Goat_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
+                GSM.Visualise_window.blit(scaled_goat, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Wolf":
                 #pygame.draw.rect(GSM.Visualise_window, GSM.Wolf_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_wolf = pygame.transform.scale(GSM.Wolf_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))

@@ -34,7 +34,7 @@ class GlobalsManager:
     World_size_spawn_tolerance = 1.05      #tolerance to world size to prevent overpopulation
     Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
     Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
-    Predator_bigger_prey_win_chance = 0.6       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
+    Predator_bigger_prey_win_chance = 0.4       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
     Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
     Animal_breed_cooldown = 2
 
@@ -114,7 +114,7 @@ class GlobalsManager:
     Berrybush_sprite = 0
     Appletree_sprite = 0
     Rabbit_sprite = 0
-    Goats_sprite = 0
+    Goat_sprite = 0
     Cow_sprite = 0
     Dandelion_sprite = 0
     Fox_sprite = 0

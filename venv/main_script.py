@@ -161,6 +161,7 @@ for i in range(GSM.Simulation_Length):
     GSM.Cows_hunger.append(CalculateAverageHunger(GSM.Cows_list))
     GSM.Tigers_hunger.append(CalculateAverageHunger(GSM.Tigers_list))
     GSM.Rabbits_hunger.append(CalculateAverageHunger(GSM.Rabbits_list))
+    GSM.Goats_hunger.append(CalculateAverageHunger(GSM.Goats_list))
     GSM.Wolf_hunger.append(CalculateAverageHunger(GSM.Wolf_list))
     GSM.Fox_hunger.append(CalculateAverageHunger(GSM.Fox_list))
 
@@ -178,8 +179,11 @@ for i in range(GSM.Simulation_Length):
 
 #report results
 print("\n\n----------SIMULATION END----------")
-print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush} Berry bushes, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
-print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_berrybush} Berry bushes, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush[0]} Berry bushes, {GSM.Num_appletree[0]} Apple trees,"
+      f" {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_goat[0]} Goats, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
+print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_berrybush} Berry bushes, "
+      f"{GSM.Num_appletree[-1]} Apple trees, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_goat[-1]} Goats, {GSM.Num_cow[-1]} Cows, {GSM.Num_fox[0]} Foxes, "
+      f"{GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
 
 VisualiseScript.VisualisePopulation(GSM)
 VisualiseScript.VisualiseHunger(GSM)

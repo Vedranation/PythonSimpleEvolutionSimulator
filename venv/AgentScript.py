@@ -237,7 +237,7 @@ class Agent:
 
         #depending on Agent size, food depletes at different rate
         if self.size == "Small":
-            self.hunger = self.hunger - 1 #lose 1 point worth of hunger
+            self.hunger = self.hunger - 1.3 #lose 1 point worth of hunger
         elif self.size == "Medium":
             self.hunger = self.hunger - 2
         else:
