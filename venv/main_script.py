@@ -24,7 +24,9 @@ if GSM.Visualise_simulation_toggle == True:
 
 DiedInBattle = False
 #Check if world is big enough for all agents
-GSM.SumAllAgents = [GSM.Num_cow[-1]+GSM.Num_dandelion[-1]+GSM.Num_tiger[-1]+GSM.Num_wolf[-1]+GSM.Num_rabbit[-1]+GSM.Num_appletree[-1]+GSM.Num_fox[-1]]
+GSM.SumAllAgents = [GSM.Num_cow[-1]+GSM.Num_dandelion[-1]+GSM.Num_tiger[-1]+
+                    GSM.Num_wolf[-1]+GSM.Num_rabbit[-1]+GSM.Num_appletree[-1]+
+                    GSM.Num_berrybush[-1]+GSM.Num_fox[-1]]
 if pow(GSM.World_size, 2) < GSM.SumAllAgents[-1]:
     raise Exception("World can't be smaller than amount of objects to spawn")
 
@@ -34,9 +36,10 @@ GSM.World_agent_list_x_y = [[None for _ in range(GSM.World_size)] for _ in range
 
 def RespawnVegetation():
     # respawn plants every turn
-    UpdatedAnimalSum = len(GSM.Tigers_list) + len(GSM.Dandelion_list) + len(GSM.Cows_list) + len(GSM.Wolf_list) + len(GSM.Rabbits_list) + len(GSM.Appletree_list) + len(GSM.Fox_list)# need to update this when adding more animals
+    UpdatedAnimalSum = len(GSM.Tigers_list) + len(GSM.Dandelion_list) + len(GSM.Cows_list) + len(GSM.Wolf_list)\
+                       + len(GSM.Rabbits_list) + len(GSM.Appletree_list) + len(GSM.Fox_list) + len(GSM.Berrybush_list)# need to update this when adding more animals
     max_tiles = pow(GSM.World_size, 2)
-    current_flower_amount = GSM.Num_dandelion[-1] + GSM.Num_appletree[-1]# + Num_berrybush[-1]
+    current_flower_amount = GSM.Num_dandelion[-1] + GSM.Num_appletree[-1] + GSM.Num_berrybush[-1]
     total_growth_per_turn = GSM.Dandelion_growth_per_turn + GSM.Appletree_growth_per_turn + GSM.Berrybush_growth_per_turn
 
     if max_tiles <= (round((UpdatedAnimalSum + total_growth_per_turn) * GSM.World_size_spawn_tolerance)):
@@ -47,11 +50,15 @@ def RespawnVegetation():
             AgentScript.SpawnDandelion(GSM)
         for j in range(GSM.Appletree_growth_per_turn):
             AgentScript.SpawnAppletree(GSM)
+        for j in range(GSM.Berrybush_growth_per_turn):
+            AgentScript.SpawnBerrybush(GSM)
     elif (current_flower_amount + total_growth_per_turn/2) <= GSM.Max_flowers: #spawns half
         for j in range(GSM.Dandelion_growth_per_turn//2):
             AgentScript.SpawnDandelion(GSM)
         for j in range(GSM.Appletree_growth_per_turn//2):
             AgentScript.SpawnAppletree(GSM)
+        for j in range(GSM.Berrybush_growth_per_turn//2):
+            AgentScript.SpawnBerrybush(GSM)
     else:
         return
 
@@ -59,6 +66,8 @@ def RespawnVegetation():
 #spawn amount of agents we want
 for i in range(GSM.Num_dandelion[0]):
     AgentScript.SpawnDandelion(GSM)
+for i in range(GSM.Num_berrybush[0]):
+    AgentScript.SpawnBerrybush(GSM)
 for i in range(GSM.Num_appletree[0]):
     AgentScript.SpawnAppletree(GSM)
 for i in range(GSM.Num_cow[0]):
@@ -72,9 +81,10 @@ for i in range(GSM.Num_wolf[0]):
 for i in range(GSM.Num_fox[0]):
     AgentScript.SpawnFox(GSM)
 
-print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
-ConsoleLog.StartPosition(GSM.Cows_list, GSM.Dandelion_list, GSM.Appletree_list, GSM.Tigers_list, GSM.Wolf_list, GSM.Rabbits_list, GSM.Fox_list, GSM.Console_log_start_position)
-
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush[0]} berry bushes, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, "
+      f"{GSM.Num_rabbit[0]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves and {GSM.Num_tiger[0]} Tigers")
+ConsoleLog.StartPosition(GSM.Cows_list, GSM.Dandelion_list, GSM.Appletree_list, GSM.Tigers_list, GSM.Wolf_list, GSM.Rabbits_list, GSM.Fox_list, GSM.Berrybush_list, GSM.Console_log_start_position)
+#fixme consolelog
 def CalculateAverageHunger(animal_list):
     average = 0
     for i in animal_list:
@@ -90,7 +100,7 @@ for i in range(GSM.Simulation_Length):
     RespawnVegetation()
 
     print(f"\n\n----------Turn {i+1}----------")
-    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Appletree_list)} Apple trees, {len(GSM.Cows_list)} Cows, {len(GSM.Rabbits_list)} Rabbits, {len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {GSM.SumAllAgents[-1]}\n\n")
+    print(f"There are: {len(GSM.Dandelion_list)} Dandelions, {len(GSM.Berrybush_list)} Berry bushes, {len(GSM.Appletree_list)} Apple trees, {len(GSM.Cows_list)} Cows, {len(GSM.Rabbits_list)} Rabbits, {len(GSM.Fox_list)} Foxes, {len(GSM.Wolf_list)} Wolves, and {len(GSM.Tigers_list)} Tigers, Total: {GSM.SumAllAgents[-1]}\n\n")
     for cows in GSM.Cows_list[:]:   #This creates shallow copies of the lists, allowing processing of all animals even if some get deleted.
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
@@ -132,12 +142,13 @@ for i in range(GSM.Simulation_Length):
 
     GSM.Num_cow.append(len(GSM.Cows_list))
     GSM.Num_dandelion.append(len(GSM.Dandelion_list))
+    GSM.Num_berrybush.append(len(GSM.Berrybush_list))
     GSM.Num_appletree.append(len(GSM.Appletree_list))
     GSM.Num_tiger.append(len(GSM.Tigers_list))
     GSM.Num_wolf.append(len(GSM.Wolf_list))
     GSM.Num_fox.append(len(GSM.Fox_list))
     GSM.Num_rabbit.append(len(GSM.Rabbits_list))
-    GSM.SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1])
+    GSM.SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1] + GSM.Num_berrybush[-1])
 
     GSM.Cows_hunger.append(CalculateAverageHunger(GSM.Cows_list))
     GSM.Tigers_hunger.append(CalculateAverageHunger(GSM.Tigers_list))
@@ -154,8 +165,8 @@ for i in range(GSM.Simulation_Length):
 
 #report results
 print("\n\n----------SIMULATION END----------")
-print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
-print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
+print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush} Berry bushes, {GSM.Num_appletree[0]} Apple trees, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
+print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_berrybush} Berry bushes, {GSM.Num_appletree[-1]} Apple trees, {GSM.Num_cow[-1]} Cows, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
 
 VisualiseScript.VisualisePopulation(GSM)
 VisualiseScript.VisualiseHunger(GSM)

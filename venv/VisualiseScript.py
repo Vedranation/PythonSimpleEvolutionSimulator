@@ -13,12 +13,14 @@ def VisualisePopulation(GSM):
         turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
         # Create traces
         fig = go.Figure()
+        #TODO: Refactor this to use singuar GSM color variable to share with square color instead of handpicking here
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_cow, mode='lines', name='Cows', line=dict(color='black')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_tiger, mode='lines', name='Tigers', line=dict(color='red')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_dandelion, mode='lines', name='Dandelions', line=dict(color='yellow', dash='dash')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_wolf, mode='lines', name='Wolves', line=dict(color='purple')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_rabbit, mode='lines', name='Rabbits', line=dict(color='white')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_appletree, mode='lines', name='Apple trees', line=dict(color='rgb(242, 87, 44)', dash='dash')))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_berrybush, mode='lines', name='Berry bushes', line=dict(color='rgb(181, 45, 0)', dash='dash')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_fox, mode='lines', name='Foxes', line=dict(color='orange')))
 
 
@@ -74,6 +76,7 @@ def VisualiseSimulationInit(GSM):
     GSM.Dandelion_sprite = pygame.image.load("AnimalSimImages/dandelion.png").convert_alpha()
     #bush
     GSM.Appletree_sprite = pygame.image.load("AnimalSimImages/appletree.png").convert_alpha()
+    GSM.Berrybush_sprite = pygame.image.load("AnimalSimImages/berrybush.png").convert_alpha()
     GSM.Rabbit_sprite = pygame.image.load("AnimalSimImages/rabbit.png").convert_alpha()
     #goat
     GSM.Cow_sprite = pygame.image.load("AnimalSimImages/cow.png").convert_alpha()
@@ -83,7 +86,7 @@ def VisualiseSimulationInit(GSM):
 
     'load fonts'
     GSM.Visualise_window.fill(GSM.Fill_color)  # background color
-    GSM.Generation_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 3)  # font and size for agent generation number
+    GSM.Generation_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 2)  # font and size for agent generation number
     GSM.Axis_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 2)  # font and size for grid axis
     GSM.GUI_text_font = pygame.font.SysFont("Arial", int(GSM.Gridsize // 15))
 
@@ -210,7 +213,9 @@ def VisualiseSimulationDraw(GSM, turnN):
                 scaled_cow = pygame.transform.scale(GSM.Cow_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_cow, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Berrybush":
-                pygame.draw.rect(GSM.Visualise_window, GSM.Berrybush_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                #pygame.draw.rect(GSM.Visualise_window, GSM.Berrybush_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                scaled_berrybush = pygame.transform.scale(GSM.Berrybush_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
+                GSM.Visualise_window.blit(scaled_berrybush, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Appletree":
                 #pygame.draw.rect(GSM.Visualise_window, GSM.Appletree_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_appletree = pygame.transform.scale(GSM.Appletree_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
@@ -221,7 +226,7 @@ def VisualiseSimulationDraw(GSM, turnN):
                 match = re.search(r"\d+$", y_cell.name)
                 generation_number = int(match.group())  # Convert the matched string to an integer
 
-                DrawText(GSM, generation_number, GSM.Generation_text_font, (0, 0, 0), cell_position_x + GSM.Distancebtwrow*0.06, cell_position_y + GSM.Distancebtwrow*0.06)
+                DrawText(GSM, generation_number, GSM.Generation_text_font, (255, 255, 255), cell_position_x + GSM.Distancebtwrow*0.06, cell_position_y + GSM.Distancebtwrow*0.06)
 
 
 

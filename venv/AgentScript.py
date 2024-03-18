@@ -67,6 +67,8 @@ class Agent:
             GSM.Wolf_list.remove(agent)
         elif "Appletree" in agent.name:
             GSM.Appletree_list.remove(agent)
+        elif "Berrybush" in agent.name:
+            GSM.Berrybush_list.remove(agent)
         elif "Fox" in agent.name:
             GSM.Fox_list.remove(agent)
 
@@ -285,7 +287,8 @@ class Agent:
             ConsoleLog.ReproduceChance(self, self.GSM.Base_reproduce_chance, sigm, mult, rnd, self.GSM.Console_log_reproduce_chance)
             if rnd <= mult:
 
-                UpdatedAnimalSum = len(self.GSM.Tigers_list) + len(self.GSM.Dandelion_list) + len(self.GSM.Cows_list) + len(self.GSM.Wolf_list) + len(self.GSM.Rabbits_list) + len(self.GSM.Appletree_list) + len(self.GSM.Fox_list) #need to update this when adding more animals
+                UpdatedAnimalSum = len(self.GSM.Tigers_list) + len(self.GSM.Dandelion_list) + len(self.GSM.Cows_list) + len(self.GSM.Wolf_list)\
+                                   + len(self.GSM.Rabbits_list) + len(self.GSM.Appletree_list) + len(self.GSM.Fox_list) + len(self.GSM.Berrybush_list) #need to update this when adding more animals
 
                 if pow(self.GSM.World_size, 2) < (round(UpdatedAnimalSum * self.GSM.World_size_spawn_tolerance, 1)):
 
@@ -343,6 +346,10 @@ def SpawnAppletree(GSM, name="Appletree_1", type="Plant", perception=0, speed=0,
     Appletree = Agent(GSM, name, type, perception, speed, size, hunger)
     GSM.Appletree_list.append(Appletree)
     return Appletree
+def SpawnBerrybush(GSM, name="Berrybush_1", type="Plant", perception=0, speed=0, size="Medium", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
+    Berrybush = Agent(GSM, name, type, perception, speed, size, hunger)
+    GSM.Berrybush_list.append(Berrybush)
+    return Berrybush
 def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25):
     Cow = Agent(GSM, name, type, perception, speed, size, hunger)
     GSM.Cows_list.append(Cow)

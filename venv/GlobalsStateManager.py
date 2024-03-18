@@ -12,12 +12,14 @@ class GlobalsManager:
     #TODO: make animals babies spawn near parents
     #TODO: make predators able to see fleeing prey
     Num_dandelion = [50];
-    Num_cow = [20];
-    Num_rabbit = [60];
-    Num_tiger = [10];
-    Num_wolf = [10];
+    Num_berrybush = [20];
     Num_appletree = [30];
+    Num_rabbit = [60];
+    Num_cow = [20];
     Num_fox = [10];
+    Num_wolf = [10];
+    Num_tiger = [10];
+
 
     Max_flowers = 30       #how many flowers can be
     Dandelion_growth_per_turn = 10     #how many Dandelions spawn per turn
@@ -78,6 +80,7 @@ class GlobalsManager:
     Cows_list = []  # initialise lists to store agents
     Rabbits_list = []
     Dandelion_list = []
+    Berrybush_list = []
     Appletree_list = []
     Tigers_list = []
     Wolf_list = []
@@ -103,6 +106,7 @@ class GlobalsManager:
 
     #placeholder variables for sprites
     background_sprite = 0
+    Berrybush_sprite = 0
     Appletree_sprite = 0
     Rabbit_sprite = 0
     Cow_sprite = 0
