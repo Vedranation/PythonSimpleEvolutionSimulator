@@ -92,6 +92,7 @@ class GlobalsManager:
     Wolf_hunger = []
     Fox_hunger = []
 
+    Is_paused = False
     SumAllAgents = 0
     Gridsize = 0
     Visualise_window = 0

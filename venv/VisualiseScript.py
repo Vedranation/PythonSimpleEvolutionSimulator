@@ -167,6 +167,8 @@ def EventHandler(GSM):
                     return GSM.Sim_delay * 2
                 else:
                     return GSM.Sim_delay + 0.25
+            elif event.key == pygame.K_p:
+                GSM.Is_paused = not GSM.Is_paused
     return GSM.Sim_delay #if no events are detected
 def VisualiseSimulationDraw(GSM, turnN):
     'this is called every main loop iteration'

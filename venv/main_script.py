@@ -157,6 +157,10 @@ for i in range(GSM.Simulation_Length):
     GSM.Fox_hunger.append(CalculateAverageHunger(GSM.Fox_list))
 
     if GSM.Visualise_simulation_toggle:
+        while GSM.Is_paused:
+            GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
+            VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+            continue
         GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
         VisualiseScript.VisualiseSimulationDraw(GSM, i) #draw the display window
         time.sleep(GSM.Sim_delay)
