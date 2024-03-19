@@ -2,6 +2,7 @@ import random
 import math
 import re
 import ConsoleLog
+import Genes
 
 class Agent:
     def __init__(self, GSM, name, type, perception, speed, size, hunger, places):
@@ -36,7 +37,7 @@ class Agent:
             else:
                 raise Exception("Not supported agent size")
         if places is not None and self.type != "Plant": #prevents parents or plants from mutating
-            self.Mutation()
+            Genes.Mutation(self, GSM)
 
         if self.type == "Plant":
             places = self.PlantCubeSpawnRadius()
@@ -426,28 +427,6 @@ class Agent:
                     babyname = "Fox_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnFox(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 ConsoleLog.Born(newborn, self.GSM.Console_log_born)
-    def Mutation(self):
-        if random.random() <= self.GSM.Mutation_chance:
-            gene_1 = random.choice(self.GSM.Mutateable_genes)
-            if gene_1 == "speed":
-                gene_nerf_2 = "perception"
-                ex_gene_buff = self.speed
-                ex_gene_nerf = self.perception
-                if self.speed != 5 or self.perception != 1:
-                    self.speed = self.speed + 1
-                    self.perception = self.perception - 1
-                else:
-                    return
-            elif gene_1 == "perception":
-                gene_nerf_2 = "speed"
-                ex_gene_buff = self.perception
-                ex_gene_nerf = self.speed
-                if self.perception != 5 or self.speed != 1:
-                    self.perception = self.perception + 1
-                    self.speed = self.speed - 1
-                else:
-                    return
-            ConsoleLog.Mutated(self, gene_1, gene_nerf_2, ex_gene_buff, ex_gene_nerf, self.GSM.Console_log_mutated)
 
 
 
