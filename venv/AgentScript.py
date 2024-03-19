@@ -36,18 +36,20 @@ class Agent:
             else:
                 raise Exception("Not supported agent size")
 
-        self.FindFreeSpot(places)  # find a free spot to spawn
+        if self.type == "Plant":
+            places = self.PlantCubeSpawnRadius()
+        self.RandomSpawnFind(places)  # find a free spot to spawn
 
-    def FindFreeSpot(self, places):
+    def RandomSpawnFind(self, places):
         if places is None:      #Random spawn
             self.x = random.randint(0, self.GSM.World_size-1)
             self.y = random.randint(0, self.GSM.World_size-1)
-            # FIXME: infinite spawning is computationally inefficient: Better would be getting list of all free spots, then shuffling that
+            # FIXME: infinite spawning is computationally inefficient: Better would be getting list of all free spots, then shuffling that (at high world density)
             #Loop until a free spot is found
             while self.GSM.World_agent_list_x_y[self.x][self.y] != None:
                 self.x = random.randint(0, self.GSM.World_size-1)
                 self.y = random.randint(0, self.GSM.World_size-1)
-        else:       #baby spawn
+        else:       #animal baby spawn
             place = random.choice(places)
             self.x = place[0]
             self.y = place[1]
@@ -230,7 +232,7 @@ class Agent:
                 ConsoleLog.FoundFood(self, direction[0], direction[1], self.GSM.World_agent_list_x_y, worth, self.GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth
             else:
-                worth = 26
+                worth = 18
                 ConsoleLog.AgentWasEaten(self, direction[0], direction[1], self.GSM.World_agent_list_x_y, worth, self.GSM.Console_log_was_eaten)
                 ConsoleLog.FoundFood(self, direction[0], direction[1], self.GSM.World_agent_list_x_y, worth, self.GSM.Console_log_found_food)
                 self.hunger = self.hunger + worth #big animals nourish for longer
@@ -240,11 +242,11 @@ class Agent:
 
         #depending on Agent size, food depletes at different rate
         if self.size == "Small":
-            self.hunger = self.hunger - 1.3 #lose 1 point worth of hunger
+            self.hunger = self.hunger - 1 #lose 1 point worth of hunger
         elif self.size == "Medium":
-            self.hunger = self.hunger - 2
+            self.hunger = self.hunger - 2.2
         else:
-            self.hunger = self.hunger - 4 #bigger animals need more food
+            self.hunger = self.hunger - 4.3 #bigger animals need more food
 
 
     @staticmethod
@@ -273,7 +275,83 @@ class Agent:
                 self.RemoveAgent(self.GSM, self)  # die of old age
             return
 
-    def Reproduce(self, GSM): #Is called directly, Handles reproducing and aging
+    def AnimalCubeSpawnRadius(self):
+        'finds free spot near breeding animal'
+        if self.GSM.Animal_spawn_cube == 1:  # Check if the radius around the agent is free
+            # TODO: I basically created perception 2 and perception 4/5 vision
+            free_breed_locations_x_y = []
+            for i in range(3):
+                breed_location_x = self.x + i - 1
+                for j in range(3):
+                    breed_location_y = self.y + j - 1
+                    free_breed_locations_x_y.append([breed_location_x, breed_location_y])
+        elif self.GSM.Animal_spawn_cube == 2:
+            free_breed_locations_x_y = []
+            for i in range(5):
+                breed_location_x = self.x + i - 2
+                for j in range(5):
+                    breed_location_y = self.y + j - 2
+                    free_breed_locations_x_y.append([breed_location_x, breed_location_y])
+        else:
+            raise Exception("The animal breed cube size is invalid, must be 1 (for 3x3) or 2 (for 5x5)")
+        free_breed_locations_x_y.remove([self.x, self.y])  # remove own position
+        for i in free_breed_locations_x_y[:]:
+            if i[0] < 0 or i[0] >= self.GSM.World_size or i[1] < 0 or i[1] >= self.GSM.World_size:
+                free_breed_locations_x_y.remove(i)  # remove out of bounds positions
+            elif self.GSM.World_agent_list_x_y[i[0]][i[1]] != None:  # remove positions that are full
+                free_breed_locations_x_y.remove(i)
+        if len(free_breed_locations_x_y) == 0:  # no space found
+            return 0
+        random.shuffle(free_breed_locations_x_y)
+        return free_breed_locations_x_y
+
+    def PlantCubeSpawnRadius(self):
+        'handles plants spawning in patches. Returns None if random spawn'
+        if self.GSM.Flower_spawn_cube is None:
+            return None
+        elif self.name == "Dandelion_1":
+            if len(self.GSM.Dandelion_list) < self.GSM.Minimum_flower_number_for_cube_spawn:
+                return None #If not enough world flowers for local spawn
+            else:
+                spawning_plant = random.choice(self.GSM.Dandelion_list)
+        elif self.name == "Berrybush_1":
+            if len(self.GSM.Berrybush_list) < self.GSM.Minimum_flower_number_for_cube_spawn:
+                return None
+            else:
+                spawning_plant = random.choice(self.GSM.Berrybush_list)
+        elif self.name == "Appletree_1":
+            if len(self.GSM.Appletree_list) < self.GSM.Minimum_flower_number_for_cube_spawn:
+                return None
+            else:
+                spawning_plant = random.choice(self.GSM.Appletree_list)
+        free_spawn_locations_x_y = []
+        if self.GSM.Flower_spawn_cube == 2:
+            for i in range(5):
+                spawn_location_x = spawning_plant.x + i - 2
+                for j in range(5):
+                    spawn_location_y = spawning_plant.y + j - 2
+                    free_spawn_locations_x_y.append([spawn_location_x, spawn_location_y])
+        elif self.GSM.Flower_spawn_cube == 6:
+            for i in range(13):
+                spawn_location_x = spawning_plant.x + i - 6
+                for j in range(13):
+                    spawn_location_y = spawning_plant.y + j - 6
+                    free_spawn_locations_x_y.append([spawn_location_x, spawn_location_y])
+        else:
+            raise Exception("Plant spawn cube size is invalid, must be 2 (for 5x5), 6 (for 13x13), or None (to disable)")
+
+        free_spawn_locations_x_y.remove([spawning_plant.x, spawning_plant.y])  # remove own position
+        for i in free_spawn_locations_x_y[:]:
+            if i[0] < 0 or i[0] >= self.GSM.World_size or i[1] < 0 or i[1] >= self.GSM.World_size:
+                free_spawn_locations_x_y.remove(i)  # remove out of bounds positions
+            elif self.GSM.World_agent_list_x_y[i[0]][i[1]] != None:  # remove positions that are full
+                free_spawn_locations_x_y.remove(i)
+        if len(free_spawn_locations_x_y) == 0:  # no space found
+            return None
+
+        return free_spawn_locations_x_y
+
+    def Reproduce(self): #Is called directly, Handles reproducing and aging
 
         if self.age > self.GSM.Reproduce_age:
             if self.breedcooldown > 0:      #Introduces a breeding cooldown
@@ -300,32 +378,9 @@ class Agent:
                     ConsoleLog.WorldTooSmallTooBreed(self.GSM.Console_log_worldtoosmalltobreed)
                     return
 
-                if GSM.Animal_spawn_cube == 1:  #Check if the radius around the agent is free
-                    #TODO: I basically created perception 2 and perception 4/5 vision
-                    free_breed_locations_x_y = []
-                    for i in range(3):
-                        breed_location_x = self.x + i - 1
-                        for j in range(3):
-                            breed_location_y = self.y + j - 1
-                            free_breed_locations_x_y.append([breed_location_x, breed_location_y])
-                elif GSM.Animal_spawn_cube == 2:
-                    free_breed_locations_x_y = []
-                    for i in range(5):
-                        breed_location_x = self.x + i - 2
-                        for j in range(5):
-                            breed_location_y = self.y + j - 2
-                            free_breed_locations_x_y.append([breed_location_x, breed_location_y])
-                else:
-                    raise Exception("The animal breed cube size is invalid, must be 1 (for 3x3) or 2 (for 5x5)")
-                free_breed_locations_x_y.remove([self.x, self.y])  # remove own position
-                for i in free_breed_locations_x_y[:]:
-                    if i[0] < 0 or i[0] >= GSM.World_size or i[1] < 0 or i[1] >= GSM.World_size:
-                        free_breed_locations_x_y.remove(i)      #remove out of bounds positions
-                    elif self.GSM.World_agent_list_x_y[i[0]][i[1]] != None:  # check cube radius for free spot
-                        free_breed_locations_x_y.remove(i)
-                if len(free_breed_locations_x_y) == 0:  #no space found
+                free_breed_locations_x_y = self.AnimalCubeSpawnRadius()
+                if free_breed_locations_x_y == 0:
                     return
-                random.shuffle(free_breed_locations_x_y)
 
                 if "Tiger" in self.name:
                     if len(self.GSM.Tigers_list) > self.GSM.Personal_animal_limit:
@@ -378,7 +433,7 @@ class Agent:
 
 #Function to spawn agents
 def SpawnDandelion(GSM, name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    dandelion = Agent(GSM, name, type, perception, speed, size, hunger, places=None) #TODO: fix this useless mess above ^
+    dandelion = Agent(GSM, name, type, perception, speed, size, hunger, places=None) #fixme: fix this useless mess above ^
     GSM.Dandelion_list.append(dandelion)
     return dandelion
 def SpawnAppletree(GSM, name="Appletree_1", type="Plant", perception=0, speed=0, size="Large", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
@@ -410,6 +465,6 @@ def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size=
     GSM.Wolf_list.append(wolf)
     return wolf
 def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25, places=None):
-    fox = Agent(GSM, name, type, perception, speed, size, hunger)
+    fox = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Fox_list.append(fox)
     return fox

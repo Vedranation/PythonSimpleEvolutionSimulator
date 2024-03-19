@@ -1,46 +1,47 @@
 
 class GlobalsManager:
-    World_size = 10     #how big (box) do you want the world to be1
+    World_size = 20     #how big (box) do you want the world to be1
     Simulation_Length = 600     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
 
-    #TODO: add Num_berrybush = [30];
-
-    #TODO: add Num_goat = [30];
-    #TODO: add stone or impassable terrain
-    #TODO: make animals babies spawn near parents
+    #TODO: add stone or water or impassable terrain
+    #TODO: add world editor
     #TODO: make predators able to see fleeing prey
-    Num_dandelion = [30];
-    Num_berrybush = [10];
-    Num_appletree = [30];
-    Num_rabbit = [0];
-    Num_goat = [0];
-    Num_cow = [1];
-    Num_fox = [0];
-    Num_wolf = [0];
-    Num_tiger = [0];
+    #TODO: create loadable settings presets
+    #TODO: Make animals able to pass thru flowers: Rabbits get stuck easily
+    Num_dandelion = [10];
+    Num_berrybush = [5];
+    Num_appletree = [2];
+    Num_rabbit = [10];
+    Num_goat = [5];
+    Num_cow = [2];
+    Num_fox = [10];
+    Num_wolf = [5];
+    Num_tiger = [2];
 
 
-    Max_flowers = 30       #how many flowers can be
+    Max_flowers = 100       #how many flowers can be
     Dandelion_growth_per_turn = 10     #how many Dandelions spawn per turn
-    Berrybush_growth_per_turn = 7
-    Appletree_growth_per_turn = 4
+    Berrybush_growth_per_turn = 5
+    Appletree_growth_per_turn = 2
+    Flower_spawn_cube = 6  # Cube, including diagonal, how far flowers spawn from each other, (2, 6, None) None disables this
+    Minimum_flower_number_for_cube_spawn = 4        #Minimum amount of unique flowers for that plant to spawn in clusters
     Maximum_hunger = 50     #maximum hunger a creature can have in its belly
     Reproduce_age = 5   #minimum age before can breed
     Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
     Base_reproduce_chance = 0.75     #maximum reproduce chance (at max hunger)
     DeathAge = 50       #at how old do animals 100% die (sigmoid)
-    World_size_spawn_tolerance = 1.05      #tolerance to world size to prevent overpopulation
-    Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
-    Predator_bigger_prey_fight_chance = 0.5     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
-    Predator_bigger_prey_win_chance = 0.4       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
-    Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
+    Predator_bigger_prey_fight_chance = 0.4     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
+    Predator_bigger_prey_win_chance = 0.25       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
+    Well_fed_buff = 0.3        #at maximum hunger, preys base chance for victory is multiplied by this much
     Animal_breed_cooldown = 2
     Animal_spawn_cube = 1       #Cube, including diagonal, how far can animal breed spawn (1 or 2)
 
-    Window_width = 800
-    Window_height = 800
+
+
+    Window_width = 900
+    Window_height = 900
 
     Console_log_start_position = False
     Console_log_check_for_food = False
@@ -79,6 +80,9 @@ class GlobalsManager:
 
     'Variables for the program to define and operate on'
     World_agent_list_x_y = []
+
+    World_size_spawn_tolerance = 1.05      #tolerance to world size to prevent overpopulation
+    Personal_animal_limit = pow(World_size, 2) * 0.7       #how much % of the world can a single population have before its forbidden from spawning
 
     Cows_list = []  # initialise lists to store agents
     Rabbits_list = []

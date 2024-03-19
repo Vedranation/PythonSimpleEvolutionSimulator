@@ -107,24 +107,24 @@ for i in range(GSM.Simulation_Length):
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
         cows.SearchForFood()
-        cows.Reproduce(GSM)
+        cows.Reproduce()
         cows.Starvation_Age_Battle_Death()
     print("")
     for rabbits in GSM.Rabbits_list[:]:
         rabbits.SearchForFood()
-        rabbits.Reproduce(GSM)
+        rabbits.Reproduce()
         rabbits.Starvation_Age_Battle_Death()
     print("")
     for goats in GSM.Goats_list[:]:
         goats.SearchForFood()
-        goats.Reproduce(GSM)
+        goats.Reproduce()
         goats.Starvation_Age_Battle_Death()
     print("")
     for foxes in GSM.Fox_list[:]:
         DiedInBattle = False
         foxes.SearchForFood()
         if DiedInBattle == False:
-            foxes.Reproduce(GSM)
+            foxes.Reproduce()
             foxes.Starvation_Age_Battle_Death()
         else:
             foxes.Starvation_Age_Battle_Death(DiedInBattle=True)
@@ -133,7 +133,7 @@ for i in range(GSM.Simulation_Length):
         DiedInBattle = False
         tigers.SearchForFood()
         if DiedInBattle == False:
-            tigers.Reproduce(GSM)
+            tigers.Reproduce()
             tigers.Starvation_Age_Battle_Death()
         else:
             tigers.Starvation_Age_Battle_Death(DiedInBattle=True)
@@ -141,7 +141,7 @@ for i in range(GSM.Simulation_Length):
     for wolves in GSM.Wolf_list[:]:
         wolves.SearchForFood()
         if DiedInBattle == False:
-            wolves.Reproduce(GSM)
+            wolves.Reproduce()
             wolves.Starvation_Age_Battle_Death()
         else:
             wolves.Starvation_Age_Battle_Death(DiedInBattle=True)

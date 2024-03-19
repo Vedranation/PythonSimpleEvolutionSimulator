@@ -196,39 +196,40 @@ def VisualiseSimulationDraw(GSM, turnN):
                 #TODO: Add zoom in, and pan around
                 #TODO: Make it clickable on specific agent to see its stats and track it
                 #TODO: Add a "walking" transition animation so its easier to tell where animal moves (especially for higher speed animals)
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Tiger_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
+
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Tiger_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
                 scaled_tiger = pygame.transform.scale(GSM.Tiger_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_tiger, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Rabbit":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Rabbit_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Rabbit_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_rabbit = pygame.transform.scale(GSM.Rabbit_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_rabbit, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Goat":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Goat_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Goat_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_goat = pygame.transform.scale(GSM.Goat_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_goat, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Wolf":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Wolf_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Wolf_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_wolf = pygame.transform.scale(GSM.Wolf_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_wolf, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Fox":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Fox_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Fox_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_fox = pygame.transform.scale(GSM.Fox_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_fox, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Dandelion":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Dandelion_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Dandelion_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_dandelion = pygame.transform.scale(GSM.Dandelion_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_dandelion, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Cow":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Cow_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Cow_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_cow = pygame.transform.scale(GSM.Cow_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_cow, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Berrybush":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Berrybush_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Berrybush_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_berrybush = pygame.transform.scale(GSM.Berrybush_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_berrybush, ((cell_position_x + GSM.Distancebtwrow * GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow * GSM.Animal_drawing_offset)))
             elif animalname == "Appletree":
-                #pygame.draw.rect(GSM.Visualise_window, GSM.Appletree_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
+                # pygame.draw.rect(GSM.Visualise_window, GSM.Appletree_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9)))
                 scaled_appletree = pygame.transform.scale(GSM.Appletree_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))
                 GSM.Visualise_window.blit(scaled_appletree, ((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset)))
 
