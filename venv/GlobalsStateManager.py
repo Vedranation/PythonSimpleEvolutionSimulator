@@ -1,6 +1,6 @@
 
 class GlobalsManager:
-    World_size = 20     #how big (box) do you want the world to be1
+    World_size = 10     #how big (box) do you want the world to be1
     Simulation_Length = 600     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
@@ -11,18 +11,18 @@ class GlobalsManager:
     #TODO: add stone or impassable terrain
     #TODO: make animals babies spawn near parents
     #TODO: make predators able to see fleeing prey
-    Num_dandelion = [50];
-    Num_berrybush = [20];
+    Num_dandelion = [30];
+    Num_berrybush = [10];
     Num_appletree = [30];
-    Num_rabbit = [60];
-    Num_goat = [15];
-    Num_cow = [20];
-    Num_fox = [10];
-    Num_wolf = [10];
-    Num_tiger = [10];
+    Num_rabbit = [0];
+    Num_goat = [0];
+    Num_cow = [1];
+    Num_fox = [0];
+    Num_wolf = [0];
+    Num_tiger = [0];
 
 
-    Max_flowers = 100       #how many flowers can be
+    Max_flowers = 30       #how many flowers can be
     Dandelion_growth_per_turn = 10     #how many Dandelions spawn per turn
     Berrybush_growth_per_turn = 7
     Appletree_growth_per_turn = 4
@@ -37,6 +37,7 @@ class GlobalsManager:
     Predator_bigger_prey_win_chance = 0.4       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
     Well_fed_buff = 0.2        #at maximum hunger, preys base chance for victory is multiplied by this much
     Animal_breed_cooldown = 2
+    Animal_spawn_cube = 1       #Cube, including diagonal, how far can animal breed spawn (1 or 2)
 
     Window_width = 800
     Window_height = 800
@@ -60,7 +61,7 @@ class GlobalsManager:
     Visualise_hunger_toggle = True
     Visualise_simulation_toggle = True
 
-    Sim_delay = 0.25    #delay in seconds between each turn
+    Sim_delay = 0.5    #delay in seconds between each turn
 
     Grid_color = (0, 0, 0)
     Fill_color = (0, 200, 0)

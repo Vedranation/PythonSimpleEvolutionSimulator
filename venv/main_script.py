@@ -107,24 +107,24 @@ for i in range(GSM.Simulation_Length):
                                 #This is because if animal is killed, list index will shift without updating current loop index, and make next
                                 #animal be skipped from processing, causing bunch of bugs
         cows.SearchForFood()
-        cows.Reproduce()
+        cows.Reproduce(GSM)
         cows.Starvation_Age_Battle_Death()
     print("")
     for rabbits in GSM.Rabbits_list[:]:
         rabbits.SearchForFood()
-        rabbits.Reproduce()
+        rabbits.Reproduce(GSM)
         rabbits.Starvation_Age_Battle_Death()
     print("")
     for goats in GSM.Goats_list[:]:
         goats.SearchForFood()
-        goats.Reproduce()
+        goats.Reproduce(GSM)
         goats.Starvation_Age_Battle_Death()
     print("")
     for foxes in GSM.Fox_list[:]:
         DiedInBattle = False
         foxes.SearchForFood()
         if DiedInBattle == False:
-            foxes.Reproduce()
+            foxes.Reproduce(GSM)
             foxes.Starvation_Age_Battle_Death()
         else:
             foxes.Starvation_Age_Battle_Death(DiedInBattle=True)
@@ -133,7 +133,7 @@ for i in range(GSM.Simulation_Length):
         DiedInBattle = False
         tigers.SearchForFood()
         if DiedInBattle == False:
-            tigers.Reproduce()
+            tigers.Reproduce(GSM)
             tigers.Starvation_Age_Battle_Death()
         else:
             tigers.Starvation_Age_Battle_Death(DiedInBattle=True)
@@ -141,7 +141,7 @@ for i in range(GSM.Simulation_Length):
     for wolves in GSM.Wolf_list[:]:
         wolves.SearchForFood()
         if DiedInBattle == False:
-            wolves.Reproduce()
+            wolves.Reproduce(GSM)
             wolves.Starvation_Age_Battle_Death()
         else:
             wolves.Starvation_Age_Battle_Death(DiedInBattle=True)
@@ -192,7 +192,7 @@ print("\n\n----------SIMULATION END----------")
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush[0]} Berry bushes, {GSM.Num_appletree[0]} Apple trees,"
       f" {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_goat[0]} Goats, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
 print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_berrybush[-1]} Berry bushes, "
-      f"{GSM.Num_appletree[-1]} Apple trees, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_goat[-1]} Goats, {GSM.Num_cow[-1]} Cows, {GSM.Num_fox[0]} Foxes, "
+      f"{GSM.Num_appletree[-1]} Apple trees, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_goat[-1]} Goats, {GSM.Num_cow[-1]} Cows, {GSM.Num_fox[-1]} Foxes, "
       f"{GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
 
 VisualiseScript.VisualisePopulation(GSM)

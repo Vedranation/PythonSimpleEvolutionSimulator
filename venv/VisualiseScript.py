@@ -145,7 +145,7 @@ def EventHandler(GSM):
     'this is called separately from VisualiseSimulationDraw so that variable can be returned to main loop'
     for event in pygame.event.get():
         if event.type == pygame.QUIT: # kill program once X is pressed
-            VisualiseSimulationQuit() #FIXME: Make X button not lag if used on high speeds
+            VisualiseSimulationQuit()
 
         elif event.type == pygame.KEYDOWN: # Checks keyboard presses
             if event.key == pygame.K_LEFT:

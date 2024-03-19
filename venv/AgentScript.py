@@ -4,7 +4,7 @@ import re
 import ConsoleLog
 
 class Agent:
-    def __init__(self, GSM, name, type, perception, speed, size, hunger):
+    def __init__(self, GSM, name, type, perception, speed, size, hunger, places):
 
         #Register what type of agent is bring created
         if type == "Plant":
@@ -36,17 +36,21 @@ class Agent:
             else:
                 raise Exception("Not supported agent size")
 
-        self.FindFreeSpot()  # find a free spot to spawn
+        self.FindFreeSpot(places)  # find a free spot to spawn
 
-    def FindFreeSpot(self):
-
-        self.x = random.randint(0, self.GSM.World_size-1)
-        self.y = random.randint(0, self.GSM.World_size-1)
-
-        #Loop until a free spot is found
-        while self.GSM.World_agent_list_x_y[self.x][self.y] != None:
+    def FindFreeSpot(self, places):
+        if places is None:      #Random spawn
             self.x = random.randint(0, self.GSM.World_size-1)
             self.y = random.randint(0, self.GSM.World_size-1)
+            # FIXME: infinite spawning is computationally inefficient: Better would be getting list of all free spots, then shuffling that
+            #Loop until a free spot is found
+            while self.GSM.World_agent_list_x_y[self.x][self.y] != None:
+                self.x = random.randint(0, self.GSM.World_size-1)
+                self.y = random.randint(0, self.GSM.World_size-1)
+        else:       #baby spawn
+            place = random.choice(places)
+            self.x = place[0]
+            self.y = place[1]
         self.GSM.World_agent_list_x_y[self.x][self.y] = self
 
     @staticmethod
@@ -139,7 +143,6 @@ class Agent:
             for direction in directions_x_y:
                 if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or self.GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
-                random.choice(directions_x_y)
                 ConsoleLog.RandomMove(self, direction[0], direction[1], self.GSM.Console_log_random_move)
 
                 self.GSM.World_agent_list_x_y[self.x][self.y] = None
@@ -270,7 +273,7 @@ class Agent:
                 self.RemoveAgent(self.GSM, self)  # die of old age
             return
 
-    def Reproduce(self): #Is called directly, Handles reproducing and aging
+    def Reproduce(self, GSM): #Is called directly, Handles reproducing and aging
 
         if self.age > self.GSM.Reproduce_age:
             if self.breedcooldown > 0:      #Introduces a breeding cooldown
@@ -294,52 +297,78 @@ class Agent:
                                    + len(self.GSM.Berrybush_list) + len(self.GSM.Goats_list) #need to update this when adding more animals
 
                 if pow(self.GSM.World_size, 2) < (round(UpdatedAnimalSum * self.GSM.World_size_spawn_tolerance, 1)):
-
                     ConsoleLog.WorldTooSmallTooBreed(self.GSM.Console_log_worldtoosmalltobreed)
                     return
 
-                elif "Tiger" in self.name:
+                if GSM.Animal_spawn_cube == 1:  #Check if the radius around the agent is free
+                    #TODO: I basically created perception 2 and perception 4/5 vision
+                    free_breed_locations_x_y = []
+                    for i in range(3):
+                        breed_location_x = self.x + i - 1
+                        for j in range(3):
+                            breed_location_y = self.y + j - 1
+                            free_breed_locations_x_y.append([breed_location_x, breed_location_y])
+                elif GSM.Animal_spawn_cube == 2:
+                    free_breed_locations_x_y = []
+                    for i in range(5):
+                        breed_location_x = self.x + i - 2
+                        for j in range(5):
+                            breed_location_y = self.y + j - 2
+                            free_breed_locations_x_y.append([breed_location_x, breed_location_y])
+                else:
+                    raise Exception("The animal breed cube size is invalid, must be 1 (for 3x3) or 2 (for 5x5)")
+                free_breed_locations_x_y.remove([self.x, self.y])  # remove own position
+                for i in free_breed_locations_x_y[:]:
+                    if i[0] < 0 or i[0] >= GSM.World_size or i[1] < 0 or i[1] >= GSM.World_size:
+                        free_breed_locations_x_y.remove(i)      #remove out of bounds positions
+                    elif self.GSM.World_agent_list_x_y[i[0]][i[1]] != None:  # check cube radius for free spot
+                        free_breed_locations_x_y.remove(i)
+                if len(free_breed_locations_x_y) == 0:  #no space found
+                    return
+                random.shuffle(free_breed_locations_x_y)
+
+                if "Tiger" in self.name:
                     if len(self.GSM.Tigers_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Tiger", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnTiger(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                    newborn = SpawnTiger(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 elif "Cow" in self.name:
                     if len(self.GSM.Cows_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Cow", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
-                    newborn = SpawnCow(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                    newborn = SpawnCow(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 elif "Rabbit" in self.name:
                     if len(self.GSM.Rabbits_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Rabbit", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Rabbit_" + str(babyname+1)
-                    newborn = SpawnRabbit(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                    newborn = SpawnRabbit(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 elif "Goat" in self.name:
                     if len(self.GSM.Goats_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Goat", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Goat_" + str(babyname+1)
-                    newborn = SpawnGoat(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                    newborn = SpawnGoat(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 elif "Wolf" in self.name:
                     if len(self.GSM.Wolf_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Wolf", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Wolf_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnWolf(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                    newborn = SpawnWolf(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 elif "Fox" in self.name:
                     if len(self.GSM.Fox_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Fox", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Fox_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnFox(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger)
+                    newborn = SpawnFox(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 ConsoleLog.Born(newborn, self.GSM.Console_log_born)
 
 
@@ -349,38 +378,38 @@ class Agent:
 
 #Function to spawn agents
 def SpawnDandelion(GSM, name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    dandelion = Agent(GSM, name, type, perception, speed, size, hunger)
+    dandelion = Agent(GSM, name, type, perception, speed, size, hunger, places=None) #TODO: fix this useless mess above ^
     GSM.Dandelion_list.append(dandelion)
     return dandelion
 def SpawnAppletree(GSM, name="Appletree_1", type="Plant", perception=0, speed=0, size="Large", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    appletree = Agent(GSM, name, type, perception, speed, size, hunger)
+    appletree = Agent(GSM, name, type, perception, speed, size, hunger, places=None)
     GSM.Appletree_list.append(appletree)
     return appletree
 def SpawnBerrybush(GSM, name="Berrybush_1", type="Plant", perception=0, speed=0, size="Medium", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    berrybush = Agent(GSM, name, type, perception, speed, size, hunger)
+    berrybush = Agent(GSM, name, type, perception, speed, size, hunger, places=None)
     GSM.Berrybush_list.append(berrybush)
     return berrybush
-def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25):
-    cow = Agent(GSM, name, type, perception, speed, size, hunger)
+def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25, places=None):
+    cow = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Cows_list.append(cow)
     return cow
-def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25):
-    rabbit = Agent(GSM, name, type, perception, speed, size, hunger)
+def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25, places=None):
+    rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Rabbits_list.append(rabbit)
     return rabbit
-def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=1, speed=1, size="Medium", hunger=25):
-    goat = Agent(GSM, name, type, perception, speed, size, hunger)
+def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=1, speed=1, size="Medium", hunger=25, places=None):
+    goat = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Goats_list.append(goat)
     return goat
-def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25):
-    tiger = Agent(GSM, name, type, perception, speed, size, hunger)
+def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25, places=None):
+    tiger = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Tigers_list.append(tiger)
     return tiger
-def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25):
-    wolf = Agent(GSM, name, type, perception, speed, size, hunger)
+def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25, places=None):
+    wolf = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Wolf_list.append(wolf)
     return wolf
-def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25):
+def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25, places=None):
     fox = Agent(GSM, name, type, perception, speed, size, hunger)
     GSM.Fox_list.append(fox)
     return fox
