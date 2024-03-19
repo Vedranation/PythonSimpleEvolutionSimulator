@@ -5,7 +5,7 @@ import ConsoleLog
 import Genes
 
 class Agent:
-    def __init__(self, GSM, name, type, perception, speed, size, hunger, places):
+    def __init__(self, GSM, name, type, perception, speed, size, hunger, places, preferred_food):
 
         #Register what type of agent is bring created
         if type == "Plant":
@@ -26,6 +26,7 @@ class Agent:
         self.size = size
         self.age = 1
         self.breedcooldown = 0
+        self.preferred_food = preferred_food
 
         if self.type != "Plant":
             if self.size == "Small": #gives babies 1 turn worth of food - can cause numeric instability
@@ -37,7 +38,7 @@ class Agent:
             else:
                 raise Exception("Not supported agent size")
         if places is not None and self.type != "Plant": #prevents parents or plants from mutating
-            Genes.Mutation(self, GSM)
+            Genes.Mutation(self)
 
         if self.type == "Plant":
             places = self.PlantCubeSpawnRadius()
@@ -83,79 +84,115 @@ class Agent:
         elif "Fox" in agent.name:
             GSM.Fox_list.remove(agent)
 
+    def PathFinding(self, scan_memory):
+        #Run away from predator if nearest
+        #Go toward preferred food if nearer than predator
+        #Go toward other food if no preferred food in range
+        pred_distance = 69
+        pref_distance = 69
+        other_distance = 69
+
+        if "nearest_predator" in scan_memory:
+            pred_distance = [self.x - scan_memory["nearest_predator"][0], self.y - scan_memory["nearest_predator"][1]]
+            pred_distance = abs(pred_distance[0]) + abs(pred_distance[1])
+        if "nearest_preferred_food" in scan_memory:
+            pref_distance = [self.x - scan_memory["nearest_preferred_food"][0], self.y - scan_memory["nearest_preferred_food"][1]]
+            pref_distance = abs(pref_distance[0]) + abs(pref_distance[1])
+        if "nearest_other_food" in scan_memory:
+            other_distance = [self.x - scan_memory["nearest_other_food"][0], self.y - scan_memory["nearest_other_food"][1]]
+        if pred_distance <= pref_distance and "nearest_predator" in scan_memory:
+            #run away
+            pred_distance = [self.x - scan_memory["nearest_predator"][0], self.y - scan_memory["nearest_predator"][1]]
+            self.SmartMove(pred_distance)
+        elif "nearest_preferred_food" in scan_memory:
+            #go to fav food
+            pref_distance = [self.x - scan_memory["nearest_preferred_food"][0], self.y - scan_memory["nearest_preferred_food"][1]]
+            pref_distance[0] = -pref_distance[0]
+            pref_distance[1] = -pref_distance[1]
+            self.SmartMove(pref_distance)
+        elif "nearest_other_food" in scan_memory:
+            #better than nothing
+            other_distance[0] = -other_distance[0]
+            other_distance[1] = -other_distance[1]
+            self.SmartMove(other_distance)
+    def SmartMove(self, target):
+        print(target)
+        if
+        directions_x_y = []
+        directions_x_y.append([self.x + 1, self.y])  # right
+        directions_x_y.append([self.x - 1, self.y])  # left
+        directions_x_y.append([self.x, self.y + 1])  # up
+        directions_x_y.append([self.x, self.y - 1])  # down
+        random.shuffle(directions_x_y)
+        for direction in directions_x_y:
+            if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or self.GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
+                continue # prevents moving beyond edge of world or into another Agent and fucking things up
+            ConsoleLog.RandomMove(self, direction[0], direction[1], self.GSM.Console_log_random_move)
 
 
     def SearchForFood(self): #Is called directly, handles Food, movement and roam
+        for i in range(self.speed):
+            scan_memory = Genes.PerceptionCheck(self)
+            print(scan_memory)
+            if not bool(scan_memory):
+                #Found nothing of interest, go random
+                self.RandomMove()
+                continue
+            else:
+                self.PathFinding(scan_memory)
+            if self.food == "Plant": #herbivore eat
+                Agent = self.GSM.World_agent_list_x_y[direction[0]][direction[1]]
+                self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
+                            direction)  # track hunger levels, pass food that was eaten
+                Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
 
-        directions_x_y = []
-        if self.perception >= 1: #lowest perception, only sees up down left right
-            directions_x_y.append([self.x + 1, self.y])  # right
-            directions_x_y.append([self.x - 1, self.y])  # left
-            directions_x_y.append([self.x, self.y + 1])  # up
-            directions_x_y.append([self.x, self.y - 1])  # down
-            random.shuffle(directions_x_y) #randomise choice selection
-
-            for direction in directions_x_y:
-                if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0: #prevents checking beyond edge of world
-                    continue
-
-                if self.GSM.World_agent_list_x_y[direction[0]][direction[1]] == None:
-                    ConsoleLog.CheckForFood(self, direction[0], direction[1], True, self.GSM.World_agent_list_x_y, self.GSM.Console_log_check_for_food)
-                    continue
-                else:
-                    ConsoleLog.CheckForFood(self, direction[0], direction[1], False, self.GSM.World_agent_list_x_y, self.GSM.Console_log_check_for_food)
-
-                #if we found food, eat it and go there:
-                if self.GSM.World_agent_list_x_y[direction[0]][direction[1]].type == self.food:
-                    if self.food == "Plant": #herbivore eat
-                        if self.HerbivoreNoEatBig(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:
-                            self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
-                                        direction)  # track hunger levels, pass food that was eaten
-                            Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
-
-                            # update new position
-                            self.GSM.World_agent_list_x_y[self.x][self.y] = None
-                            self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
-                            self.x = direction[0]
-                            self.y = direction[1]
-                            return  # end the search
-                        else:
-                            continue #small herbivores don't eat bigger size food
-
-                    if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:   #carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
-
-                        if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:    #predator won and ate the meal
-
-                            self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
-                            Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
-
-                            #update new position
-                            self.GSM.World_agent_list_x_y[self.x][self.y] = None
-                            self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
-                            self.x = direction[0]
-                            self.y = direction[1]
-
-                            return #end the search
-                        else:   #predator lost and died
-                            global DiedInBattle
-                            DiedInBattle = True #pass this to main loop
-                            return
-                    else:
-                        continue #prey not worth the risk, keep searching
-        self.RandomMove(directions_x_y)
-    def RandomMove(self, directions_x_y):
-        if self.speed == 3: #simplest case, just move and end turn
-            for direction in directions_x_y:
-                if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or self.GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
-                    continue # prevents moving beyond edge of world or into another Agent and fucking things up
-                ConsoleLog.RandomMove(self, direction[0], direction[1], self.GSM.Console_log_random_move)
-
+                # update new position
                 self.GSM.World_agent_list_x_y[self.x][self.y] = None
                 self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
                 self.x = direction[0]
                 self.y = direction[1]
-                self.Hunger(False) #track hunger levels, didnt eat
-                return
+                return  # end the search
+
+            if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:   #carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
+
+                if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:    #predator won and ate the meal
+
+                    self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
+                    Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
+
+                    #update new position
+                    self.GSM.World_agent_list_x_y[self.x][self.y] = None
+                    self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
+                    self.x = direction[0]
+                    self.y = direction[1]
+
+                    return #end the search
+                else:   #predator lost and died
+                    global DiedInBattle
+                    DiedInBattle = True #pass this to main loop
+                    return
+            else:
+                continue #prey not worth the risk, keep searching
+
+    def RandomMove(self):
+        directions_x_y = []
+        directions_x_y.append([self.x + 1, self.y])  # right
+        directions_x_y.append([self.x - 1, self.y])  # left
+        directions_x_y.append([self.x, self.y + 1])  # up
+        directions_x_y.append([self.x, self.y - 1])  # down
+        random.shuffle(directions_x_y)
+        for direction in directions_x_y:
+            if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or self.GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
+                continue # prevents moving beyond edge of world or into another Agent and fucking things up
+            ConsoleLog.RandomMove(self, direction[0], direction[1], self.GSM.Console_log_random_move)
+
+            self.GSM.World_agent_list_x_y[self.x][self.y] = None
+            self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
+            self.x = direction[0]
+            self.y = direction[1]
+            #fixme: remove hunger track from RandomMove so high speed dont burn 3x calories
+            self.Hunger(False) #track hunger levels, didnt eat
+            return
     def HerbivoreNoEatBig(self, plant_agent):
         'simple function to ensure all herbivores only eat food same size or smaller'
         if self.size == "Large":
@@ -390,80 +427,80 @@ class Agent:
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Tiger_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnTiger(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
+                    newborn = SpawnTiger(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y, preferred_food=self.preferred_food)
                 elif "Cow" in self.name:
                     if len(self.GSM.Cows_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Cow", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Cow_" + str(babyname+1)
-                    newborn = SpawnCow(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
+                    newborn = SpawnCow(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y, preferred_food=self.preferred_food)
                 elif "Rabbit" in self.name:
                     if len(self.GSM.Rabbits_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Rabbit", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Rabbit_" + str(babyname+1)
-                    newborn = SpawnRabbit(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
+                    newborn = SpawnRabbit(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y, preferred_food=self.preferred_food)
                 elif "Goat" in self.name:
                     if len(self.GSM.Goats_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Goat", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1))
                     babyname = "Goat_" + str(babyname+1)
-                    newborn = SpawnGoat(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
+                    newborn = SpawnGoat(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y, preferred_food=self.preferred_food)
                 elif "Wolf" in self.name:
                     if len(self.GSM.Wolf_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Wolf", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Wolf_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnWolf(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
+                    newborn = SpawnWolf(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y, preferred_food=self.preferred_food)
                 elif "Fox" in self.name:
                     if len(self.GSM.Fox_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Fox", self.GSM.Console_log_personalpopulationlimit)
                         return
                     babyname = int(re.search(r"(\d+)$", self.name).group(1)) #use regular expression to extract the generation of parent
                     babyname = "Fox_" + str(babyname+1) #make name with new generation number
-                    newborn = SpawnFox(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
+                    newborn = SpawnFox(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y, preferred_food=self.preferred_food)
                 ConsoleLog.Born(newborn, self.GSM.Console_log_born)
 
 
 
 #Function to spawn agents
 def SpawnDandelion(GSM, name="Dandelion_1", type="Plant", perception=0, speed=0, size="Small", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    dandelion = Agent(GSM, name, type, perception, speed, size, hunger, places=None) #fixme: fix this useless mess above ^
+    dandelion = Agent(GSM, name, type, perception, speed, size, hunger, places=None, preferred_food=None) #fixme: fix this useless mess above ^
     GSM.Dandelion_list.append(dandelion)
     return dandelion
 def SpawnAppletree(GSM, name="Appletree_1", type="Plant", perception=0, speed=0, size="Large", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    appletree = Agent(GSM, name, type, perception, speed, size, hunger, places=None)
+    appletree = Agent(GSM, name, type, perception, speed, size, hunger, places=None, preferred_food=None)
     GSM.Appletree_list.append(appletree)
     return appletree
 def SpawnBerrybush(GSM, name="Berrybush_1", type="Plant", perception=0, speed=0, size="Medium", hunger=20): # input default name, type, perception, speed, size, and starting hunger, unless overwritten by parent
-    berrybush = Agent(GSM, name, type, perception, speed, size, hunger, places=None)
+    berrybush = Agent(GSM, name, type, perception, speed, size, hunger, places=None, preferred_food=None)
     GSM.Berrybush_list.append(berrybush)
     return berrybush
-def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25, places=None):
-    cow = Agent(GSM, name, type, perception, speed, size, hunger, places)
+def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25, places=None, preferred_food="Large"):
+    cow = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Cows_list.append(cow)
     return cow
-def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=3, speed=3, size="Small", hunger=25, places=None):
-    rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places)
+def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=3, speed=3, size="Small", hunger=25, places=None, preferred_food="Small"):
+    rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Rabbits_list.append(rabbit)
     return rabbit
-def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=1, speed=1, size="Medium", hunger=25, places=None):
-    goat = Agent(GSM, name, type, perception, speed, size, hunger, places)
+def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=3, speed=1, size="Medium", hunger=25, places=None, preferred_food="Medium"):
+    goat = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Goats_list.append(goat)
     return goat
-def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25, places=None):
-    tiger = Agent(GSM, name, type, perception, speed, size, hunger, places)
+def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25, places=None, preferred_food="Large"):
+    tiger = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Tigers_list.append(tiger)
     return tiger
-def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25, places=None):
-    wolf = Agent(GSM, name, type, perception, speed, size, hunger, places)
+def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25, places=None, preferred_food="Medium"):
+    wolf = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Wolf_list.append(wolf)
     return wolf
-def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25, places=None):
-    fox = Agent(GSM, name, type, perception, speed, size, hunger, places)
+def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25, places=None, preferred_food="Small"):
+    fox = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Fox_list.append(fox)
     return fox

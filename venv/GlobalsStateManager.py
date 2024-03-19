@@ -11,20 +11,20 @@ class GlobalsManager:
     #TODO: create loadable settings presets
     #TODO: Make animals able to pass thru flowers: Rabbits get stuck easily
     #TODO: Add individual flower limit
-    Num_dandelion = [0];
-    Num_berrybush = [0];
+    Num_dandelion = [5];
+    Num_berrybush = [5];
     Num_appletree = [0];
-    Num_rabbit    = [1];
-    Num_goat      = [0];
+    Num_rabbit    = [0];
+    Num_goat      = [1];
     Num_cow       = [0];
     Num_fox       = [0];
-    Num_wolf      = [0];
+    Num_wolf      = [10];
     Num_tiger     = [0];
 
 
     Max_flowers               = 10       #how many flowers can be
     Dandelion_growth_per_turn = 2     #how many Dandelions spawn per turn
-    Berrybush_growth_per_turn = 0
+    Berrybush_growth_per_turn = 2
     Appletree_growth_per_turn = 0
     # Num_dandelion = [25];
     # Num_berrybush = [25];
