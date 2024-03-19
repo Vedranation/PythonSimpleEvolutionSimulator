@@ -63,7 +63,7 @@ class GlobalsManager:
 
     Console_log_start_position = False
     Console_log_mutated = True
-    Console_log_check_for_food = False
+    Console_log_check_for_food = True
     Console_log_found_food = False
     Console_log_was_eaten = False
     Console_log_death_starvation = False
