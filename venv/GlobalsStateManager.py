@@ -97,6 +97,7 @@ class GlobalsManager:
     Fox_hunger = []
 
     Is_paused = False
+    Last_update_time = 0
     SumAllAgents = 0
     Gridsize = 0
     Visualise_window = 0

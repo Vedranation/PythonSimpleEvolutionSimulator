@@ -1,4 +1,3 @@
-
 import time
 import ConsoleLog
 import VisualiseScript
@@ -18,7 +17,7 @@ GSM = GlobalsStateManager.GlobalsManager #Encapsulate all globals
 
 if GSM.Visualise_simulation_toggle == True:
     VisualiseScript.VisualiseSimulationInit(GSM)
-
+    GSM.Last_update_time = time.time()
 
 DiedInBattle = False
 #Check if world is big enough for all agents
@@ -166,14 +165,25 @@ for i in range(GSM.Simulation_Length):
     GSM.Fox_hunger.append(CalculateAverageHunger(GSM.Fox_list))
 
     if GSM.Visualise_simulation_toggle:
-        while GSM.Is_paused:
-            GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
+        while True:
+            #loop to trap the program
+            current_time = time.time()
+            elapsed_time = current_time - GSM.Last_update_time
+            VisualiseScript.EventHandler(GSM)
+            if GSM.Visualise_simulation_toggle == False:
+                break
+            if GSM.Is_paused:
+                time.sleep(0.05) #to prevent it eating 25% CPU
+                VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+                continue
+            if elapsed_time >= GSM.Sim_delay:
+                GSM.Last_update_time = current_time
+                VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+                break
             VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
-            time.sleep(0.05) #to prevent it eating 25% CPU
-            continue
-        GSM.Sim_delay = VisualiseScript.EventHandler(GSM)
-        VisualiseScript.VisualiseSimulationDraw(GSM, i) #draw the display window
-        time.sleep(GSM.Sim_delay)
+            if GSM.Sim_delay > 0.05:
+                time.sleep(0.01) #to prevent it eating 25% CPU
+
 
 
 
@@ -181,7 +191,7 @@ for i in range(GSM.Simulation_Length):
 print("\n\n----------SIMULATION END----------")
 print(f"World started with {GSM.Num_dandelion[0]} Dandelions, {GSM.Num_berrybush[0]} Berry bushes, {GSM.Num_appletree[0]} Apple trees,"
       f" {GSM.Num_rabbit[0]} Rabbits, {GSM.Num_goat[0]} Goats, {GSM.Num_cow[0]} Cows, {GSM.Num_fox[0]} Foxes, {GSM.Num_wolf[0]} Wolves, and {GSM.Num_tiger[0]} Tigers, Total: {(GSM.SumAllAgents[0])}")
-print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_berrybush} Berry bushes, "
+print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]} Dandelions, {GSM.Num_berrybush[-1]} Berry bushes, "
       f"{GSM.Num_appletree[-1]} Apple trees, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_goat[-1]} Goats, {GSM.Num_cow[-1]} Cows, {GSM.Num_fox[0]} Foxes, "
       f"{GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
 

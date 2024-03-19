@@ -5,6 +5,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame #2.5.2
 import re #2.2.1
 import sys
+import time
 
 def VisualisePopulation(GSM):
 
@@ -60,9 +61,11 @@ def VisualiseHunger(GSM):
 def VisualiseSimulationInit(GSM):
     'Initialises visualisation, and sets variables like font, color etc'
     pygame.init()
+    pygame.display.set_caption("Vedran's Animal Sim")
 
 
     GSM.Visualise_window = pygame.display.set_mode((GSM.Window_width, GSM.Window_height))
+    pygame.display.set_icon(pygame.image.load("AnimalSimImages/tiger.png").convert_alpha())
     GSM.Gridsize = round(min((GSM.Window_width, GSM.Window_height)) * 0.8) #use 80% of the smaller dimension
     GSM.Cell_positions = []  # Initialize list to hold cell positions
 
@@ -115,7 +118,7 @@ def DrawGrid(GSM, turnN):
     scaled_background = pygame.transform.scale(GSM.background_sprite, (GSM.Window_width, GSM.Window_height))
     GSM.Visualise_window.blit(scaled_background, (0, 0))
     DrawText(GSM, "Turn " + str(turnN), GSM.GUI_text_font, (0, 0, 0), 5, 5)
-    DrawText(GSM, "Speed: " + str(GSM.Sim_delay), GSM.GUI_text_font, (0, 0, 0), GSM.Window_width - 230, 5)
+    DrawText(GSM, "Delay: " + str(GSM.Sim_delay), GSM.GUI_text_font, (0, 0, 0), GSM.Window_width - 230, 5)
     for i in range(GSM.World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
         if i == 0 or i == GSM.World_size:
@@ -144,32 +147,34 @@ def EventHandler(GSM):
         if event.type == pygame.QUIT: # kill program once X is pressed
             VisualiseSimulationQuit() #FIXME: Make X button not lag if used on high speeds
 
-        elif event.type == pygame.KEYDOWN: # For switching sim speed
+        elif event.type == pygame.KEYDOWN: # Checks keyboard presses
             if event.key == pygame.K_LEFT:
                 if GSM.Sim_delay > 1:
-                    return GSM.Sim_delay - 0.5
+                    GSM.Sim_delay = GSM.Sim_delay - 0.5
                 elif GSM.Sim_delay == 0.25:
-                    return 0.12
+                    GSM.Sim_delay = 0.12
                 elif GSM.Sim_delay < 0.25 and GSM.Sim_delay != 0.03:
-                    return GSM.Sim_delay / 2
+                    GSM.Sim_delay = GSM.Sim_delay / 2
                 elif GSM.Sim_delay == 0.03:
-                    return 0
+                    GSM.Sim_delay = 0
                 else:
-                    return GSM.Sim_delay - 0.25
+                    GSM.Sim_delay = GSM.Sim_delay - 0.25
             elif event.key == pygame.K_RIGHT:
                 if GSM.Sim_delay >= 1:
-                    return GSM.Sim_delay + 0.5
+                    GSM.Sim_delay = GSM.Sim_delay + 0.5
                 elif GSM.Sim_delay == 0.12:
-                    return 0.25
+                    GSM.Sim_delay = 0.25
                 elif GSM.Sim_delay == 0:
                     GSM.Sim_delay = 0.03
                 elif GSM.Sim_delay < 0.12:
-                    return GSM.Sim_delay * 2
+                    GSM.Sim_delay = GSM.Sim_delay * 2
                 else:
-                    return GSM.Sim_delay + 0.25
+                    GSM.Sim_delay = GSM.Sim_delay + 0.25
             elif event.key == pygame.K_p:
                 GSM.Is_paused = not GSM.Is_paused
-    return GSM.Sim_delay #if no events are detected
+            elif event.key == pygame.K_ESCAPE:
+                GSM.Visualise_simulation_toggle = False
+                pygame.quit()
 def VisualiseSimulationDraw(GSM, turnN):
     'this is called every main loop iteration'
 
