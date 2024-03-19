@@ -1,6 +1,6 @@
 
 class GlobalsManager:
-    World_size = 20     #how big (box) do you want the world to be1
+    World_size = 10     #how big (box) do you want the world to be1
     Simulation_Length = 600     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
@@ -10,33 +10,51 @@ class GlobalsManager:
     #TODO: make predators able to see fleeing prey
     #TODO: create loadable settings presets
     #TODO: Make animals able to pass thru flowers: Rabbits get stuck easily
-    Num_dandelion = [10];
-    Num_berrybush = [5];
-    Num_appletree = [2];
-    Num_rabbit = [10];
-    Num_goat = [5];
-    Num_cow = [2];
-    Num_fox = [10];
-    Num_wolf = [5];
-    Num_tiger = [2];
+    #TODO: Add individual flower limit
+    Num_dandelion = [0];
+    Num_berrybush = [0];
+    Num_appletree = [0];
+    Num_rabbit    = [1];
+    Num_goat      = [0];
+    Num_cow       = [0];
+    Num_fox       = [0];
+    Num_wolf      = [0];
+    Num_tiger     = [0];
 
 
-    Max_flowers = 100       #how many flowers can be
-    Dandelion_growth_per_turn = 10     #how many Dandelions spawn per turn
-    Berrybush_growth_per_turn = 5
-    Appletree_growth_per_turn = 2
-    Flower_spawn_cube = 6  # Cube, including diagonal, how far flowers spawn from each other, (2, 6, None) None disables this
-    Minimum_flower_number_for_cube_spawn = 4        #Minimum amount of unique flowers for that plant to spawn in clusters
-    Maximum_hunger = 50     #maximum hunger a creature can have in its belly
-    Reproduce_age = 5   #minimum age before can breed
-    Max_hunger_to_reproduce = 40    #at which hunger value is highest chance to breed
-    Base_reproduce_chance = 0.75     #maximum reproduce chance (at max hunger)
-    DeathAge = 50       #at how old do animals 100% die (sigmoid)
-    Predator_bigger_prey_fight_chance = 0.4     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
-    Predator_bigger_prey_win_chance = 0.25       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
-    Well_fed_buff = 0.3        #at maximum hunger, preys base chance for victory is multiplied by this much
-    Animal_breed_cooldown = 2
-    Animal_spawn_cube = 1       #Cube, including diagonal, how far can animal breed spawn (1 or 2)
+    Max_flowers               = 10       #how many flowers can be
+    Dandelion_growth_per_turn = 2     #how many Dandelions spawn per turn
+    Berrybush_growth_per_turn = 0
+    Appletree_growth_per_turn = 0
+    # Num_dandelion = [25];
+    # Num_berrybush = [25];
+    # Num_appletree = [25];
+    # Num_rabbit    = [25];
+    # Num_goat      = [25];
+    # Num_cow       = [25];
+    # Num_fox       = [25];
+    # Num_wolf      = [25];
+    # Num_tiger     = [25];
+    #
+    #
+    # Max_flowers               = 250       #how many flowers can be
+    # Dandelion_growth_per_turn = 15     #how many Dandelions spawn per turn
+    # Berrybush_growth_per_turn = 15
+    # Appletree_growth_per_turn = 15
+    Flower_spawn_cube         = 6  # Cube, including diagonal, how far flowers spawn from each other, (2, 6, None) None disables this
+    Minimum_flower_number_for_cube_spawn = 6        #Minimum amount of unique flowers for that plant to spawn in clusters
+    Mutation_chance           = 0.9        #Chance for baby to change genes
+    Mutateable_genes          = ["perception", "speed"]  # which genes are permitted to mutate (empty list disables mutations)
+    Maximum_hunger            = 50     #maximum hunger a creature can have in its belly
+    Reproduce_age             = 5   #minimum age before can breed
+    Max_hunger_to_reproduce   = 40    #at which hunger value is highest chance to breed
+    Base_reproduce_chance     = 0.75     #maximum reproduce chance (at max hunger)
+    DeathAge                  = 50       #at how old do animals 100% die (sigmoid)
+    Predator_bigger_prey_fight_chance   = 0.4     #for prey 1 size larger, chance to fight it. This is 1/5 worth for 2 size larger
+    Predator_bigger_prey_win_chance     = 0.25       #for prey 1 size larger, chance for predator to kill it, else it dies. This is 1/5 worth for 2 size larger
+    Well_fed_buff             = 0.3        #at maximum hunger, preys base chance for victory is multiplied by this much
+    Animal_breed_cooldown     = 2
+    Animal_spawn_cube         = 1       #Cube, including diagonal, how far can animal breed spawn (1 or 2)
 
 
 
@@ -44,6 +62,7 @@ class GlobalsManager:
     Window_height = 900
 
     Console_log_start_position = False
+    Console_log_mutated = True
     Console_log_check_for_food = False
     Console_log_found_food = False
     Console_log_was_eaten = False
@@ -53,7 +72,7 @@ class GlobalsManager:
     Console_log_born = False
     Console_log_random_move = False
     Console_log_reproduce_chance = False
-    Console_log_fight_big = True
+    Console_log_fight_big = False
     Console_log_worldtoosmalltobreed = False
     Console_log_personalpopulationlimit = False
     Console_log_worldtoosmalltogrow = False

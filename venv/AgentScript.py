@@ -35,6 +35,8 @@ class Agent:
                 self.hunger = hunger + 0
             else:
                 raise Exception("Not supported agent size")
+        if places is not None and self.type != "Plant": #prevents parents or plants from mutating
+            self.Mutation()
 
         if self.type == "Plant":
             places = self.PlantCubeSpawnRadius()
@@ -141,7 +143,7 @@ class Agent:
                         continue #prey not worth the risk, keep searching
         self.RandomMove(directions_x_y)
     def RandomMove(self, directions_x_y):
-        if self.speed == 1: #simplest case, just move and end turn
+        if self.speed == 3: #simplest case, just move and end turn
             for direction in directions_x_y:
                 if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or self.GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
                     continue # prevents moving beyond edge of world or into another Agent and fucking things up
@@ -381,7 +383,6 @@ class Agent:
                 free_breed_locations_x_y = self.AnimalCubeSpawnRadius()
                 if free_breed_locations_x_y == 0:
                     return
-
                 if "Tiger" in self.name:
                     if len(self.GSM.Tigers_list) > self.GSM.Personal_animal_limit:
                         ConsoleLog.PersonalPopulationLimit("Tiger", self.GSM.Console_log_personalpopulationlimit)
@@ -425,9 +426,28 @@ class Agent:
                     babyname = "Fox_" + str(babyname+1) #make name with new generation number
                     newborn = SpawnFox(self.GSM, name=babyname, perception=self.perception, speed=self.speed, hunger=self.hunger, places=free_breed_locations_x_y)
                 ConsoleLog.Born(newborn, self.GSM.Console_log_born)
-
-
-            #todo: gene evo mutate func
+    def Mutation(self):
+        if random.random() <= self.GSM.Mutation_chance:
+            gene_1 = random.choice(self.GSM.Mutateable_genes)
+            if gene_1 == "speed":
+                gene_nerf_2 = "perception"
+                ex_gene_buff = self.speed
+                ex_gene_nerf = self.perception
+                if self.speed != 5 or self.perception != 1:
+                    self.speed = self.speed + 1
+                    self.perception = self.perception - 1
+                else:
+                    return
+            elif gene_1 == "perception":
+                gene_nerf_2 = "speed"
+                ex_gene_buff = self.perception
+                ex_gene_nerf = self.speed
+                if self.perception != 5 or self.speed != 1:
+                    self.perception = self.perception + 1
+                    self.speed = self.speed - 1
+                else:
+                    return
+            ConsoleLog.Mutated(self, gene_1, gene_nerf_2, ex_gene_buff, ex_gene_nerf, self.GSM.Console_log_mutated)
 
 
 
@@ -448,7 +468,7 @@ def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="L
     cow = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Cows_list.append(cow)
     return cow
-def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25, places=None):
+def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=3, speed=3, size="Small", hunger=25, places=None):
     rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places)
     GSM.Rabbits_list.append(rabbit)
     return rabbit
