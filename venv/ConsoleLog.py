@@ -30,7 +30,7 @@ def CheckForFood(agent, directionX, directionY, isNone, World_agent_list_x_y, lo
 
     if logbool == True:
         if isNone == True:
-            print(f"{agent.name} X: {agent.x} Y: {agent.y}  |  check: [{directionX}, {directionY}]  |  found: None")
+            print(f"{agent.name} [{agent.x},{agent.y}]  |  check: [{directionX},{directionY}]  |  found: None")
         else:
             print(f"{agent.name} [{agent.x},{agent.y}]  |  check: [{directionX},{directionY}]  |  found: {World_agent_list_x_y[directionX][directionY].name}")
     return

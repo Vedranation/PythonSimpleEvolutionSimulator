@@ -174,13 +174,13 @@ for i in range(GSM.Simulation_Length):
                 break
             if GSM.Is_paused:
                 time.sleep(0.05) #to prevent it eating 25% CPU
-                VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+                VisualiseScript.VisualiseSimulationDraw(GSM, i+1)  # draw the display window
                 continue
             if elapsed_time >= GSM.Sim_delay:
                 GSM.Last_update_time = current_time
-                VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+                VisualiseScript.VisualiseSimulationDraw(GSM, i+1)  # draw the display window
                 break
-            VisualiseScript.VisualiseSimulationDraw(GSM, i)  # draw the display window
+            VisualiseScript.VisualiseSimulationDraw(GSM, i+1)  # draw the display window
             if GSM.Sim_delay > 0.05:
                 time.sleep(0.01) #to prevent it eating 25% CPU
 

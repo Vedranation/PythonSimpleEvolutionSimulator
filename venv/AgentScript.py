@@ -85,13 +85,12 @@ class Agent:
             GSM.Fox_list.remove(agent)
 
     def PathFinding(self, scan_memory):
-        #Run away from predator if nearest
-        #Go toward preferred food if nearer than predator
-        #Go toward other food if no preferred food in range
+        '''Run away from predator if nearest;
+        Go toward preferred food if nearer than predator;
+        Go toward other food if no preferred food in range'''
         pred_distance = 69
         pref_distance = 69
         other_distance = 69
-
         if "nearest_predator" in scan_memory:
             pred_distance = [self.x - scan_memory["nearest_predator"][0], self.y - scan_memory["nearest_predator"][1]]
             pred_distance = abs(pred_distance[0]) + abs(pred_distance[1])
@@ -116,63 +115,95 @@ class Agent:
             other_distance[1] = -other_distance[1]
             self.SmartMove(other_distance)
     def SmartMove(self, target):
-        print(target)
-        if
         directions_x_y = []
-        directions_x_y.append([self.x + 1, self.y])  # right
-        directions_x_y.append([self.x - 1, self.y])  # left
-        directions_x_y.append([self.x, self.y + 1])  # up
-        directions_x_y.append([self.x, self.y - 1])  # down
+        if target[0] > 0: #need to go right
+            directions_x_y.append([self.x + 1, self.y])  # right
+        elif target[0] < 0: #need to go left
+            directions_x_y.append([self.x - 1, self.y])  # left
+        if target[1] > 0: #need to go up
+            directions_x_y.append([self.x, self.y + 1])  # up
+        elif target[1] < 0: #need to go down
+            directions_x_y.append([self.x, self.y - 1])  # down
         random.shuffle(directions_x_y)
         for direction in directions_x_y:
             if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or self.GSM.World_agent_list_x_y[direction[0]][direction[1]] != None:
                 continue # prevents moving beyond edge of world or into another Agent and fucking things up
             ConsoleLog.RandomMove(self, direction[0], direction[1], self.GSM.Console_log_random_move)
 
+            self.GSM.World_agent_list_x_y[self.x][self.y] = None
+            self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
+            self.x = direction[0]
+            self.y = direction[1]
+            return
 
     def SearchForFood(self): #Is called directly, handles Food, movement and roam
         for i in range(self.speed):
-            scan_memory = Genes.PerceptionCheck(self)
+            scan_memory = Genes.PerceptionCheck(self)   #scan around, get and remember whats around me in order of closest to furthest, does NOT scan the system memory
             print(scan_memory)
+
+            #Look around to see if food is next to you
+            directions_x_y = []
+            directions_x_y.append([self.x + 1, self.y])  # right
+            directions_x_y.append([self.x - 1, self.y])  # left
+            directions_x_y.append([self.x, self.y + 1])  # up
+            directions_x_y.append([self.x, self.y - 1])  # down
+            random.shuffle(directions_x_y)
+            for direction in directions_x_y:
+                if direction[0] >= self.GSM.World_size or direction[1] >= self.GSM.World_size or direction[0] < 0 or direction[1] < 0 or\
+                    self.GSM.World_agent_list_x_y[direction[0]][direction[1]] is None:
+                    continue  # found nothing there or outside would bounds
+                elif self.GSM.World_agent_list_x_y[direction[0]][direction[1]].type == self.food:    #Something next to me. Is food?
+                    if self.food == "Plant":  # herbivore eat
+
+                        self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
+                                    direction)  # track hunger levels, pass food that was eaten
+                        Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][
+                            direction[1]])  # delete the agent being eaten
+
+                        # update new position
+                        self.GSM.World_agent_list_x_y[self.x][self.y] = None
+                        self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
+                        self.x = direction[0]
+                        self.y = direction[1]
+                        return  # end the search
+
+                    #FIXME: FightOrFlight don't work with new search anymore. Need to make decide this when choosing to hunt
+                    if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[
+                        1]]) == True:  # carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
+
+                        if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][
+                                          direction[1]]) == True:  # predator won and ate the meal
+
+                            self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
+                                        direction)  # track hunger levels, pass food that was eaten
+                            Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][
+                                direction[1]])  # delete the agent being eaten
+
+                            # update new position
+                            self.GSM.World_agent_list_x_y[self.x][self.y] = None
+                            self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
+                            self.x = direction[0]
+                            self.y = direction[1]
+
+                            return  # end the search
+                        else:  # predator lost and died
+                            global DiedInBattle
+                            DiedInBattle = True  # pass this to main loop
+                            return
+                    else:
+                        continue  # prey not worth the risk, keep searching
+
             if not bool(scan_memory):
                 #Found nothing of interest, go random
                 self.RandomMove()
                 continue
             else:
-                self.PathFinding(scan_memory)
-            if self.food == "Plant": #herbivore eat
-                Agent = self.GSM.World_agent_list_x_y[direction[0]][direction[1]]
-                self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
-                            direction)  # track hunger levels, pass food that was eaten
-                Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
+                self.PathFinding(scan_memory)   #go toward (or away from) something interesting
+                #FIXME: When finds food, it wants to go to it and gets stuck in this continue if distance to target is 1, dont continue
+                #FIXME: Also visualise sim is 1 turn early??
+                continue
 
-                # update new position
-                self.GSM.World_agent_list_x_y[self.x][self.y] = None
-                self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
-                self.x = direction[0]
-                self.y = direction[1]
-                return  # end the search
-
-            if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:   #carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
-
-                if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:    #predator won and ate the meal
-
-                    self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size, direction)  # track hunger levels, pass food that was eaten
-                    Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][direction[1]])  # delete the agent being eaten
-
-                    #update new position
-                    self.GSM.World_agent_list_x_y[self.x][self.y] = None
-                    self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
-                    self.x = direction[0]
-                    self.y = direction[1]
-
-                    return #end the search
-                else:   #predator lost and died
-                    global DiedInBattle
-                    DiedInBattle = True #pass this to main loop
-                    return
-            else:
-                continue #prey not worth the risk, keep searching
+        self.Hunger(False)  # track hunger levels, didnt eat
 
     def RandomMove(self):
         directions_x_y = []
@@ -190,8 +221,6 @@ class Agent:
             self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
             self.x = direction[0]
             self.y = direction[1]
-            #fixme: remove hunger track from RandomMove so high speed dont burn 3x calories
-            self.Hunger(False) #track hunger levels, didnt eat
             return
     def HerbivoreNoEatBig(self, plant_agent):
         'simple function to ensure all herbivores only eat food same size or smaller'
@@ -488,7 +517,7 @@ def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=3, speed=3, s
     rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Rabbits_list.append(rabbit)
     return rabbit
-def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=3, speed=1, size="Medium", hunger=25, places=None, preferred_food="Medium"):
+def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=5, speed=1, size="Medium", hunger=25, places=None, preferred_food="Medium"):
     goat = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Goats_list.append(goat)
     return goat

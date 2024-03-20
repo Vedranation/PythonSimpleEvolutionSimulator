@@ -7,7 +7,7 @@ def Mutation(agent):
             gene_nerf_2 = "perception"
             ex_gene_buff = agent.speed
             ex_gene_nerf = agent.perception
-            if agent.speed != 5 or agent.perception != 1:
+            if agent.speed != 5 and agent.perception != 1:
                 agent.speed = agent.speed + 1
                 agent.perception = agent.perception - 1
             else:
@@ -16,7 +16,7 @@ def Mutation(agent):
             gene_nerf_2 = "speed"
             ex_gene_buff = agent.perception
             ex_gene_nerf = agent.speed
-            if agent.perception != 5 or agent.speed != 1:
+            if agent.perception != 5 and agent.speed != 1:
                 agent.perception = agent.perception + 1
                 agent.speed = agent.speed - 1
             else:

@@ -11,20 +11,20 @@ class GlobalsManager:
     #TODO: create loadable settings presets
     #TODO: Make animals able to pass thru flowers: Rabbits get stuck easily
     #TODO: Add individual flower limit
-    Num_dandelion = [5];
-    Num_berrybush = [5];
+    Num_dandelion = [0];
+    Num_berrybush = [4];
     Num_appletree = [0];
     Num_rabbit    = [0];
     Num_goat      = [1];
     Num_cow       = [0];
     Num_fox       = [0];
-    Num_wolf      = [10];
+    Num_wolf      = [0];
     Num_tiger     = [0];
 
 
-    Max_flowers               = 10       #how many flowers can be
-    Dandelion_growth_per_turn = 2     #how many Dandelions spawn per turn
-    Berrybush_growth_per_turn = 2
+    Max_flowers               = 5       #how many flowers can be
+    Dandelion_growth_per_turn = 0     #how many Dandelions spawn per turn
+    Berrybush_growth_per_turn = 0
     Appletree_growth_per_turn = 0
     # Num_dandelion = [25];
     # Num_berrybush = [25];
@@ -61,16 +61,16 @@ class GlobalsManager:
     Window_width = 900
     Window_height = 900
 
-    Console_log_start_position = False
+    Console_log_start_position = True
     Console_log_mutated = True
     Console_log_check_for_food = True
-    Console_log_found_food = False
+    Console_log_found_food = True
     Console_log_was_eaten = False
     Console_log_death_starvation = False
     Console_log_death_oldage = False
     Console_log_death_battle = False
-    Console_log_born = False
-    Console_log_random_move = False
+    Console_log_born = True
+    Console_log_random_move = True
     Console_log_reproduce_chance = False
     Console_log_fight_big = False
     Console_log_worldtoosmalltobreed = False
@@ -81,7 +81,7 @@ class GlobalsManager:
     Visualise_hunger_toggle = True
     Visualise_simulation_toggle = True
 
-    Sim_delay = 0.5    #delay in seconds between each turn
+    Sim_delay = 1    #delay in seconds between each turn
 
     Grid_color = (0, 0, 0)
     Fill_color = (0, 200, 0)
