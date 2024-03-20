@@ -1,6 +1,6 @@
 
 class GlobalsManager:
-    World_size = 10     #how big (box) do you want the world to be1
+    World_size = 20     #how big (box) do you want the world to be1
     Simulation_Length = 600     #how many turns in simulation
 
     #how many of each agents do you want to start with, stores their numbers each turn
@@ -11,20 +11,22 @@ class GlobalsManager:
     #TODO: create loadable settings presets
     #TODO: Make animals able to pass thru flowers: Rabbits get stuck easily
     #TODO: Add individual flower limit
-    Num_dandelion = [0];
-    Num_berrybush = [4];
+    #TODO: Add consoleLog when running from predator
+    #TODO: Add visualiser graph for genes
+    Num_dandelion = [20];
+    Num_berrybush = [20];
     Num_appletree = [0];
-    Num_rabbit    = [0];
-    Num_goat      = [1];
+    Num_rabbit    = [40];
+    Num_goat      = [40];
     Num_cow       = [0];
     Num_fox       = [0];
-    Num_wolf      = [0];
+    Num_wolf      = [30];
     Num_tiger     = [0];
 
 
-    Max_flowers               = 5       #how many flowers can be
-    Dandelion_growth_per_turn = 0     #how many Dandelions spawn per turn
-    Berrybush_growth_per_turn = 0
+    Max_flowers               = 100       #how many flowers can be
+    Dandelion_growth_per_turn = 17     #how many Dandelions spawn per turn
+    Berrybush_growth_per_turn = 10
     Appletree_growth_per_turn = 0
     # Num_dandelion = [25];
     # Num_berrybush = [25];
@@ -43,7 +45,7 @@ class GlobalsManager:
     # Appletree_growth_per_turn = 15
     Flower_spawn_cube         = 6  # Cube, including diagonal, how far flowers spawn from each other, (2, 6, None) None disables this
     Minimum_flower_number_for_cube_spawn = 6        #Minimum amount of unique flowers for that plant to spawn in clusters
-    Mutation_chance           = 0.9        #Chance for baby to change genes
+    Mutation_chance           = 0.05        #Chance for baby to change genes
     Mutateable_genes          = ["perception", "speed"]  # which genes are permitted to mutate (empty list disables mutations)
     Maximum_hunger            = 50     #maximum hunger a creature can have in its belly
     Reproduce_age             = 5   #minimum age before can breed
@@ -61,21 +63,21 @@ class GlobalsManager:
     Window_width = 900
     Window_height = 900
 
-    Console_log_start_position = True
-    Console_log_mutated = True
-    Console_log_check_for_food = True
-    Console_log_found_food = True
-    Console_log_was_eaten = False
-    Console_log_death_starvation = False
-    Console_log_death_oldage = False
-    Console_log_death_battle = False
-    Console_log_born = True
-    Console_log_random_move = True
-    Console_log_reproduce_chance = False
-    Console_log_fight_big = False
-    Console_log_worldtoosmalltobreed = False
+    Console_log_start_position          = True
+    Console_log_mutated                 = True
+    Console_log_check_for_food          = False
+    Console_log_found_food              = True
+    Console_log_was_eaten               = False
+    Console_log_death_starvation        = False
+    Console_log_death_oldage            = False
+    Console_log_death_battle            = False
+    Console_log_born                    = True
+    Console_log_random_move             = False
+    Console_log_reproduce_chance        = False
+    Console_log_fight_big               = False
+    Console_log_worldtoosmalltobreed    = False
     Console_log_personalpopulationlimit = False
-    Console_log_worldtoosmalltogrow = False
+    Console_log_worldtoosmalltogrow     = False
 
     Visualise_population_toggle = True
     Visualise_hunger_toggle = True
