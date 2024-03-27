@@ -120,10 +120,13 @@ def DrawHUD(GSM, turnN):
     #Display agent numbers
     smaller_dimension = min(GSM.Window_height, GSM.Window_width)
     present_tokens = 0
+
     def DrawAgentIconAndNumber(animal_sprite, animal_num_list):
         nonlocal present_tokens
         if animal_num_list[0] == 0: #Don't display number of animals that were never spawned
             return
+        #TODO: add greyscale when species dies out
+
         hud_animal = pygame.transform.scale(animal_sprite, (smaller_dimension * 0.06, smaller_dimension * 0.06))
         GSM.Visualise_window.blit(hud_animal, ((GSM.Window_width * 0.06) * present_tokens, GSM.Window_height * 0.93))
 
@@ -134,9 +137,17 @@ def DrawHUD(GSM, turnN):
         DrawText(GSM, text, GSM.Token_num_text_font, (0, 0, 0), text_x, text_y)
         present_tokens += 1
 
-    DrawAgentIconAndNumber(GSM.Tiger_sprite, GSM.Num_tiger)
+    DrawAgentIconAndNumber(GSM.Dandelion_sprite, GSM.Num_dandelion)
+    DrawAgentIconAndNumber(GSM.Berrybush_sprite, GSM.Num_berrybush)
+    DrawAgentIconAndNumber(GSM.Appletree_sprite, GSM.Num_appletree)
+
     DrawAgentIconAndNumber(GSM.Rabbit_sprite, GSM.Num_rabbit)
+    DrawAgentIconAndNumber(GSM.Goat_sprite, GSM.Num_goat)
     DrawAgentIconAndNumber(GSM.Cow_sprite, GSM.Num_cow)
+
+    DrawAgentIconAndNumber(GSM.Fox_sprite, GSM.Num_fox)
+    DrawAgentIconAndNumber(GSM.Wolf_sprite, GSM.Num_wolf)
+    DrawAgentIconAndNumber(GSM.Tiger_sprite, GSM.Num_tiger)
 
 def DrawGrid(GSM, turnN):
 

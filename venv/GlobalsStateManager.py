@@ -16,7 +16,7 @@ class GlobalsManager:
 
     Num_dandelion = [20];
     Num_berrybush = [20];
-    Num_appletree = [0];
+    Num_appletree = [30];
     Num_rabbit    = [40];
     Num_goat      = [40];
     Num_cow       = [0];
