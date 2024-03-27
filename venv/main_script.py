@@ -196,7 +196,7 @@ print(f"World ended at turn {GSM.Simulation_Length} with {GSM.Num_dandelion[-1]}
       f"{GSM.Num_appletree[-1]} Apple trees, {GSM.Num_rabbit[-1]} Rabbits, {GSM.Num_goat[-1]} Goats, {GSM.Num_cow[-1]} Cows, {GSM.Num_fox[-1]} Foxes, "
       f"{GSM.Num_wolf[-1]} Wolves, and {GSM.Num_tiger[-1]} Tigers, Total: {GSM.SumAllAgents[-1]}/{round(pow(GSM.World_size, 2) / GSM.World_size_spawn_tolerance)}")
 
-VisualiseScript.VisualisePopulation(GSM)
-VisualiseScript.VisualiseHunger(GSM)
+VisualiseScript.GraphPopulation(GSM)
+VisualiseScript.GraphHunger(GSM)
 
 VisualiseScript.VisualiseSimulationQuit()

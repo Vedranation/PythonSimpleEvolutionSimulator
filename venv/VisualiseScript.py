@@ -7,9 +7,9 @@ import re #2.2.1
 import sys
 import time
 
-def VisualisePopulation(GSM):
+def GraphPopulation(GSM):
 
-    if GSM.Visualise_population_toggle == True:
+    if GSM.Graph_population_toggle == True:
         turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
         # Create traces
         fig = go.Figure()
@@ -34,12 +34,11 @@ def VisualisePopulation(GSM):
         fig.show()
     return
 
-def VisualiseHunger(GSM):
+def GraphHunger(GSM):
 
-    if GSM.Visualise_hunger_toggle == True:
+    if GSM.Graph_hunger_toggle == True:
         # Turns list for X-axis
         turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
-
         # Create the plot for average hunger
         fig_hunger = go.Figure()
         fig_hunger.add_trace(go.Scatter(x=turns_list, y=GSM.Cows_hunger, mode='lines', name='Cows', line=dict(color='black')))
@@ -56,6 +55,34 @@ def VisualiseHunger(GSM):
 
         # Show the plot
         fig_hunger.show()
+    return
+def GraphPopulation(GSM):
+
+    if GSM.Graph_population_toggle == True:
+        turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
+        # Create traces
+        fig = go.Figure()
+
+        # Refactor this to use singular GSM color variable to share with square color instead of handpicking here
+        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_cow, name='Cows', marker_color='black'))
+        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_tiger, name='Tigers', marker_color='red'))
+
+        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_wolf, name='Wolves', marker_color='purple'))
+        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_rabbit, name='Rabbits', marker_color='white'))
+
+        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_fox, name='Foxes', marker_color='orange'))
+        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_goat, name='Goats', marker_color='rgb(52, 192, 235)'))
+
+        # Use barmode='stack' to enable stacking
+        fig.update_layout(barmode='stack')
+
+        # Add titles and labels
+        fig.update_layout(title='Animal genes Over Time',
+                          xaxis_title='Turn',
+                          yaxis_title='Gene distribution')
+
+        # Show the plot
+        fig.show()
     return
 
 def VisualiseSimulationInit(GSM):

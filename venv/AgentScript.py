@@ -27,6 +27,7 @@ class Agent:
         self.age = 1
         self.breedcooldown = 0
         self.preferred_food = preferred_food
+        self.free_mutation_points = GSM.Max_mutation_points - (perception + speed)
 
         if self.type != "Plant":
             if self.size == "Small": #gives babies 1 turn worth of food - can cause numeric instability
@@ -513,7 +514,7 @@ def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=3, speed=3, size="L
     cow = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Cows_list.append(cow)
     return cow
-def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=3, speed=3, size="Small", hunger=25, places=None, preferred_food="Small"):
+def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=1, speed=1, size="Small", hunger=25, places=None, preferred_food="Small"):
     rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Rabbits_list.append(rabbit)
     return rabbit
@@ -529,7 +530,7 @@ def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=3, speed=3, size=
     wolf = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Wolf_list.append(wolf)
     return wolf
-def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=3, speed=3, size="Small", hunger=25, places=None, preferred_food="Small"):
+def SpawnFox(GSM, name="Fox_1", type="Carnivore", perception=1, speed=1, size="Small", hunger=25, places=None, preferred_food="Small"):
     fox = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Fox_list.append(fox)
     return fox

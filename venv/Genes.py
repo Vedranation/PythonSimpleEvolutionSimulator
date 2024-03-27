@@ -2,31 +2,36 @@ import ConsoleLog
 import random
 def Mutation(agent):
     if random.random() <= agent.GSM.Mutation_chance:
-        gene_1 = random.choice(agent.GSM.Mutateable_genes) #TODO: Make preffered_food mutateable gene
-        if gene_1 == "speed":
-            gene_nerf_2 = "perception"
-            ex_gene_buff = agent.speed
-            ex_gene_nerf = agent.perception
-            #TODO: Convert this into a gene pool system - Have a certain amount of points to spend
-            if agent.speed != 5 and agent.perception != 1:
-                agent.speed = agent.speed + 1
-                agent.perception = agent.perception - 1
-            else:
-                return
-        elif gene_1 == "perception":
-            gene_nerf_2 = "speed"
-            ex_gene_buff = agent.perception
-            ex_gene_nerf = agent.speed
-            if agent.perception != 5 and agent.speed != 1:
-                agent.perception = agent.perception + 1
-                agent.speed = agent.speed - 1
-            else:
-                return
-        ConsoleLog.Mutated(agent, gene_1, gene_nerf_2, ex_gene_buff, ex_gene_nerf, agent.GSM.Console_log_mutated)
+        gene_name = random.choice(agent.GSM.Mutateable_genes) #TODO: Make preffered_food mutateable gene
+        if gene_name == "speed":
+            ex_gene_value = agent.speed
+            if agent.free_mutation_points > 0:   #Use a point to upgrade
+                if agent.speed != 5:
+                    agent.speed += 1
+                    agent.free_mutation_points -= 1
+                    ConsoleLog.Mutated(agent, gene_name, ex_gene_value, agent.speed, agent.GSM.Console_log_mutated)
+            else:   #Downgrade to get a point
+                if agent.speed != 1:
+                    agent.speed -= 1
+                    agent.free_mutation_points += 1
+                    ConsoleLog.Mutated(agent, gene_name, ex_gene_value, agent.speed, agent.GSM.Console_log_mutated)
+        elif gene_name == "perception":
+            ex_gene_value = agent.perception
+            if agent.free_mutation_points > 0:  # Use a point to upgrade
+                if agent.perception != 5:
+                    agent.perception += 1
+                    agent.free_mutation_points -= 1
+                    ConsoleLog.Mutated(agent, gene_name, ex_gene_value, agent.perception, agent.GSM.Console_log_mutated)
+            else:  # Downgrade to get a point
+                if agent.perception != 1:
+                    agent.perception -= 1
+                    agent.free_mutation_points += 1
+                    ConsoleLog.Mutated(agent, gene_name, ex_gene_value, agent.perception, agent.GSM.Console_log_mutated)
+
 def PerceptionCheck(agent):
     'Scans area around depending on agents perception. Agents will prioritise moving toward the closest preferable food'
     #Yes thats a D&D reference
-    directions_x_y = []
+    directions_x_y = [] #Order which they're added to list is important for target acquisition logic and search optimisation
     if agent.perception >= 1:  # lowest perception, only sees up down left right
         directions_x_y_tier1 = []
         directions_x_y_tier1.append([agent.x + 1, agent.y])  # right

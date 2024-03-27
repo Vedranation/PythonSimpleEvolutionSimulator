@@ -35,10 +35,13 @@ def CheckForFood(agent, directionX, directionY, isNone, World_agent_list_x_y, lo
             print(f"{agent.name} [{agent.x},{agent.y}]  |  check: [{directionX},{directionY}]  |  found: {World_agent_list_x_y[directionX][directionY].name}")
     return
 
-def Mutated(agent, gene_1, gene_nerf_2, ex_gene_buff, ex_gene_nerf, logbool):
+def Mutated(agent, gene_name, ex_value, new_value, logbool):
     if logbool:
-        print(f"{agent.name} mutated {gene_1}: ({ex_gene_buff} -> {ex_gene_buff+1})"
-              f" and {gene_nerf_2}: ({ex_gene_nerf} -> {ex_gene_nerf-1})")
+        if new_value > ex_value:    #Spent a point to upgrade
+            print(f"{agent.name} mutated {gene_name}: ({ex_value} -> {new_value})  |  Gene points: {agent.free_mutation_points+1} -> {agent.free_mutation_points}")
+        else:   #Gained a point to downgrade
+            print(f"{agent.name} mutated {gene_name}: ({ex_value} -> {new_value})  |  Gene points: {agent.free_mutation_points-1} -> {agent.free_mutation_points}")
+
 
 def FoundFood(agent, directionX, directionY, World_agent_list_x_y, worth, logbool):
     '''Logs when agents find food, input agent instance, directionX, directionY, World_agent_list_x_y'''
