@@ -13,6 +13,7 @@ class GlobalsManager:
     #TODO: Add individual flower limit
     #TODO: Add consoleLog when running from predator
     #TODO: Add visualiser graph for genes
+
     Num_dandelion = [20];
     Num_berrybush = [20];
     Num_appletree = [0];

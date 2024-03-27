@@ -90,8 +90,10 @@ def VisualiseSimulationInit(GSM):
     'load fonts'
     GSM.Visualise_window.fill(GSM.Fill_color)  # background color
     GSM.Generation_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 2)  # font and size for agent generation number
-    GSM.Axis_text_font = pygame.font.SysFont("Arial", GSM.Distancebtwrow // 2)  # font and size for grid axis
+    GSM.Axis_text_font = pygame.font.SysFont("Roboto", GSM.Distancebtwrow // 1)  # font and size for grid axis
     GSM.GUI_text_font = pygame.font.SysFont("Arial", int(GSM.Gridsize // 15))
+    GSM.Token_num_text_font = pygame.font.SysFont("Roboto", int(GSM.Gridsize // 15))
+    GSM.Token_num_text_font.set_bold(False)
 
     DrawGrid(GSM, 0)
 
@@ -111,14 +113,40 @@ def DrawText(GSM, text, font, color, x, y):
     text_image = font.render(text, True, color)
     GSM.Visualise_window.blit(text_image, (x, y))
 
+def DrawHUD(GSM, turnN):
+    # Draw HUD
+    DrawText(GSM, "Turn " + str(turnN), GSM.GUI_text_font, (0, 0, 0), 5, 5)
+    DrawText(GSM, "Delay: " + str(GSM.Sim_delay), GSM.GUI_text_font, (0, 0, 0), GSM.Window_width - 230, 5)
+    #Display agent numbers
+    smaller_dimension = min(GSM.Window_height, GSM.Window_width)
+    present_tokens = 0
+    def DrawAgentIconAndNumber(animal_sprite, animal_num_list):
+        nonlocal present_tokens
+        if animal_num_list[0] == 0: #Don't display number of animals that were never spawned
+            return
+        hud_animal = pygame.transform.scale(animal_sprite, (smaller_dimension * 0.06, smaller_dimension * 0.06))
+        GSM.Visualise_window.blit(hud_animal, ((GSM.Window_width * 0.06) * present_tokens, GSM.Window_height * 0.93))
+
+        text = str(animal_num_list[-1])
+        text_width, text_height = GSM.Token_num_text_font.size(text)
+        text_x = ((GSM.Window_width * 0.06) * present_tokens) + (int(smaller_dimension * 0.06) - text_width) / 2
+        text_y = (GSM.Window_height * 0.93) + (int(smaller_dimension * 0.06) - text_height) / 2
+        DrawText(GSM, text, GSM.Token_num_text_font, (0, 0, 0), text_x, text_y)
+        present_tokens += 1
+
+    DrawAgentIconAndNumber(GSM.Tiger_sprite, GSM.Num_tiger)
+    DrawAgentIconAndNumber(GSM.Rabbit_sprite, GSM.Num_rabbit)
+    DrawAgentIconAndNumber(GSM.Cow_sprite, GSM.Num_cow)
 
 def DrawGrid(GSM, turnN):
 
-    #GSM.Visualise_window.fill(GSM.Fill_color)
+    #Draw background
     scaled_background = pygame.transform.scale(GSM.background_sprite, (GSM.Window_width, GSM.Window_height))
     GSM.Visualise_window.blit(scaled_background, (0, 0))
-    DrawText(GSM, "Turn " + str(turnN), GSM.GUI_text_font, (0, 0, 0), 5, 5)
-    DrawText(GSM, "Delay: " + str(GSM.Sim_delay), GSM.GUI_text_font, (0, 0, 0), GSM.Window_width - 230, 5)
+
+    DrawHUD(GSM, turnN)
+
+    #Draw grid
     for i in range(GSM.World_size + 1):  # +1 to draw the boundary of the grid
         # Vertical line (need to adjust both start and end points)
         if i == 0 or i == GSM.World_size:
@@ -138,8 +166,8 @@ def DrawGrid(GSM, turnN):
                              (GSM.Start_x, GSM.Start_y + i * GSM.Distancebtwrow),
                              (GSM.Start_x + GSM.Gridsize, GSM.Start_y + i * GSM.Distancebtwrow))
         if i != GSM.World_size: #Draw axis numbers
-            DrawText(GSM, str(i), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.5), (GSM.Window_height - GSM.Start_y))
-            DrawText(GSM, str(GSM.World_size - i -1), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x - GSM.Distancebtwrow/2), (GSM.Start_y + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.25)) #(Y AXIS)
+            DrawText(GSM, str(i), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.27), (GSM.Window_height - GSM.Start_y + GSM.Distancebtwrow*0.1)) #(X AXIS)
+            DrawText(GSM, str(GSM.World_size - i -1), GSM.Axis_text_font, (0, 0, 0), (GSM.Start_x - GSM.Distancebtwrow*0.8), (GSM.Start_y + i * GSM.Distancebtwrow + GSM.Distancebtwrow*0.25)) #(Y AXIS)
 
 def EventHandler(GSM):
     'this is called separately from VisualiseSimulationDraw so that variable can be returned to main loop'
@@ -196,6 +224,7 @@ def VisualiseSimulationDraw(GSM, turnN):
                 #TODO: Add zoom in, and pan around
                 #TODO: Make it clickable on specific agent to see its stats and track it
                 #TODO: Add a "walking" transition animation so its easier to tell where animal moves (especially for higher speed animals)
+                #fixme: This visualise trash can be refactored into single function (dont be yandere dev with infinite IF's)
 
                 # pygame.draw.rect(GSM.Visualise_window, GSM.Tiger_color, pygame.Rect((cell_position_x + GSM.Distancebtwrow*GSM.Animal_drawing_offset, cell_position_y + GSM.Distancebtwrow*GSM.Animal_drawing_offset, GSM.Distancebtwrow*0.9, GSM.Distancebtwrow*0.9))) #window, color, what (start x, start y, sizex , sizey)
                 scaled_tiger = pygame.transform.scale(GSM.Tiger_sprite, (GSM.Distancebtwrow, GSM.Distancebtwrow))

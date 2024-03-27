@@ -165,6 +165,7 @@ for i in range(GSM.Simulation_Length):
     GSM.Fox_hunger.append(CalculateAverageHunger(GSM.Fox_list))
 
     if GSM.Visualise_simulation_toggle:
+        #TODO: Change displayed speed from being "time between turns" into "turns per second" so "0.06 delay" instead becomes "16.6 turns per second"
         while True:
             #loop to trap the program
             current_time = time.time()

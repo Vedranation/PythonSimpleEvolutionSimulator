@@ -7,6 +7,7 @@ def Mutation(agent):
             gene_nerf_2 = "perception"
             ex_gene_buff = agent.speed
             ex_gene_nerf = agent.perception
+            #TODO: Convert this into a gene pool system - Have a certain amount of points to spend
             if agent.speed != 5 and agent.perception != 1:
                 agent.speed = agent.speed + 1
                 agent.perception = agent.perception - 1
