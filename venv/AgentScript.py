@@ -154,8 +154,9 @@ class Agent:
                     self.GSM.World_agent_list_x_y[direction[0]][direction[1]] is None:
                     continue  # found nothing there or outside would bounds
                 elif self.GSM.World_agent_list_x_y[direction[0]][direction[1]].type == self.food:    #Something next to me. Is food?
-                    if self.food == "Plant":  # herbivore eat
 
+                    #Herbivores:
+                    if self.food == "Plant" and self.HerbivoreNoEatBig(self.GSM.World_agent_list_x_y[direction[0]][direction[1]]) == True:  # herbivore eat and no eat big
                         self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
                                     direction)  # track hunger levels, pass food that was eaten
                         Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][
@@ -167,11 +168,14 @@ class Agent:
                         self.x = direction[0]
                         self.y = direction[1]
                         return  # end the search
+                    else:
+                        continue
 
-                    #FIXME: FightOrFlight don't work with new search anymore. Need to make decide this when choosing to hunt
+                    #Carnivores:
+                    #FIXME: FightOrFlight don't work with new search anymore. Need to make decide this before choosing to hunt
                     if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[
                         1]]) == True:  # carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
-
+                                       # funniest bug yet: Bunnies fought trees and had 100% victory rate
                         if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][
                                           direction[1]]) == True:  # predator won and ate the meal
 
@@ -510,7 +514,7 @@ def SpawnBerrybush(GSM, name="Berrybush_1", type="Plant", perception=0, speed=0,
     berrybush = Agent(GSM, name, type, perception, speed, size, hunger, places=None, preferred_food=None)
     GSM.Berrybush_list.append(berrybush)
     return berrybush
-def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=3, speed=3, size="Large", hunger=25, places=None, preferred_food="Large"):
+def SpawnCow(GSM, name="Cow_1", type="Herbivore", perception=1, speed=1, size="Large", hunger=25, places=None, preferred_food="Large"):
     cow = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Cows_list.append(cow)
     return cow
@@ -518,15 +522,15 @@ def SpawnRabbit(GSM, name="Rabbit_1", type="Herbivore", perception=1, speed=1, s
     rabbit = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Rabbits_list.append(rabbit)
     return rabbit
-def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=3, speed=3, size="Medium", hunger=25, places=None, preferred_food="Medium"):
+def SpawnGoat(GSM, name="Goat_1", type="Herbivore", perception=1, speed=1, size="Medium", hunger=25, places=None, preferred_food="Medium"):
     goat = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Goats_list.append(goat)
     return goat
-def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=3, speed=3, size="Large", hunger=25, places=None, preferred_food="Large"):
+def SpawnTiger(GSM, name="Tiger_1", type="Carnivore", perception=1, speed=1, size="Large", hunger=25, places=None, preferred_food="Large"):
     tiger = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Tigers_list.append(tiger)
     return tiger
-def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=3, speed=3, size="Medium", hunger=25, places=None, preferred_food="Medium"):
+def SpawnWolf(GSM, name="Wolf_1", type="Carnivore", perception=1, speed=1, size="Medium", hunger=25, places=None, preferred_food="Medium"):
     wolf = Agent(GSM, name, type, perception, speed, size, hunger, places, preferred_food)
     GSM.Wolf_list.append(wolf)
     return wolf

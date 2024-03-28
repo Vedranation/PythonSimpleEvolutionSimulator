@@ -8,41 +8,43 @@ class GlobalsManager:
     # TODO: Add individual flower limit
     # TODO: Add consoleLog when running from predator
     # TODO: Add visualiser graph for genes
+    if False:
+        World_size = 20     #how big (box) do you want the world to be1
+        Simulation_Length = 60     #how many turns in simulation
 
-    World_size = 20     #how big (box) do you want the world to be1
-    Simulation_Length = 600     #how many turns in simulation
+        #how many of each agents do you want to start with, stores their numbers each turn
+        Num_dandelion = [0];
+        Num_berrybush = [0];
+        Num_appletree = [20];
+        Num_rabbit    = [40];
+        Num_goat      = [0];
+        Num_cow       = [0];
+        Num_fox       = [0];
+        Num_wolf      = [0];
+        Num_tiger     = [0];
 
-    #how many of each agents do you want to start with, stores their numbers each turn
-    Num_dandelion = [20];
-    Num_berrybush = [0];
-    Num_appletree = [0];
-    Num_rabbit    = [40];
-    Num_goat      = [0];
-    Num_cow       = [0];
-    Num_fox       = [0];
-    Num_wolf      = [0];
-    Num_tiger     = [0];
+        Max_flowers               = 5       #how many flowers can be
+        Dandelion_growth_per_turn = 0     #how many Dandelions spawn per turn
+        Berrybush_growth_per_turn = 0
+        Appletree_growth_per_turn = 5
+    else:
+        World_size = 40  # how big (box) do you want the world to be1
+        Simulation_Length = 600  # how many turns in simulation
+        Num_dandelion = [25];
+        Num_berrybush = [25];
+        Num_appletree = [25];
+        Num_rabbit    = [50];
+        Num_goat      = [25];
+        Num_cow       = [25];
+        Num_fox       = [25];
+        Num_wolf      = [25];
+        Num_tiger     = [25];
 
+        Max_flowers               = 250       #how many flowers can be
+        Dandelion_growth_per_turn = 15     #how many Dandelions spawn per turn
+        Berrybush_growth_per_turn = 15
+        Appletree_growth_per_turn = 15
 
-    Max_flowers               = 50       #how many flowers can be
-    Dandelion_growth_per_turn = 2     #how many Dandelions spawn per turn
-    Berrybush_growth_per_turn = 0
-    Appletree_growth_per_turn = 0
-    # Num_dandelion = [25];
-    # Num_berrybush = [25];
-    # Num_appletree = [25];
-    # Num_rabbit    = [25];
-    # Num_goat      = [25];
-    # Num_cow       = [25];
-    # Num_fox       = [25];
-    # Num_wolf      = [25];
-    # Num_tiger     = [25];
-    #
-    #
-    # Max_flowers               = 250       #how many flowers can be
-    # Dandelion_growth_per_turn = 15     #how many Dandelions spawn per turn
-    # Berrybush_growth_per_turn = 15
-    # Appletree_growth_per_turn = 15
     Flower_spawn_cube         = 6  # Cube, including diagonal, how far flowers spawn from each other, (2, 6, None) None disables this
     Minimum_flower_number_for_cube_spawn = 6        #Minimum amount of unique flowers for that plant to spawn in clusters
     Mutation_chance           = 0.1        #Chance for baby to change genes
@@ -65,7 +67,7 @@ class GlobalsManager:
     Window_height = 900
 
     Console_log_start_position          = False
-    Console_log_mutated                 = True
+    Console_log_mutated                 = False
     Console_log_check_for_food          = False
     Console_log_found_food              = False
     Console_log_was_eaten               = False
@@ -123,6 +125,19 @@ class GlobalsManager:
     Tigers_hunger = []
     Wolf_hunger = []
     Fox_hunger = []
+
+    Cows_perception = []  # stores average genes values every turn
+    Rabbits_perception = []
+    Goats_perception = []
+    Tigers_perception = []
+    Wolf_perception = []
+    Fox_perception = []
+    Cows_speed = []
+    Rabbits_speed = []
+    Goats_speed = []
+    Tigers_speed = []
+    Wolf_speed = []
+    Fox_speed = []
 
     Is_paused = False
     Last_update_time = 0
