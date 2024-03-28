@@ -24,7 +24,6 @@ def GraphPopulation(GSM):
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_fox, mode='lines', name='Foxes', line=dict(color='orange')))
         fig.add_trace(go.Scatter(x=turns_list, y=GSM.Num_goat, mode='lines', name='Goats', line=dict(color='rgb(52, 192, 235)')))
 
-
         # Add titles and labels
         fig.update_layout(title='Animal Population Over Time',
                           xaxis_title='Turn',
@@ -52,35 +51,56 @@ def GraphHunger(GSM):
         fig_hunger.update_layout(title='Average Animal Hunger Over Time',
                                  xaxis_title='Turn',
                                  yaxis_title='Average Hunger')
-
         # Show the plot
         fig_hunger.show()
     return
-def GraphPopulation(GSM):
+def GraphPerception(GSM):
 
-    if GSM.Graph_population_toggle == True:
+    if GSM.Graph_perception_toggle == True:
         turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
         # Create traces
         fig = go.Figure()
 
         # Refactor this to use singular GSM color variable to share with square color instead of handpicking here
-        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_cow, name='Cows', marker_color='black'))
-        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_tiger, name='Tigers', marker_color='red'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Cows_perception, name='Cows', marker_color='black'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Tigers_perception, name='Tigers', marker_color='red'))
 
-        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_wolf, name='Wolves', marker_color='purple'))
-        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_rabbit, name='Rabbits', marker_color='white'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Wolf_perception, name='Wolves', marker_color='purple'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Rabbits_perception, name='Rabbits', marker_color='white'))
 
-        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_fox, name='Foxes', marker_color='orange'))
-        fig.add_trace(go.Bar(x=turns_list, y=GSM.Num_goat, name='Goats', marker_color='rgb(52, 192, 235)'))
-
-        # Use barmode='stack' to enable stacking
-        fig.update_layout(barmode='stack')
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Fox_perception, name='Foxes', marker_color='orange'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Goats_perception, name='Goats', marker_color='rgb(52, 192, 235)'))
 
         # Add titles and labels
-        fig.update_layout(title='Animal genes Over Time',
+        fig.update_layout(title='Animal Perception',
                           xaxis_title='Turn',
-                          yaxis_title='Gene distribution')
+                          yaxis_title='Perception tier')
+        # Show the plot
+        fig.show()
+    return
 
+#Todo: Graphs deserve their own script at this point
+def GraphSpeed(GSM):
+
+    if GSM.Graph_speed_toggle == True:
+        turns_list = [i for i in range(1, GSM.Simulation_Length + 1)]
+        # Create traces
+        fig = go.Figure()
+
+        # Refactor this to use singular GSM color variable to share with square color instead of handpicking here
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Cows_speed, name='Cows', marker_color='black'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Tigers_speed, name='Tigers', marker_color='red'))
+
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Wolf_speed, name='Wolves', marker_color='purple'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Rabbits_speed, name='Rabbits', marker_color='white'))
+
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Fox_speed, name='Foxes', marker_color='orange'))
+        fig.add_trace(go.Scatter(x=turns_list, y=GSM.Goats_speed, name='Goats', marker_color='rgb(52, 192, 235)'))
+
+        # Add titles and labels
+        fig.update_layout(title='Animal Speed',
+                          xaxis_title='Turn',
+                          yaxis_title='Speed tier')
         # Show the plot
         fig.show()
     return

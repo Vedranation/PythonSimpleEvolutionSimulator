@@ -8,11 +8,10 @@ class GlobalsManager:
     # TODO: Add individual flower limit
     # TODO: Add consoleLog when running from predator
     # TODO: Add visualiser graph for genes
-    if False:
+    if False:       #debug/test mode
         World_size = 20     #how big (box) do you want the world to be1
         Simulation_Length = 60     #how many turns in simulation
 
-        #how many of each agents do you want to start with, stores their numbers each turn
         Num_dandelion = [0];
         Num_berrybush = [0];
         Num_appletree = [20];
@@ -28,8 +27,10 @@ class GlobalsManager:
         Berrybush_growth_per_turn = 0
         Appletree_growth_per_turn = 5
     else:
-        World_size = 40  # how big (box) do you want the world to be1
-        Simulation_Length = 600  # how many turns in simulation
+        World_size = 40     # how big (box) do you want the world to be1
+        Simulation_Length = 600     # how many turns in simulation
+
+        # how many of each agents do you want to start with, stores their numbers each turn
         Num_dandelion = [25];
         Num_berrybush = [25];
         Num_appletree = [25];
@@ -61,8 +62,6 @@ class GlobalsManager:
     Animal_breed_cooldown     = 2
     Animal_spawn_cube         = 1       #Cube, including diagonal, how far can animal breed spawn (1 or 2)
 
-
-
     Window_width = 900
     Window_height = 900
 
@@ -74,7 +73,7 @@ class GlobalsManager:
     Console_log_death_starvation        = False
     Console_log_death_oldage            = False
     Console_log_death_battle            = False
-    Console_log_born                    = True
+    Console_log_born                    = False
     Console_log_random_move             = False
     Console_log_reproduce_chance        = False
     Console_log_fight_big               = False
@@ -82,10 +81,11 @@ class GlobalsManager:
     Console_log_personalpopulationlimit = False
     Console_log_worldtoosmalltogrow     = False
 
-    Graph_population_toggle = True
-    Graph_hunger_toggle = True
-    Graph_population_toggle = True
-    Visualise_simulation_toggle = True
+    Graph_population_toggle = False
+    Graph_hunger_toggle = False
+    Graph_perception_toggle = True
+    Graph_speed_toggle = True
+    Visualise_simulation_toggle = False
 
     Sim_delay = 1    #delay in seconds between each turn
 
