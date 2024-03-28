@@ -157,26 +157,34 @@ for i in range(GSM.Simulation_Length):
     GSM.Num_goat.append(len(GSM.Goats_list))
     GSM.SumAllAgents.append(GSM.Num_dandelion[-1] + GSM.Num_cow[-1] + GSM.Num_tiger[-1] + GSM.Num_wolf[-1] + GSM.Num_rabbit[-1] + GSM.Num_appletree[-1] + GSM.Num_fox[-1] + GSM.Num_berrybush[-1] + GSM.Num_goat[-1])
 
-    GSM.Cows_hunger.append(CalculateAverageStat(GSM.Cows_list, "hunger"))
-    GSM.Tigers_hunger.append(CalculateAverageStat(GSM.Tigers_list, "hunger"))
-    GSM.Rabbits_hunger.append(CalculateAverageStat(GSM.Rabbits_list, "hunger"))
-    GSM.Goats_hunger.append(CalculateAverageStat(GSM.Goats_list, "hunger"))
-    GSM.Wolf_hunger.append(CalculateAverageStat(GSM.Wolf_list, "hunger"))
-    GSM.Fox_hunger.append(CalculateAverageStat(GSM.Fox_list, "hunger"))
 
-    GSM.Cows_perception.append(CalculateAverageStat(GSM.Cows_list, "perception"))
-    GSM.Tigers_perception.append(CalculateAverageStat(GSM.Tigers_list, "perception"))
-    GSM.Rabbits_perception.append(CalculateAverageStat(GSM.Rabbits_list, "perception"))
-    GSM.Goats_perception.append(CalculateAverageStat(GSM.Goats_list, "perception"))
-    GSM.Wolf_perception.append(CalculateAverageStat(GSM.Wolf_list, "perception"))
-    GSM.Fox_perception.append(CalculateAverageStat(GSM.Fox_list, "perception"))
 
-    GSM.Cows_speed.append(CalculateAverageStat(GSM.Cows_list, "speed"))
-    GSM.Tigers_speed.append(CalculateAverageStat(GSM.Tigers_list, "speed"))
-    GSM.Rabbits_speed.append(CalculateAverageStat(GSM.Rabbits_list, "speed"))
-    GSM.Goats_speed.append(CalculateAverageStat(GSM.Goats_list, "speed"))
-    GSM.Wolf_speed.append(CalculateAverageStat(GSM.Wolf_list, "speed"))
-    GSM.Fox_speed.append(CalculateAverageStat(GSM.Fox_list, "speed"))
+
+    if GSM.Graph_hunger_toggle:
+        GSM.Cows_hunger.append(CalculateAverageStat(GSM.Cows_list, "hunger"))
+        GSM.Tigers_hunger.append(CalculateAverageStat(GSM.Tigers_list, "hunger"))
+        GSM.Rabbits_hunger.append(CalculateAverageStat(GSM.Rabbits_list, "hunger"))
+        GSM.Goats_hunger.append(CalculateAverageStat(GSM.Goats_list, "hunger"))
+        GSM.Wolf_hunger.append(CalculateAverageStat(GSM.Wolf_list, "hunger"))
+        GSM.Fox_hunger.append(CalculateAverageStat(GSM.Fox_list, "hunger"))
+    if GSM.Graph_perception_toggle or Console_log_avg_perception:
+        GSM.Cows_perception.append(CalculateAverageStat(GSM.Cows_list, "perception"))
+        GSM.Tigers_perception.append(CalculateAverageStat(GSM.Tigers_list, "perception"))
+        GSM.Rabbits_perception.append(CalculateAverageStat(GSM.Rabbits_list, "perception"))
+        GSM.Goats_perception.append(CalculateAverageStat(GSM.Goats_list, "perception"))
+        GSM.Wolf_perception.append(CalculateAverageStat(GSM.Wolf_list, "perception"))
+        GSM.Fox_perception.append(CalculateAverageStat(GSM.Fox_list, "perception"))
+
+        ConsoleLog.AveragePerception(GSM.Cows_perception[-1], GSM.Tigers_perception[-1], GSM.Rabbits_perception[-1], GSM.Goats_perception[-1], GSM.Wolf_perception[-1], GSM.Fox_perception[-1], GSM.Console_log_avg_perception)
+    if GSM.Graph_speed_toggle or Console_log_avg_speed:
+        GSM.Cows_speed.append(CalculateAverageStat(GSM.Cows_list, "speed"))
+        GSM.Tigers_speed.append(CalculateAverageStat(GSM.Tigers_list, "speed"))
+        GSM.Rabbits_speed.append(CalculateAverageStat(GSM.Rabbits_list, "speed"))
+        GSM.Goats_speed.append(CalculateAverageStat(GSM.Goats_list, "speed"))
+        GSM.Wolf_speed.append(CalculateAverageStat(GSM.Wolf_list, "speed"))
+        GSM.Fox_speed.append(CalculateAverageStat(GSM.Fox_list, "speed"))
+
+        ConsoleLog.AverageSpeed(GSM.Cows_speed[-1], GSM.Tigers_speed[-1], GSM.Rabbits_speed[-1], GSM.Goats_speed[-1], GSM.Wolf_speed[-1], GSM.Fox_speed[-1], GSM.Console_log_avg_speed)
 
     if GSM.Visualise_simulation_toggle:
         #TODO: Change displayed speed from being "time between turns" into "turns per second" so "0.06 delay" instead becomes "16.6 turns per second"

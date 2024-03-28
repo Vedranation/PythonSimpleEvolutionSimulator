@@ -110,3 +110,10 @@ def FightBig(agent, prey_agent, win_chance, prey_power, logbool):
 def WorldTooSmallTooBreed(logbool):
     if logbool:
         print(f"World too small to breed!")
+
+def AverageSpeed(cows_speed, tigers_speed, rabbits_speed, goats_speed, wolf_speed, fox_speed, logbool):
+    if logbool:
+        print(f"Average speed for:   cows: {cows_speed} | tigers: {tigers_speed} | rabbits: {rabbits_speed} | goats: {goats_speed} | wolves: {wolf_speed} | foxes: {fox_speed}")
+def AveragePerception(cows_perception, tigers_perception, rabbits_perception, goats_perception, wolf_perception, fox_perception, logbool):
+    if logbool:
+        print(f"Average perception for:   cows: {cows_perception} | tigers: {tigers_perception} | rabbits: {rabbits_perception} | goats: {goats_perception} | wolves: {wolf_perception} | foxes: {fox_perception}")

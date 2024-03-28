@@ -172,6 +172,7 @@ class Agent:
                         continue
 
                     #Carnivores:
+                    #TODO: Make carnivores only have a % chance to "catch" (without dying) same size or smaller prey to prevent too easy extinction
                     #FIXME: FightOrFlight don't work with new search anymore. Need to make decide this before choosing to hunt
                     if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[
                         1]]) == True:  # carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
@@ -211,6 +212,7 @@ class Agent:
         self.Hunger(False)  # track hunger levels, didnt eat
 
     def RandomMove(self):
+        #TODO: Give animals a rng +25% prefference to roam in 1 direction instead of using 5 movement to be back forth and not really move
         directions_x_y = []
         directions_x_y.append([self.x + 1, self.y])  # right
         directions_x_y.append([self.x - 1, self.y])  # left

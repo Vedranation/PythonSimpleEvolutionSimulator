@@ -14,18 +14,18 @@ class GlobalsManager:
 
         Num_dandelion = [0];
         Num_berrybush = [0];
-        Num_appletree = [20];
-        Num_rabbit    = [40];
+        Num_appletree = [0];
+        Num_rabbit    = [1];
         Num_goat      = [0];
         Num_cow       = [0];
         Num_fox       = [0];
         Num_wolf      = [0];
         Num_tiger     = [0];
 
-        Max_flowers               = 5       #how many flowers can be
+        Max_flowers               = 20       #how many flowers can be
         Dandelion_growth_per_turn = 0     #how many Dandelions spawn per turn
         Berrybush_growth_per_turn = 0
-        Appletree_growth_per_turn = 5
+        Appletree_growth_per_turn = 0
     else:
         World_size = 40     # how big (box) do you want the world to be1
         Simulation_Length = 600     # how many turns in simulation
@@ -47,8 +47,8 @@ class GlobalsManager:
         Appletree_growth_per_turn = 15
 
     Flower_spawn_cube         = 6  # Cube, including diagonal, how far flowers spawn from each other, (2, 6, None) None disables this
-    Minimum_flower_number_for_cube_spawn = 6        #Minimum amount of unique flowers for that plant to spawn in clusters
-    Mutation_chance           = 0.1        #Chance for baby to change genes
+    Minimum_flower_number_for_cube_spawn = 6        #Minimum amount of unique flowers for that plant to spawn in clusters, bigger number means more clusters
+    Mutation_chance           = 0.15        #Chance for baby to change genes
     Mutateable_genes          = ["perception", "speed"]  # which genes are permitted to mutate (empty list disables mutations)
     Max_mutation_points       = 6       #how many mutation points can animals use
     Maximum_hunger            = 50     #maximum hunger a creature can have in its belly
@@ -67,6 +67,8 @@ class GlobalsManager:
 
     Console_log_start_position          = False
     Console_log_mutated                 = False
+    Console_log_avg_perception          = True
+    Console_log_avg_speed               = True
     Console_log_check_for_food          = False
     Console_log_found_food              = False
     Console_log_was_eaten               = False
@@ -85,7 +87,7 @@ class GlobalsManager:
     Graph_hunger_toggle = False
     Graph_perception_toggle = True
     Graph_speed_toggle = True
-    Visualise_simulation_toggle = False
+    Visualise_simulation_toggle = True
 
     Sim_delay = 1    #delay in seconds between each turn
 
