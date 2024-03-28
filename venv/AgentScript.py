@@ -168,36 +168,37 @@ class Agent:
                         self.x = direction[0]
                         self.y = direction[1]
                         return  # end the search
+
+                    # Carnivores:
+                    elif self.food == "Herbivore":
+                        #TODO: Make carnivores only have a % chance to "catch" (without dying) same size or smaller prey to prevent too easy extinction
+                        #FIXME: FightOrFlight don't work with new search anymore. Need to make decide this before choosing to hunt
+                        if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[
+                            1]]) == True:  # carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
+                                           # funniest bug yet: Bunnies fought trees and had 100% victory rate
+                            if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][
+                                              direction[1]]) == True:  # predator won and ate the meal
+
+                                self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
+                                            direction)  # track hunger levels, pass food that was eaten
+                                Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][
+                                    direction[1]])  # delete the agent being eaten
+
+                                # update new position
+                                self.GSM.World_agent_list_x_y[self.x][self.y] = None
+                                self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
+                                self.x = direction[0]
+                                self.y = direction[1]
+
+                                return  # end the search
+                            else:  # predator lost and died
+                                global DiedInBattle
+                                DiedInBattle = True  # pass this to main loop
+                                return
+                        else:
+                            continue  # prey not worth the risk, keep searching
                     else:
                         continue
-
-                    #Carnivores:
-                    #TODO: Make carnivores only have a % chance to "catch" (without dying) same size or smaller prey to prevent too easy extinction
-                    #FIXME: FightOrFlight don't work with new search anymore. Need to make decide this before choosing to hunt
-                    if self.FightOrFlight(self.GSM.World_agent_list_x_y[direction[0]][direction[
-                        1]]) == True:  # carnivore eat: check prey size, if prey is bigger chance to fight it is smaller
-                                       # funniest bug yet: Bunnies fought trees and had 100% victory rate
-                        if self.Fight(self.GSM.World_agent_list_x_y[direction[0]][
-                                          direction[1]]) == True:  # predator won and ate the meal
-
-                            self.Hunger(True, self.GSM.World_agent_list_x_y[direction[0]][direction[1]].size,
-                                        direction)  # track hunger levels, pass food that was eaten
-                            Agent.RemoveAgent(self.GSM, self.GSM.World_agent_list_x_y[direction[0]][
-                                direction[1]])  # delete the agent being eaten
-
-                            # update new position
-                            self.GSM.World_agent_list_x_y[self.x][self.y] = None
-                            self.GSM.World_agent_list_x_y[direction[0]][direction[1]] = self
-                            self.x = direction[0]
-                            self.y = direction[1]
-
-                            return  # end the search
-                        else:  # predator lost and died
-                            global DiedInBattle
-                            DiedInBattle = True  # pass this to main loop
-                            return
-                    else:
-                        continue  # prey not worth the risk, keep searching
 
             if not bool(scan_memory):
                 #Found nothing of interest, go random
@@ -290,7 +291,6 @@ class Agent:
             return True #large predator automatically wins
 
 
-
     def Hunger(self, ate=False, preySize="Small", direction=[69, 69]):
 
         #Function to track Agents hunger level
@@ -318,11 +318,11 @@ class Agent:
 
         #depending on Agent size, food depletes at different rate
         if self.size == "Small":
-            self.hunger = self.hunger - 1 #lose 1 point worth of hunger
+            self.hunger = round(self.hunger - 1, 1) #lose 1 point worth of hunger
         elif self.size == "Medium":
-            self.hunger = self.hunger - 2.2
+            self.hunger = round(self.hunger - 2.2, 1)
         else:
-            self.hunger = self.hunger - 4.3 #bigger animals need more food
+            self.hunger = round(self.hunger - 4.3, 1) #bigger animals need more food
 
 
     @staticmethod
